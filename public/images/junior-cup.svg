@@ -1,0 +1,31 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Junior golfer with trophy">
+  <defs>
+    <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c1e6ff"/>
+      <stop offset="100%" stop-color="#eef9ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky2)"/>
+  <rect y="560" width="1600" height="340" fill="#6fbe63"/>
+  <ellipse cx="800" cy="740" rx="520" ry="130" fill="#5dae54"/>
+
+  <g transform="translate(650 410)">
+    <circle cx="0" cy="-80" r="38" fill="#f3c9a5"/>
+    <path d="M-32 -88 q32 -34 64 0 v16 h-64z" fill="#5a4538"/>
+    <rect x="-30" y="-36" width="60" height="116" rx="14" fill="#2a7fdd"/>
+    <rect x="-72" y="-18" width="44" height="16" rx="8" transform="rotate(-18)" fill="#2a7fdd"/>
+    <rect x="28" y="-18" width="46" height="16" rx="8" transform="rotate(18)" fill="#2a7fdd"/>
+    <rect x="-28" y="78" width="20" height="128" rx="10" fill="#2d425f"/>
+    <rect x="8" y="78" width="20" height="128" rx="10" fill="#2d425f"/>
+    <rect x="-40" y="196" width="38" height="14" rx="7" fill="#ffffff"/>
+    <rect x="16" y="196" width="38" height="14" rx="7" fill="#ffffff"/>
+  </g>
+
+  <g transform="translate(930 400)">
+    <rect x="-24" y="116" width="48" height="70" rx="8" fill="#c6952a"/>
+    <path d="M-72 10 h144 v60 q0 64 -72 64 q-72 0 -72 -64z" fill="#f0c24d" stroke="#c6952a" stroke-width="8"/>
+    <path d="M-72 42 q-52 0 -52 36 q0 34 40 34" fill="none" stroke="#c6952a" stroke-width="10"/>
+    <path d="M72 42 q52 0 52 36 q0 34 -40 34" fill="none" stroke="#c6952a" stroke-width="10"/>
+    <rect x="-72" y="186" width="144" height="20" rx="10" fill="#8a6520"/>
+  </g>
+</svg>

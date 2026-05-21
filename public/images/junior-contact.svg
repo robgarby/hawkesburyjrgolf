@@ -1,0 +1,30 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Junior golfers team contact">
+  <rect width="1600" height="900" fill="#d5efff"/>
+  <rect y="570" width="1600" height="330" fill="#7cc66f"/>
+
+  <g transform="translate(560 450)">
+    <circle cx="0" cy="-90" r="34" fill="#f0c29d"/>
+    <path d="M-28 -100 q28 -30 56 0 v14 h-56z" fill="#3b2f2d"/>
+    <rect x="-30" y="-48" width="60" height="126" rx="14" fill="#3498db"/>
+    <rect x="-24" y="78" width="20" height="124" rx="10" fill="#274562"/>
+    <rect x="4" y="78" width="20" height="124" rx="10" fill="#274562"/>
+  </g>
+
+  <g transform="translate(740 460)">
+    <circle cx="0" cy="-92" r="32" fill="#eebf98"/>
+    <path d="M-26 -100 q28 -24 52 0 v12 h-52z" fill="#5c432f"/>
+    <rect x="-28" y="-50" width="56" height="122" rx="14" fill="#f0b84d"/>
+    <rect x="-22" y="72" width="18" height="120" rx="9" fill="#274562"/>
+    <rect x="4" y="72" width="18" height="120" rx="9" fill="#274562"/>
+  </g>
+
+  <g transform="translate(1000 360)">
+    <rect x="0" y="0" width="330" height="250" rx="22" fill="#ffffff" stroke="#bdd5e7" stroke-width="8"/>
+    <circle cx="48" cy="56" r="16" fill="#5dbf67"/>
+    <rect x="78" y="44" width="210" height="24" rx="12" fill="#dceaf5"/>
+    <circle cx="48" cy="108" r="16" fill="#5dbf67"/>
+    <rect x="78" y="96" width="180" height="24" rx="12" fill="#dceaf5"/>
+    <circle cx="48" cy="160" r="16" fill="#5dbf67"/>
+    <rect x="78" y="148" width="220" height="24" rx="12" fill="#dceaf5"/>
+  </g>
+</svg>

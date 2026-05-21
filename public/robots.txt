@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hawkesburyjuniorgolf.ca/sitemap.xml

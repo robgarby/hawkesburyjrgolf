@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+dist-contents*.zip
+
+# Production secrets / server-only config
+public/api/db.php
+public/api/auth.php
+public/api/smtp-secret.php
+dist/api/db.php
+dist/api/auth.php
+dist/api/smtp-secret.php
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

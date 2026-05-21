@@ -1,0 +1,17 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <!-- Cup base -->
+    <ellipse cx="60" cy="100" rx="25" ry="8" fill="#C2B280" />
+    <!-- Cup body -->
+    <rect x="40" y="40" width="40" height="40" rx="20" fill="#FFD700" stroke="#C2B280" stroke-width="3" />
+    <!-- Cup handles -->
+    <path d="M40 60 Q20 60 30 80" stroke="#C2B280" stroke-width="3" fill="none"/>
+    <path d="M80 60 Q100 60 90 80" stroke="#C2B280" stroke-width="3" fill="none"/>
+    <!-- Golf ball -->
+    <circle cx="60" cy="38" r="8" fill="#fff" stroke="#bbb" stroke-width="2" />
+    <circle cx="60" cy="38" r="4" fill="#eee" />
+    <!-- Text: Hawkesbury Cup -->
+    <text x="60" y="25" text-anchor="middle" font-size="12" font-family="Arial" fill="#2d3a4a">Hawkesbury</text>
+    <text x="60" y="115" text-anchor="middle" font-size="18" font-family="Arial" font-weight="bold" fill="#2d3a4a">Cup</text>
+  </g>
+</svg>

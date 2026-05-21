@@ -1,0 +1,33 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Junior golfer on fairway">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b6e3ff"/>
+      <stop offset="100%" stop-color="#eef8ff"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8fdc7e"/>
+      <stop offset="100%" stop-color="#4a9c45"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect y="520" width="1600" height="380" fill="url(#grass)"/>
+  <circle cx="1320" cy="160" r="56" fill="#ffd66b"/>
+  <ellipse cx="300" cy="690" rx="280" ry="100" fill="#6dbd63"/>
+  <ellipse cx="980" cy="710" rx="360" ry="110" fill="#6ab85f"/>
+
+  <g transform="translate(720 390)">
+    <circle cx="0" cy="-80" r="40" fill="#f2c7a1"/>
+    <path d="M-34 -90 q34 -40 68 0 v20 h-68z" fill="#3a2f2a"/>
+    <rect x="-34" y="-36" width="68" height="120" rx="16" fill="#ff7b48"/>
+    <rect x="-85" y="-20" width="52" height="18" rx="9" transform="rotate(-24)" fill="#ff7b48"/>
+    <rect x="34" y="-20" width="74" height="16" rx="8" transform="rotate(28)" fill="#ff7b48"/>
+    <rect x="-30" y="84" width="24" height="132" rx="10" fill="#163d66"/>
+    <rect x="6" y="84" width="24" height="132" rx="10" fill="#163d66"/>
+    <rect x="-44" y="206" width="44" height="16" rx="8" fill="#ffffff"/>
+    <rect x="18" y="206" width="44" height="16" rx="8" fill="#ffffff"/>
+    <rect x="100" y="-10" width="12" height="250" transform="rotate(20)" fill="#c5ccd3"/>
+    <path d="M185 160 q24 -20 52 -4 q-9 32 -43 42 q-19 -6 -9 -38z" fill="#8da2b4"/>
+  </g>
+
+  <circle cx="1020" cy="705" r="11" fill="#fff" stroke="#d0d0d0" stroke-width="2"/>
+</svg>
