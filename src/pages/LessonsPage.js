@@ -9,12 +9,12 @@ export const lessonsPage = {
     "fr": "Enseignement junior"
   },
   "heading": {
-    "en": "Lessons, camp instruction, and free lesson requests.",
-    "fr": "Leçons, camp d’enseignement et demandes de leçons gratuites."
+    "en": "Lessons, camp instruction, and free volunteer-coach lesson requests.",
+    "fr": "Leçons, camp d’enseignement et demandes de leçons gratuites avec des entraîneurs bénévoles."
   },
   "intro": {
-    "en": "Boys and girls ages 9-17 can learn through group instruction, available lesson times, and free lesson requests. Admins and teachers can offer times, while juniors can join open lessons or request single or group help.",
-    "fr": "Les filles et garçons de 9 à 17 ans peuvent apprendre grâce aux leçons de groupe, aux heures de leçon disponibles et aux demandes de leçons gratuites. Les admins et enseignants peuvent offrir des heures, tandis que les juniors peuvent joindre des leçons ouvertes ou demander de l’aide individuelle ou de groupe."
+    "en": "Boys and girls ages 9-17 can learn through group instruction and free volunteer-coach lessons made available in the same My Account area used by both CUP and Community members. Lessons with Hawkesbury Golf and Curling Club professionals are booked through the club and are not free unless they are listed in the Lessons area of My Account.",
+    "fr": "Les filles et garçons de 9 à 17 ans peuvent apprendre grâce aux leçons de groupe et aux leçons gratuites avec des entraîneurs bénévoles offertes dans le même espace Mon compte utilisé par les membres CUP et communautaires. Les leçons avec les professionnels du Hawkesbury Golf and Curling Club se réservent auprès du club et ne sont pas gratuites, sauf si elles sont affichées dans la section Leçons de Mon compte."
   },
   "image": "/images/putting-green.jpeg",
   "cta": {
@@ -24,11 +24,11 @@ export const lessonsPage = {
   "seo": {
     "en": {
       "title": "Junior Golf Lessons in Hawkesbury",
-      "description": "Junior golf lessons in Hawkesbury for boys and girls ages 9-17, including Monday Morning Golf Camp and free junior lesson requests."
+      "description": "Junior golf lessons in Hawkesbury for boys and girls ages 9-17, including Monday Morning Golf Camp and free volunteer-coach junior lesson requests in My Account."
     },
     "fr": {
       "title": "Leçons de golf junior à Hawkesbury",
-      "description": "Leçons de golf junior à Hawkesbury pour les filles et garçons de 9 à 17 ans, incluant le camp du lundi matin et les demandes de leçons gratuites."
+      "description": "Leçons de golf junior à Hawkesbury pour les filles et garçons de 9 à 17 ans, incluant le camp du lundi matin et les demandes de leçons gratuites avec des entraîneurs bénévoles dans Mon compte."
     }
   },
   "ctaRoute": "login",
@@ -74,17 +74,18 @@ export const lessonsPage = {
     },
     {
       "title": {
-        "en": "Request Free Lessons",
-        "fr": "Demander des leçons gratuites"
+        "en": "Free Volunteer-Coach Lessons",
+        "fr": "Leçons gratuites avec entraîneurs bénévoles"
       },
       "text": {
-        "en": "Lessons are always free for junior golfers. A Hawkesbury Jr. Golf account lets juniors see available lesson times, request single or group lessons, and view booked lessons once a teacher or admin accepts.",
-        "fr": "Les leçons sont toujours gratuites pour les golfeurs juniors. Un compte Hawkesbury Jr. Golf permet aux juniors de voir les heures disponibles, de demander des leçons individuelles ou de groupe et de consulter les leçons réservées lorsqu’un enseignant ou admin accepte."
+        "en": "Volunteer coaches are willing to give free lessons to juniors. These free lessons are available in the same My Account area for both CUP and Community members, where juniors can see available times, request single or group lessons, and view booked lessons once a teacher or admin accepts.",
+        "fr": "Des entraîneurs bénévoles sont prêts à offrir des leçons gratuites aux juniors. Ces leçons gratuites sont offertes dans le même espace Mon compte pour les membres CUP et communautaires, où les juniors peuvent voir les heures disponibles, demander des leçons individuelles ou de groupe et consulter les leçons réservées lorsqu’un enseignant ou admin accepte."
       },
       "bullets": {
         "en": [
-          "Members of Hawkesbury Golf and Curling Club: use your Login Portal to request lessons",
-          "Community Members: create an account or log in to request junior lessons that are always free",
+          "Only lessons made available in My Account are free to juniors",
+          "Free lessons are provided by volunteer coaches",
+          "To book a lesson with the club professionals, contact Hawkesbury Golf and Curling Club. Professional lessons are not free unless they are listed in the Lessons area of My Account.",
           "Request a single lesson or a group lesson with a maximum number of students",
           "Join available lesson times when space is open",
           "Booked lessons move into the Booked Lessons area for the student and teacher",
@@ -96,8 +97,9 @@ export const lessonsPage = {
           "Lessons can be <strong>given in French</strong> as there are several French-speaking volunteers. This must be indicated at the time of booking to ensure proper coach selection."
         ],
         "fr": [
-          "Membres du Hawkesbury Golf and Curling Club: utilisez votre portail de connexion pour demander des leçons",
-          "Membres communautaires: créez un compte ou connectez-vous pour demander des leçons juniors toujours gratuites",
+          "Seules les leçons offertes dans Mon compte sont gratuites pour les juniors",
+          "Les leçons gratuites sont données par des entraîneurs bénévoles",
+          "Pour réserver une leçon avec les professionnels du club, communiquez avec le Hawkesbury Golf and Curling Club. Les leçons professionnelles ne sont pas gratuites, sauf si elles sont affichées dans la section Leçons de Mon compte.",
           "Demander une leçon individuelle ou une leçon de groupe avec un nombre maximum d’élèves",
           "Joindre les heures de leçon disponibles lorsqu’il reste des places",
           "Les leçons réservées passent dans la section Leçons réservées pour l’élève et l’enseignant",

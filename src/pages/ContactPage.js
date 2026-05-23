@@ -40,8 +40,8 @@ export const contactPage = {
         "fr": "Programme de golf junior The Cup Jr."
       },
       "text": {
-        "en": "For registration, account access, free lesson requests, event details, posted games, scores, points, and notification settings, contact the team for The Cup Jr. Golf program.",
-        "fr": "Pour l'inscription, l’accès au compte, les demandes de leçons gratuites, les détails d’événements, les parties publiées, les scores, les points et les paramètres d’avis, communiquez avec l’équipe du programme The Cup Jr. Golf."
+        "en": "For registration, My Account access, free volunteer-coach lesson requests, event details, posted games, scores, points, and notification settings, contact the team for The Cup Jr. Golf program.",
+        "fr": "Pour l'inscription, l’accès à Mon compte, les demandes de leçons gratuites avec des entraîneurs bénévoles, les détails d’événements, les parties publiées, les scores, les points et les paramètres d’avis, communiquez avec l’équipe du programme The Cup Jr. Golf."
       },
       "bullets": {
         "en": [

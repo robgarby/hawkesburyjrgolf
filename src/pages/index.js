@@ -11,6 +11,7 @@ import {
   eventsPage,
   findAGamePage,
   pointsPage,
+  rankingPage,
   scoresPage,
 } from './AccountSubPages.js'
 
@@ -25,6 +26,7 @@ export const pages = [
   myAccountPage,
   scoresPage,
   pointsPage,
+  rankingPage,
   eventsPage,
   findAGamePage,
   bookALessonPage,

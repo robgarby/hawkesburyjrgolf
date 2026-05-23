@@ -77,6 +77,20 @@ function get_member_type(PDO $pdo, int $memberId): string
     return (string) ($statement->fetch()['membership_type'] ?? '');
 }
 
+function get_member_age(PDO $pdo, int $memberId): ?int
+{
+    $statement = $pdo->prepare(
+        'SELECT player_age
+         FROM members
+         WHERE id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $memberId]);
+    $age = $statement->fetch()['player_age'] ?? null;
+
+    return $age === null ? null : (int) $age;
+}
+
 function get_slot_students(PDO $pdo, int $slotId): array
 {
     $statement = $pdo->prepare(
@@ -103,6 +117,9 @@ function get_slot_students(PDO $pdo, int $slotId): array
 function get_lessons(PDO $pdo, int $memberId): array
 {
     $today = (new DateTimeImmutable('today'))->format('Y-m-d');
+    $memberType = get_member_type($pdo, $memberId);
+    $memberAge = get_member_age($pdo, $memberId);
+    $canTeach = in_array($memberType, ['ADMIN', 'TEACHER'], true);
     $slotsStatement = $pdo->query(
         'SELECT slots.*, members.first_name, members.last_name, members.username, members.membership_type
          FROM member_lesson_slots slots
@@ -119,6 +136,8 @@ function get_lessons(PDO $pdo, int $memberId): array
 
         $students = get_slot_students($pdo, (int) $slot['id']);
         $studentCount = count($students);
+        $minAge = $slot['min_age'] === null ? null : (int) $slot['min_age'];
+        $maxAge = $slot['max_age'] === null ? null : (int) $slot['max_age'];
 
         $mappedSlot = [
             'id' => (int) $slot['id'],
@@ -130,6 +149,10 @@ function get_lessons(PDO $pdo, int $memberId): array
             'lessonTime' => substr((string) $slot['lesson_time'], 0, 5),
             'lessonType' => $slot['lesson_type'],
             'maxStudents' => (int) $slot['max_students'],
+            'lessonPath' => $slot['lesson_path'] ?? 'EVERYONE',
+            'minAge' => $minAge,
+            'maxAge' => $maxAge,
+            'isAgeEligible' => age_allows_member($minAge, $maxAge, $memberAge),
             'spotsRemaining' => max(0, (int) $slot['max_students'] - $studentCount),
             'location' => $slot['location'],
             'notes' => $slot['notes'],
@@ -141,7 +164,11 @@ function get_lessons(PDO $pdo, int $memberId): array
             $booked[] = $mappedSlot;
         }
 
-        if ($mappedSlot['spotsRemaining'] > 0 && !$mappedSlot['isJoined'] && $mappedSlot['providerMemberId'] !== $memberId) {
+        if (
+            $mappedSlot['spotsRemaining'] > 0
+            && !$mappedSlot['isJoined']
+            && $mappedSlot['providerMemberId'] !== $memberId
+        ) {
             $slots[] = $mappedSlot;
         }
     }
@@ -167,7 +194,7 @@ function get_lessons(PDO $pdo, int $memberId): array
             continue;
         }
 
-        $requests[] = [
+        $mappedRequest = [
             'id' => (int) $request['id'],
             'requesterMemberId' => (int) $request['requester_member_id'],
             'requesterName' => member_name([
@@ -180,6 +207,7 @@ function get_lessons(PDO $pdo, int $memberId): array
             'preferredTime' => substr((string) $request['preferred_time'], 0, 5),
             'lessonType' => $request['lesson_type'],
             'maxStudents' => (int) $request['max_students'],
+            'lessonPath' => $request['lesson_path'] ?? $request['requester_membership_type'] ?? 'EVERYONE',
             'notes' => $request['notes'],
             'acceptedByMemberId' => $request['accepted_by_member_id'] === null ? null : (int) $request['accepted_by_member_id'],
             'acceptedByName' => $request['accepted_by_member_id'] === null ? '' : member_name([
@@ -189,6 +217,12 @@ function get_lessons(PDO $pdo, int $memberId): array
             ]),
             'acceptedByMembershipType' => $request['accepted_by_member_id'] === null ? '' : $request['accepter_membership_type'],
         ];
+
+        if (!$canTeach && (int) $request['requester_member_id'] !== $memberId) {
+            continue;
+        }
+
+        $requests[] = $mappedRequest;
     }
 
     return ['slots' => $slots, 'booked' => $booked, 'requests' => $requests];
@@ -212,6 +246,57 @@ function read_lesson_type(): string
     $type = strtoupper(trim((string) ($_POST['lesson_type'] ?? 'SINGLE')));
 
     return in_array($type, ['SINGLE', 'GROUP'], true) ? $type : 'SINGLE';
+}
+
+function read_path(string $fieldName): string
+{
+    $path = strtoupper(trim((string) ($_POST[$fieldName] ?? 'EVERYONE')));
+
+    return in_array($path, ['CUP', 'COMMUNITY', 'EVERYONE'], true) ? $path : 'EVERYONE';
+}
+
+function path_allows_member(string $path, string $memberType): bool
+{
+    if ($path === 'EVERYONE') {
+        return in_array($memberType, ['CUP', 'COMMUNITY'], true);
+    }
+
+    return $memberType === $path;
+}
+
+function age_allows_member(?int $minAge, ?int $maxAge, ?int $playerAge): bool
+{
+    if ($minAge === null && $maxAge === null) {
+        return true;
+    }
+
+    if ($playerAge === null || $playerAge < 1) {
+        return false;
+    }
+
+    if ($minAge !== null && $playerAge < $minAge) {
+        return false;
+    }
+
+    return $maxAge === null || $playerAge <= $maxAge;
+}
+
+function read_age_range(): array
+{
+    $minAgeRaw = trim((string) ($_POST['min_age'] ?? ''));
+    $maxAgeRaw = trim((string) ($_POST['max_age'] ?? ''));
+    $minAge = $minAgeRaw === '' ? null : filter_var($minAgeRaw, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 99],
+    ]);
+    $maxAge = $maxAgeRaw === '' ? null : filter_var($maxAgeRaw, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 99],
+    ]);
+
+    if ($minAge === false || $maxAge === false || ($minAge !== null && $maxAge !== null && $minAge > $maxAge)) {
+        send_json(422, ['ok' => false, 'message' => 'Please enter a valid age range.']);
+    }
+
+    return [$minAge, $maxAge];
 }
 
 try {
@@ -243,7 +328,7 @@ try {
             send_json(422, ['ok' => false, 'message' => 'Please choose a valid lesson time.']);
         }
 
-        $slotStatement = $pdo->prepare('SELECT id, lesson_date, max_students FROM member_lesson_slots WHERE id = :id LIMIT 1');
+        $slotStatement = $pdo->prepare('SELECT id, lesson_date, max_students, lesson_path, min_age, max_age FROM member_lesson_slots WHERE id = :id LIMIT 1');
         $slotStatement->execute(['id' => (int) $slotId]);
         $slot = $slotStatement->fetch();
 
@@ -258,6 +343,17 @@ try {
         if ($action === 'join_slot') {
             if (!$canJoinLesson) {
                 send_json(403, ['ok' => false, 'message' => 'Only CUP and Community members can join lessons.']);
+            }
+
+            if (!path_allows_member((string) ($slot['lesson_path'] ?? 'EVERYONE'), $memberType)) {
+                send_json(403, ['ok' => false, 'message' => 'This lesson is not open to your membership path.']);
+            }
+
+            $minAge = $slot['min_age'] === null ? null : (int) $slot['min_age'];
+            $maxAge = $slot['max_age'] === null ? null : (int) $slot['max_age'];
+
+            if (!age_allows_member($minAge, $maxAge, get_member_age($pdo, $memberId))) {
+                send_json(403, ['ok' => false, 'message' => 'This lesson is not open to your age group.']);
             }
 
             $countStatement = $pdo->prepare('SELECT COUNT(*) AS student_count FROM member_lesson_slot_students WHERE lesson_slot_id = :slot_id');
@@ -332,7 +428,7 @@ try {
         }
 
         $requestStatement = $pdo->prepare(
-            'SELECT id, requester_member_id, preferred_date, preferred_time, lesson_type, max_students, notes
+            'SELECT id, requester_member_id, preferred_date, preferred_time, lesson_type, max_students, lesson_path, notes
              FROM member_lesson_requests
              WHERE id = :id
              AND requester_member_id <> :member_id
@@ -353,9 +449,9 @@ try {
 
         $insertSlot = $pdo->prepare(
             'INSERT INTO member_lesson_slots
-                (provider_member_id, lesson_date, lesson_time, lesson_type, max_students, location, notes, source_request_id)
+                (provider_member_id, lesson_date, lesson_time, lesson_type, max_students, lesson_path, location, notes, source_request_id)
              VALUES
-                (:provider_member_id, :lesson_date, :lesson_time, :lesson_type, :max_students, :location, :notes, :source_request_id)'
+                (:provider_member_id, :lesson_date, :lesson_time, :lesson_type, :max_students, :lesson_path, :location, :notes, :source_request_id)'
         );
         $insertSlot->execute([
             'provider_member_id' => $memberId,
@@ -363,6 +459,7 @@ try {
             'lesson_time' => $request['preferred_time'],
             'lesson_type' => $request['lesson_type'],
             'max_students' => (int) $request['max_students'],
+            'lesson_path' => $request['lesson_path'] ?? 'EVERYONE',
             'location' => 'Hawkesbury',
             'notes' => $request['notes'],
             'source_request_id' => (int) $request['id'],
@@ -425,6 +522,8 @@ try {
         $lessonTime = trim((string) ($_POST['lesson_time'] ?? ''));
         $lessonType = read_lesson_type();
         $maxStudents = filter_var($_POST['max_students'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 12]]);
+        $lessonPath = read_path('lesson_path');
+        [$minAge, $maxAge] = read_age_range();
         $location = trim((string) ($_POST['location'] ?? 'Hawkesbury'));
         $notes = trim((string) ($_POST['notes'] ?? ''));
         $date = DateTimeImmutable::createFromFormat('!Y-m-d', $lessonDate);
@@ -443,8 +542,8 @@ try {
         }
 
         $insert = $pdo->prepare(
-            'INSERT INTO member_lesson_slots (provider_member_id, lesson_date, lesson_time, lesson_type, max_students, location, notes)
-             VALUES (:member_id, :lesson_date, :lesson_time, :lesson_type, :max_students, :location, :notes)'
+            'INSERT INTO member_lesson_slots (provider_member_id, lesson_date, lesson_time, lesson_type, max_students, lesson_path, min_age, max_age, location, notes)
+             VALUES (:member_id, :lesson_date, :lesson_time, :lesson_type, :max_students, :lesson_path, :min_age, :max_age, :location, :notes)'
         );
         $insert->execute([
             'member_id' => $memberId,
@@ -452,6 +551,9 @@ try {
             'lesson_time' => $lessonTime,
             'lesson_type' => $lessonType,
             'max_students' => (int) $maxStudents,
+            'lesson_path' => $lessonPath,
+            'min_age' => $minAge,
+            'max_age' => $maxAge,
             'location' => $location,
             'notes' => $notes,
         ]);
@@ -481,8 +583,8 @@ try {
         }
 
         $insert = $pdo->prepare(
-            'INSERT INTO member_lesson_requests (requester_member_id, preferred_date, preferred_time, lesson_type, max_students, notes)
-             VALUES (:member_id, :preferred_date, :preferred_time, :lesson_type, :max_students, :notes)'
+            'INSERT INTO member_lesson_requests (requester_member_id, preferred_date, preferred_time, lesson_type, max_students, lesson_path, notes)
+             VALUES (:member_id, :preferred_date, :preferred_time, :lesson_type, :max_students, :lesson_path, :notes)'
         );
         $insert->execute([
             'member_id' => $memberId,
@@ -490,6 +592,7 @@ try {
             'preferred_time' => $preferredTime,
             'lesson_type' => $lessonType,
             'max_students' => (int) $maxStudents,
+            'lesson_path' => in_array($memberType, ['CUP', 'COMMUNITY'], true) ? $memberType : 'EVERYONE',
             'notes' => $notes,
         ]);
 

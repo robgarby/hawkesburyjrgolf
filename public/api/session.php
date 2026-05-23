@@ -61,7 +61,7 @@ try {
     ensure_members_table($pdo);
 
     $statement = $pdo->prepare(
-        'SELECT id, username, first_name, last_name, membership_type
+        'SELECT id, is_active, username, first_name, last_name, membership_type
          FROM members
          WHERE id = :id
          LIMIT 1'
@@ -69,7 +69,7 @@ try {
     $statement->execute(['id' => $memberId]);
     $member = $statement->fetch();
 
-    if (!$member) {
+    if (!$member || !(bool) $member['is_active']) {
         http_response_code(401);
         echo json_encode([
             'ok' => false,

@@ -53,8 +53,8 @@ export const myAccountPage = {
     {
       "route": "find-a-game",
       "label": {
-        "en": "Find a Game",
-        "fr": "Trouver une partie"
+        "en": "Find a Round",
+        "fr": "Trouver une ronde"
       }
     },
     {
@@ -62,6 +62,13 @@ export const myAccountPage = {
       "label": {
         "en": "Book a Lesson",
         "fr": "Réserver une leçon"
+      }
+    },
+    {
+      "route": "ranking",
+      "label": {
+        "en": "Ranking",
+        "fr": "Classement"
       }
     }
   ]

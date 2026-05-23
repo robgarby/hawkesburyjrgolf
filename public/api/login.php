@@ -44,6 +44,8 @@ try {
 
     $username = normalize_username((string) ($_POST['username'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
+    $sessionMode = (string) ($_POST['session_mode'] ?? 'site');
+    $jwtTtl = get_member_jwt_ttl_for_mode($sessionMode);
 
     if ($username === '' || $password === '') {
         http_response_code(422);
@@ -57,6 +59,7 @@ try {
     $statement = $pdo->prepare(
         'SELECT
             id,
+            is_active,
             first_name,
             last_name,
             username,
@@ -79,6 +82,15 @@ try {
         echo json_encode([
             'ok' => false,
             'message' => 'The username or password is incorrect.',
+        ]);
+        exit;
+    }
+
+    if (!(bool) $member['is_active']) {
+        http_response_code(403);
+        echo json_encode([
+            'ok' => false,
+            'message' => 'This account is inactive. Please contact an admin.',
         ]);
         exit;
     }
@@ -118,8 +130,8 @@ try {
         'message' => $profileComplete ? 'You are logged in.' : 'Please complete the parent and player contact details.',
         'requiresProfile' => !$profileComplete,
         'profileToken' => $profileToken,
-        'token' => create_member_jwt($member),
-        'expiresIn' => HAWKJR_JWT_TTL_SECONDS,
+        'token' => create_member_jwt($member, $jwtTtl),
+        'expiresIn' => $jwtTtl,
         'member' => [
             'id' => (int) $member['id'],
             'firstName' => $member['first_name'],

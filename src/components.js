@@ -1,3 +1,5 @@
+import { appVersion } from './version.js'
+
 function renderLanguageToggle(language, copy) {
   return `
     <div class="language-toggle" aria-label="${copy.languageLabel}">
@@ -15,11 +17,15 @@ function escapeAttribute(value) {
     .replaceAll('>', '&gt;')
 }
 
-function renderHeader({ routes, page, language, copy, isLoggedIn }) {
+function renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal = false }) {
+  if (isMemberPortal) {
+    return ''
+  }
+
   return `
     <header class="site-header">
       <a class="brand" href="#home" aria-label="${copy.brandHome}">
-        <span class="brand-mark">HJG</span>
+        <img class="brand-mark" src="/pwa-icon-192.png?v=20260523-1320" alt="" width="48" height="48" />
         <span>
           <strong>Hawkesbury</strong>
           <small>Junior Golf</small>
@@ -85,15 +91,6 @@ function accountStreamLabel(membershipType = '') {
   return type || 'Member'
 }
 
-function renderNotificationToggle(name, label) {
-  return `
-    <label class="account-notify-toggle">
-      <input type="checkbox" name="${name}" />
-      <span>${label}</span>
-    </label>
-  `
-}
-
 function renderAccountProfilePanel(language, member) {
   const copy = {
     en: {
@@ -103,10 +100,13 @@ function renderAccountProfilePanel(language, member) {
       parentEmail: 'Parent Email',
       playerText: 'Player Text',
       parentText: 'Parent Text',
-      notify: 'Notify',
+      notifications: 'Notifications',
+      lessonPosted: 'Notify on Lesson Posted',
+      eventPosted: 'Notify when Event Posted',
+      gamePosted: 'Notify when Round Posted',
       save: 'Save Notifications',
       loading: 'Loading account details...',
-      helper: 'Choose separately whether the parent and junior receive notifications when new lessons, events, or rounds are added.',
+      helper: 'Choose which contact methods receive alerts when lessons, events, or rounds are posted.',
     },
     fr: {
       title: 'Détails du joueur',
@@ -115,10 +115,13 @@ function renderAccountProfilePanel(language, member) {
       parentEmail: 'Courriel du parent',
       playerText: 'Texto du joueur',
       parentText: 'Texto du parent',
-      notify: 'Aviser',
+      notifications: 'Avis',
+      lessonPosted: 'Aviser quand une leçon est publiée',
+      eventPosted: 'Aviser quand un événement est publié',
+      gamePosted: 'Aviser quand une ronde est publiée',
       save: 'Enregistrer',
       loading: 'Chargement du compte...',
-      helper: 'Choisissez séparément si le parent et le junior reçoivent les avis pour les nouvelles leçons, événements ou rondes.',
+      helper: 'Choisissez quelles méthodes de contact reçoivent les avis pour les leçons, événements ou rondes publiés.',
     },
   }[language]
   const playerName = [member?.firstName, member?.lastName].filter(Boolean).join(' ') || member?.username || ''
@@ -129,7 +132,7 @@ function renderAccountProfilePanel(language, member) {
         <h2>${copy.title}</h2>
         <p>${copy.helper}</p>
       </div>
-      <div class="account-profile-grid">
+      <div class="account-profile-grid account-profile-summary-grid">
         <label>
           <span>${copy.playerName}</span>
           <input type="text" name="player_name" value="${escapeAttribute(playerName)}" readonly />
@@ -138,21 +141,40 @@ function renderAccountProfilePanel(language, member) {
           <span>${copy.stream}</span>
           <input type="text" name="stream" value="${escapeAttribute(accountStreamLabel(member?.membershipType))}" readonly />
         </label>
+      </div>
+      <div class="account-profile-grid account-contact-grid">
         <label>
           <span>${copy.parentEmail}</span>
           <input type="email" name="parent_email" autocomplete="email" data-account-profile-parent-email />
-          ${renderNotificationToggle('parent_email_notify', copy.notify)}
         </label>
         <label>
           <span>${copy.playerText}</span>
           <input type="tel" name="player_text" autocomplete="tel" data-account-profile-player-text />
-          ${renderNotificationToggle('player_text_notify', copy.notify)}
         </label>
         <label>
           <span>${copy.parentText}</span>
           <input type="tel" name="parent_text" autocomplete="tel" data-account-profile-parent-text />
-          ${renderNotificationToggle('parent_text_notify', copy.notify)}
         </label>
+      </div>
+      <div class="account-notification-matrix" aria-label="${copy.notifications}">
+        <div class="account-notification-row account-notification-head">
+          <span>${copy.notifications}</span>
+          <span>${copy.parentEmail}</span>
+          <span>${copy.playerText}</span>
+          <span>${copy.parentText}</span>
+        </div>
+        ${[
+          ['lessons', copy.lessonPosted],
+          ['events', copy.eventPosted],
+          ['games', copy.gamePosted],
+        ].map(([key, label]) => `
+          <div class="account-notification-row">
+            <strong>${label}</strong>
+            <label><input type="checkbox" name="notify_${key}_parent_email" data-notification-setting /><span>${copy.parentEmail}</span></label>
+            <label><input type="checkbox" name="notify_${key}_player_text" data-notification-setting /><span>${copy.playerText}</span></label>
+            <label><input type="checkbox" name="notify_${key}_parent_text" data-notification-setting /><span>${copy.parentText}</span></label>
+          </div>
+        `).join('')}
       </div>
       <div class="account-profile-actions">
         <button type="submit">${copy.save}</button>
@@ -171,6 +193,18 @@ function renderAdminPanel(language) {
       staff: 'Admin / Teacher',
       cup: 'Cup',
       community: 'Community',
+      inactive: 'Inactive',
+      sendText: 'Send Text',
+      textTitle: 'Send Text',
+      textHelper: 'Testing mode is on. Messages will be previewed only.',
+      targetLabel: 'Send to',
+      all: 'All',
+      parents: 'Parents',
+      juniors: 'Juniors',
+      messageLabel: 'Message',
+      messagePlaceholder: 'Example: Hi {name}, practice starts at 6 PM.',
+      cancel: 'Cancel',
+      send: 'Send',
     },
     fr: {
       title: 'Panneau admin',
@@ -179,6 +213,18 @@ function renderAdminPanel(language) {
       staff: 'Admin / Enseignant',
       cup: 'Cup',
       community: 'Communauté',
+      inactive: 'Inactifs',
+      sendText: 'Envoyer texto',
+      textTitle: 'Envoyer texto',
+      textHelper: 'Le mode test est activé. Les messages seront seulement prévisualisés.',
+      targetLabel: 'Envoyer à',
+      all: 'Tous',
+      parents: 'Parents',
+      juniors: 'Juniors',
+      messageLabel: 'Message',
+      messagePlaceholder: 'Exemple : Bonjour {name}, la pratique commence à 18 h.',
+      cancel: 'Annuler',
+      send: 'Envoyer',
     },
   }[language]
 
@@ -188,11 +234,45 @@ function renderAdminPanel(language) {
         <h2>${copy.title}</h2>
         <p>${copy.helper}</p>
       </div>
+      <div class="admin-toolbar">
+        <button type="button" data-admin-text-open>${copy.sendText}</button>
+      </div>
+      <div class="admin-text-modal is-hidden" data-admin-text-modal aria-hidden="true">
+        <div class="admin-text-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-text-title">
+          <form data-admin-text-form>
+            <div class="admin-text-heading">
+              <span>
+                <h3 id="admin-text-title">${copy.textTitle}</h3>
+                <p>${copy.textHelper}</p>
+              </span>
+              <button type="button" data-admin-text-close aria-label="${copy.cancel}">&times;</button>
+            </div>
+            <label>
+              <span>${copy.targetLabel}</span>
+              <select name="target">
+                <option value="all">${copy.all}</option>
+                <option value="parents">${copy.parents}</option>
+                <option value="juniors">${copy.juniors}</option>
+              </select>
+            </label>
+            <label>
+              <span>${copy.messageLabel}</span>
+              <textarea name="message" rows="5" placeholder="${copy.messagePlaceholder}" required></textarea>
+            </label>
+            <div class="admin-text-actions">
+              <button type="button" data-admin-text-close>${copy.cancel}</button>
+              <button type="submit">${copy.send}</button>
+            </div>
+            <div class="admin-text-results" data-admin-text-results aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
       <div class="admin-cashout-list" data-admin-cashouts></div>
       <div class="admin-filter-tabs" role="tablist" aria-label="${copy.title}">
-        <button type="button" class="active" data-admin-filter="staff">${copy.staff}</button>
-        <button type="button" data-admin-filter="cup">${copy.cup}</button>
-        <button type="button" data-admin-filter="community">${copy.community}</button>
+        <button type="button" class="active" data-admin-filter="staff"><span>${copy.staff}</span><small data-admin-filter-count="staff">0</small></button>
+        <button type="button" data-admin-filter="cup"><span>${copy.cup}</span><small data-admin-filter-count="cup">0</small></button>
+        <button type="button" data-admin-filter="community"><span>${copy.community}</span><small data-admin-filter-count="community">0</small></button>
+        <button type="button" data-admin-filter="inactive"><span>${copy.inactive}</span><small data-admin-filter-count="inactive">0</small></button>
       </div>
       <div class="admin-members-list" data-admin-members data-empty-label="${copy.loading}">
         <p>${copy.loading}</p>
@@ -202,11 +282,13 @@ function renderAdminPanel(language) {
   `
 }
 
-function renderAccountPage(page, language, member) {
+function renderAccountPage(page, language, member, copy, isMemberPortal = false) {
   const logoutLabel = language === 'fr' ? 'Se déconnecter' : 'Log out'
-  const comingSoonLabel = language === 'fr'
-    ? 'De nouvelles fonctions seront ajoutées la semaine du 22 au 25 mai. Les événements sont maintenant en ligne.'
-    : 'New features will be added the week of May 22-25th. Events are now live.'
+  const appButtonLabel = isMemberPortal
+    ? (language === 'fr' ? 'Site complet' : 'Load Full Site')
+    : (language === 'fr' ? 'Ouvrir comme app' : 'Open as App')
+  const appButtonHref = isMemberPortal ? '/' : '/members'
+  const appButtonMode = isMemberPortal ? 'site' : 'app'
   const isAdmin = member?.membershipType === 'ADMIN'
   const adminLabel = language === 'fr' ? 'Panneau admin' : 'Admin Panel'
 
@@ -218,19 +300,22 @@ function renderAccountPage(page, language, member) {
           <p class="eyebrow">${page.eyebrow[language]}</p>
           <div class="account-title-row">
             <h1>${page.heading[language]}</h1>
-            <strong>${comingSoonLabel}</strong>
+            <a class="account-app-link" href="${appButtonHref}" data-session-mode-link="${appButtonMode}">${appButtonLabel}</a>
           </div>
           <p>${page.intro[language]}</p>
         </div>
         <div class="account-top-actions">
+          ${isMemberPortal ? renderLanguageToggle(language, copy) : ''}
           ${isAdmin ? `<button class="account-logout" type="button" data-admin-toggle aria-expanded="false">${adminLabel}</button>` : ''}
           <button class="account-logout" type="button" data-account-logout>${logoutLabel}</button>
         </div>
       </div>
       <nav class="account-link-grid" aria-label="${page.title[language]}">
-        ${page.accountLinks
-          .map((link) => `<a href="#${link.route}">${link.label[language]}</a>`)
-          .join('')}
+        ${isMemberPortal
+          ? renderMemberPortalNavLinks(language, 'my-account')
+          : page.accountLinks
+            .map((link) => `<a href="#${link.route}">${link.label[language]}</a>`)
+            .join('')}
       </nav>
       ${isAdmin ? renderAdminPanel(language) : ''}
       ${renderAccountProfilePanel(language, member)}
@@ -238,18 +323,43 @@ function renderAccountPage(page, language, member) {
   `
 }
 
-function renderAccountSubpage(page, language, member) {
+function renderMemberPortalNav(language) {
+  const activeRoute = window.location.hash.replace('#', '') || 'my-account'
+  const linkHtml = renderMemberPortalNavLinks(language, activeRoute)
+
+  return `
+    <nav class="account-link-grid member-portal-nav" aria-label="${language === 'fr' ? 'Navigation membre' : 'Member navigation'}">
+      ${linkHtml}
+    </nav>
+  `
+}
+
+function renderMemberPortalNavLinks(language, activeRoute = 'my-account') {
+  const links = [
+    ['my-account', language === 'fr' ? 'Profil' : 'Profile'],
+    ['scores', language === 'fr' ? 'Scores' : 'Scores'],
+    ['points', language === 'fr' ? 'Points' : 'Points'],
+    ['events', language === 'fr' ? 'Événements' : 'Events'],
+    ['find-a-game', language === 'fr' ? 'Trouver une ronde' : 'Find a Round'],
+    ['book-a-lesson', language === 'fr' ? 'Réserver une leçon' : 'Book a Lesson'],
+    ['ranking', language === 'fr' ? 'Classement' : 'Ranking'],
+  ]
+
+  return links.map(([route, label]) => `<a href="#${route}" class="${route === activeRoute ? 'active' : ''}">${label}</a>`).join('')
+}
+
+function renderAccountSubpage(page, language, member, isMemberPortal = false) {
   const backLabel = language === 'fr' ? 'Retour à Mon compte' : 'Back to My Account'
 
   return `
     <section class="account-page account-subpage account-${page.id}-page">
-      <a class="account-back-link" href="#my-account">${backLabel}</a>
+      ${isMemberPortal ? renderMemberPortalNav(language) : `<a class="account-back-link" href="#my-account">${backLabel}</a>`}
       <h1>${page.heading[language]}</h1>
       <p>${page.intro[language]}</p>
       ${page.id === 'scores' ? renderScoresTool(page, language) : ''}
       ${page.id === 'points' ? renderPointsTool(page, language) : ''}
       ${page.id === 'events' ? renderEventsTool(page, language, member) : ''}
-      ${page.id === 'find-a-game' ? renderFindGameTool(page, language) : ''}
+      ${page.id === 'find-a-game' ? renderFindGameTool(page, language, member) : ''}
       ${page.id === 'book-a-lesson' ? renderLessonTool(page, language, member) : ''}
     </section>
   `
@@ -285,6 +395,24 @@ function renderLessonTypeSelect(lessonTool, language) {
   `
 }
 
+function renderPathSelect(name, label, pathOptions, language, member, includeAllPaths = false) {
+  const memberType = String(member?.membershipType || '').toUpperCase()
+  const values = includeAllPaths || ['ADMIN', 'TEACHER'].includes(memberType)
+    ? ['EVERYONE', 'CUP', 'COMMUNITY']
+    : ['EVERYONE', memberType].filter((value, index, list) => (
+        ['EVERYONE', 'CUP', 'COMMUNITY'].includes(value) && list.indexOf(value) === index
+      ))
+
+  return `
+    <label>
+      <span>${label}</span>
+      <select name="${name}" required>
+        ${values.map((value) => `<option value="${value}">${pathOptions[value.toLowerCase()]?.[language] || value}</option>`).join('')}
+      </select>
+    </label>
+  `
+}
+
 function renderLessonTool(page, language, member) {
   const lessonTool = page.lessonTool
   const canTeach = ['ADMIN', 'TEACHER'].includes(member?.membershipType)
@@ -304,6 +432,15 @@ function renderLessonTool(page, language, member) {
           <label><span>${lessonTool.timeLabel[language]}</span><input type="time" name="lesson_time" required /></label>
           ${renderLessonTypeSelect(lessonTool, language)}
           <label><span>${lessonTool.maxLabel[language]}</span><input type="number" name="max_students" min="1" max="12" value="1" inputmode="numeric" required /></label>
+          ${renderPathSelect('lesson_path', lessonTool.pathLabel[language], lessonTool.pathOptions, language, member, true)}
+          <label>
+            <span>${lessonTool.minAgeLabel[language]}</span>
+            <input type="number" name="min_age" min="1" max="99" inputmode="numeric" placeholder="${lessonTool.noMinAgePlaceholder[language]}" />
+          </label>
+          <label>
+            <span>${lessonTool.maxAgeLabel[language]}</span>
+            <input type="number" name="max_age" min="1" max="99" inputmode="numeric" placeholder="${lessonTool.noMaxAgePlaceholder[language]}" />
+          </label>
           <label><span>${lessonTool.locationLabel[language]}</span><input type="text" name="location" value="Hawkesbury" required /></label>
         </div>
         <label><span>${lessonTool.notesLabel[language]}</span><textarea name="notes" rows="3" maxlength="240"></textarea></label>
@@ -340,7 +477,7 @@ function renderLessonTool(page, language, member) {
   `
 }
 
-function renderFindGameTool(page, language) {
+function renderFindGameTool(page, language, member) {
   const findGameTool = page.findGameTool
 
   return `
@@ -373,6 +510,15 @@ function renderFindGameTool(page, language) {
             <span>${findGameTool.spotsLabel[language]}</span>
             <input type="number" name="spots_open" min="1" max="12" inputmode="numeric" required />
           </label>
+          ${renderPathSelect('game_path', findGameTool.pathLabel[language], findGameTool.pathOptions, language, member)}
+          <label>
+            <span>${findGameTool.minAgeLabel[language]}</span>
+            <input type="number" name="min_age" min="1" max="99" inputmode="numeric" placeholder="${findGameTool.noMinAgePlaceholder[language]}" />
+          </label>
+          <label>
+            <span>${findGameTool.maxAgeLabel[language]}</span>
+            <input type="number" name="max_age" min="1" max="99" inputmode="numeric" placeholder="${findGameTool.noMaxAgePlaceholder[language]}" />
+          </label>
           <label>
             <span>${findGameTool.locationLabel[language]}</span>
             <input type="text" name="location" value="Hawkesbury" required />
@@ -399,10 +545,10 @@ function renderFindGameTool(page, language) {
 
 function renderEventsTool(page, language, member) {
   const eventsTool = page.eventsTool
-  const isAdmin = member?.membershipType === 'ADMIN'
-  const adminForm = isAdmin
+  const canManageEvents = ['ADMIN', 'TEACHER'].includes(member?.membershipType)
+  const adminForm = canManageEvents
     ? `
-      <form class="event-entry-form" data-event-form data-event-admin-panel>
+      <form class="event-entry-form is-hidden" data-event-form data-event-admin-panel>
         <input type="hidden" name="action" value="add_event" />
         <input type="hidden" name="event_id" value="" />
         <h2 data-event-form-title data-add-title="${eventsTool.addTitle[language]}" data-edit-title="${eventsTool.editTitle[language]}">${eventsTool.addTitle[language]}</h2>
@@ -453,6 +599,14 @@ function renderEventsTool(page, language, member) {
             <input type="number" name="community_cost" min="0" max="9999" step="0.01" inputmode="decimal" value="0" required />
           </label>
           <label>
+            <span>${eventsTool.minAgeLabel[language]}</span>
+            <input type="number" name="min_age" min="1" max="99" inputmode="numeric" placeholder="${eventsTool.noMinAgePlaceholder[language]}" />
+          </label>
+          <label>
+            <span>${eventsTool.maxAgeLabel[language]}</span>
+            <input type="number" name="max_age" min="1" max="99" inputmode="numeric" placeholder="${eventsTool.noMaxAgePlaceholder[language]}" />
+          </label>
+          <label>
             <span>${eventsTool.locationLabel[language]}</span>
             <input type="text" name="location" value="Hawkesbury" required />
           </label>
@@ -484,7 +638,7 @@ function renderEventsTool(page, language, member) {
         <div class="events-list-heading">
           <h2>${eventsTool.upcomingTitle[language]}</h2>
           <div class="events-list-actions">
-            ${isAdmin ? `<button type="button" data-event-admin-toggle data-show-label="${eventsTool.showAdminButton[language]}" data-hide-label="${eventsTool.hideAdminButton[language]}">${eventsTool.hideAdminButton[language]}</button>` : ''}
+            ${canManageEvents ? `<button type="button" data-event-admin-toggle data-show-label="${eventsTool.showAdminButton[language]}" data-hide-label="${eventsTool.hideAdminButton[language]}" aria-expanded="false">${eventsTool.showAdminButton[language]}</button>` : ''}
             <button type="button" data-past-events-toggle>${eventsTool.pastButton[language]}</button>
           </div>
         </div>
@@ -836,16 +990,17 @@ function renderLoginPanel(page, language) {
         <p class="login-status" data-account-status aria-live="polite"></p>
         <p class="login-helper">${profileForm.helper[language]}</p>
       </form>
+      <p class="login-version">Version ${appVersion}</p>
     </section>
   `
 }
 
-export function renderPage({ routes, page, language, copy, isLoggedIn, member }) {
+export function renderPage({ routes, page, language, copy, isLoggedIn, member, isMemberPortal = false }) {
   if (page.template === 'login') {
     return `
-      ${renderHeader({ routes, page, language, copy, isLoggedIn })}
+      ${renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal })}
       <main>
-        ${renderHero(page, language)}
+        ${isMemberPortal ? '' : renderHero(page, language)}
         ${renderLoginPanel(page, language)}
       </main>
     `
@@ -853,24 +1008,24 @@ export function renderPage({ routes, page, language, copy, isLoggedIn, member })
 
   if (page.template === 'account') {
     return `
-      ${renderHeader({ routes, page, language, copy, isLoggedIn })}
+      ${renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal })}
       <main>
-        ${renderAccountPage(page, language, member)}
+        ${renderAccountPage(page, language, member, copy, isMemberPortal)}
       </main>
     `
   }
 
   if (page.template === 'accountSubpage') {
     return `
-      ${renderHeader({ routes, page, language, copy, isLoggedIn })}
+      ${renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal })}
       <main>
-        ${renderAccountSubpage(page, language, member)}
+        ${renderAccountSubpage(page, language, member, isMemberPortal)}
       </main>
     `
   }
 
   return `
-    ${renderHeader({ routes, page, language, copy, isLoggedIn })}
+    ${renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal })}
     <main>
       ${renderHero(page, language)}
       ${renderQuickPanel(page, language, copy)}

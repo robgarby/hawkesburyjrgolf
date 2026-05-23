@@ -4,6 +4,11 @@ SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Member portal route for the single page app
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^members?/?$ /index.html [L]
+
 # Basic security hardening for static site deployment
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"

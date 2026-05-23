@@ -170,6 +170,23 @@ export const pointsPage = {
   },
 }
 
+export const rankingPage = {
+  ...accountSubPageDefaults,
+  "id": "ranking",
+  "title": {
+    "en": "Ranking",
+    "fr": "Classement"
+  },
+  "heading": {
+    "en": "Ranking",
+    "fr": "Classement"
+  },
+  "intro": {
+    "en": "Player rankings will activate once Ranking Point Rounds are created and ranking points are distributed. Rankings are for CUP members only when they participate in eligible Ranking Point Rounds.",
+    "fr": "Le classement des joueurs sera activé lorsque les rondes de points de classement seront créées et que les points de classement seront distribués. Le classement est réservé aux membres CUP qui participent aux rondes admissibles de points de classement."
+  },
+}
+
 export const eventsPage = {
   ...accountSubPageDefaults,
   "id": "events",
@@ -182,8 +199,8 @@ export const eventsPage = {
     "fr": "Événements"
   },
   "intro": {
-    "en": "View upcoming events, see who is attending, and join instantly when spots are open. Admins can add, edit, and remove events.",
-    "fr": "Consultez les événements à venir, voyez qui participe et joignez instantanément lorsqu’il reste des places. Les admins peuvent ajouter, modifier et supprimer les événements."
+    "en": "View upcoming events, see who is attending, and join instantly when spots are open. Admins and teachers can add, edit, and remove events.",
+    "fr": "Consultez les événements à venir, voyez qui participe et joignez instantanément lorsqu’il reste des places. Les admins et enseignants peuvent ajouter, modifier et supprimer les événements."
   },
   "eventsTool": {
     "addTitle": {
@@ -228,13 +245,29 @@ export const eventsPage = {
         "fr": "Communauté"
       },
       "everyone": {
-        "en": "Everyone",
-        "fr": "Tout le monde"
+        "en": "Both (Cup and Community)",
+        "fr": "Les deux (CUP et communauté)"
       }
     },
     "communityCostLabel": {
       "en": "Cost for Community Member",
       "fr": "Coût pour membre communautaire"
+    },
+    "minAgeLabel": {
+      "en": "Minimum age",
+      "fr": "Âge minimum"
+    },
+    "maxAgeLabel": {
+      "en": "Maximum age",
+      "fr": "Âge maximum"
+    },
+    "noMinAgePlaceholder": {
+      "en": "No minimum",
+      "fr": "Aucun minimum"
+    },
+    "noMaxAgePlaceholder": {
+      "en": "No maximum",
+      "fr": "Aucun maximum"
     },
     "locationLabel": {
       "en": "Location",
@@ -277,12 +310,12 @@ export const eventsPage = {
       "fr": "Annuler la modification"
     },
     "hideAdminButton": {
-      "en": "Hide Admin",
-      "fr": "Masquer admin"
+      "en": "Close Add Event",
+      "fr": "Fermer l’ajout d’événement"
     },
     "showAdminButton": {
-      "en": "Show Admin",
-      "fr": "Afficher admin"
+      "en": "Add Event",
+      "fr": "Ajouter un événement"
     },
     "upcomingTitle": {
       "en": "Upcoming events",
@@ -343,12 +376,12 @@ export const findAGamePage = {
   ...accountSubPageDefaults,
   "id": "find-a-game",
   "title": {
-    "en": "Find a Game",
-    "fr": "Trouver une partie"
+    "en": "Find a Round",
+    "fr": "Trouver une ronde"
   },
   "heading": {
-    "en": "Find a Game",
-    "fr": "Trouver une partie"
+    "en": "Find a Round",
+    "fr": "Trouver une ronde"
   },
   "intro": {
     "en": "Post a round you plan to play, show how many spots are open, and let any junior join the group.",
@@ -356,16 +389,16 @@ export const findAGamePage = {
   },
   "findGameTool": {
     "postButton": {
-      "en": "Post a Game",
-      "fr": "Publier une partie"
+      "en": "Post a Round",
+      "fr": "Publier une ronde"
     },
     "hidePostButton": {
       "en": "Hide Post Form",
       "fr": "Masquer le formulaire"
     },
     "formTitle": {
-      "en": "Post a Game",
-      "fr": "Publier une partie"
+      "en": "Post a Round",
+      "fr": "Publier une ronde"
     },
     "dateLabel": {
       "en": "Date",
@@ -378,6 +411,40 @@ export const findAGamePage = {
     "spotsLabel": {
       "en": "Open spots",
       "fr": "Places disponibles"
+    },
+    "pathLabel": {
+      "en": "Path",
+      "fr": "Parcours"
+    },
+    "pathOptions": {
+      "cup": {
+        "en": "CUP",
+        "fr": "CUP"
+      },
+      "community": {
+        "en": "Community",
+        "fr": "Communauté"
+      },
+      "everyone": {
+        "en": "Both (Cup and Community)",
+        "fr": "Les deux (CUP et communauté)"
+      }
+    },
+    "minAgeLabel": {
+      "en": "Minimum age",
+      "fr": "Âge minimum"
+    },
+    "maxAgeLabel": {
+      "en": "Maximum age",
+      "fr": "Âge maximum"
+    },
+    "noMinAgePlaceholder": {
+      "en": "No minimum",
+      "fr": "Aucun minimum"
+    },
+    "noMaxAgePlaceholder": {
+      "en": "No maximum",
+      "fr": "Aucun maximum"
     },
     "roundLabel": {
       "en": "Round you are playing",
@@ -392,24 +459,24 @@ export const findAGamePage = {
       "fr": "Lieu"
     },
     "saveButton": {
-      "en": "Post game",
-      "fr": "Publier la partie"
+      "en": "Post round",
+      "fr": "Publier la ronde"
     },
     "gamesTitle": {
-      "en": "Posted games",
-      "fr": "Parties publiées"
+      "en": "Posted rounds",
+      "fr": "Rondes publiées"
     },
     "empty": {
-      "en": "No games posted yet.",
-      "fr": "Aucune partie publiée pour le moment."
+      "en": "No rounds posted yet.",
+      "fr": "Aucune ronde publiée pour le moment."
     },
     "loading": {
-      "en": "Loading games...",
-      "fr": "Chargement des parties..."
+      "en": "Loading rounds...",
+      "fr": "Chargement des rondes..."
     },
     "saving": {
-      "en": "Saving game...",
-      "fr": "Enregistrement de la partie..."
+      "en": "Saving round...",
+      "fr": "Enregistrement de la ronde..."
     }
   },
 }
@@ -426,8 +493,8 @@ export const bookALessonPage = {
     "fr": "Réserver une leçon"
   },
   "intro": {
-    "en": "Juniors can join available lesson times or request single and group lessons. Admins and teachers can offer lesson times and accept requests.",
-    "fr": "Les juniors peuvent joindre les heures de leçon disponibles ou demander des leçons individuelles et de groupe. Les admins et enseignants peuvent offrir des heures de leçon et accepter les demandes."
+    "en": "Juniors can join available free volunteer-coach lesson times or request single and group lessons in the same My Account area used by CUP and Community members. To book a lesson with Hawkesbury Golf and Curling Club professionals, contact the club directly; professional lessons are not free unless they are listed here in the Lessons area.",
+    "fr": "Les juniors peuvent joindre les heures de leçon gratuites avec des entraîneurs bénévoles ou demander des leçons individuelles et de groupe dans le même espace Mon compte utilisé par les membres CUP et communautaires. Pour réserver une leçon avec les professionnels du Hawkesbury Golf and Curling Club, communiquez directement avec le club; les leçons professionnelles ne sont pas gratuites, sauf si elles sont affichées ici dans la section Leçons."
   },
   "lessonTool": {
     "availableButton": {
@@ -473,6 +540,40 @@ export const bookALessonPage = {
     "maxLabel": {
       "en": "Maximum number",
       "fr": "Nombre maximum"
+    },
+    "pathLabel": {
+      "en": "Path",
+      "fr": "Parcours"
+    },
+    "pathOptions": {
+      "cup": {
+        "en": "CUP",
+        "fr": "CUP"
+      },
+      "community": {
+        "en": "Community",
+        "fr": "Communauté"
+      },
+      "everyone": {
+        "en": "Both (Cup and Community)",
+        "fr": "Les deux (CUP et communauté)"
+      }
+    },
+    "minAgeLabel": {
+      "en": "Minimum age",
+      "fr": "Âge minimum"
+    },
+    "maxAgeLabel": {
+      "en": "Maximum age",
+      "fr": "Âge maximum"
+    },
+    "noMinAgePlaceholder": {
+      "en": "No minimum",
+      "fr": "Aucun minimum"
+    },
+    "noMaxAgePlaceholder": {
+      "en": "No maximum",
+      "fr": "Aucun maximum"
     },
     "locationLabel": {
       "en": "Location",

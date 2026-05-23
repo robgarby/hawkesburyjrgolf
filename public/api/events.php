@@ -92,8 +92,10 @@ function get_event_attendees(PDO $pdo, int $eventId): array
 
 function get_events(PDO $pdo, int $memberId): array
 {
+    $memberDetails = get_member_details($pdo, $memberId);
+    $playerAge = $memberDetails['playerAge'];
     $statement = $pdo->query(
-        'SELECT id, created_by_member_id, event_name, event_date, event_time, winner_points, participant_points, max_players, event_path, community_cost, location, description, winner, attendee_csv, created_at
+        'SELECT id, created_by_member_id, event_name, event_date, event_time, winner_points, participant_points, max_players, event_path, min_age, max_age, community_cost, location, description, winner, attendee_csv, created_at
          FROM member_events
          ORDER BY event_date ASC, event_time ASC, id ASC'
     );
@@ -107,6 +109,8 @@ function get_events(PDO $pdo, int $memberId): array
         $attendees = get_event_attendees($pdo, (int) $event['id']);
         $attendeeCount = count($attendees);
         $maxPlayers = (int) $event['max_players'];
+        $minAge = $event['min_age'] === null ? null : (int) $event['min_age'];
+        $maxAge = $event['max_age'] === null ? null : (int) $event['max_age'];
         $mappedEvent = [
             'id' => (int) $event['id'],
             'createdByMemberId' => (int) $event['created_by_member_id'],
@@ -117,6 +121,9 @@ function get_events(PDO $pdo, int $memberId): array
             'participantPoints' => (int) $event['participant_points'],
             'maxPlayers' => $maxPlayers,
             'eventPath' => $event['event_path'] ?? 'EVERYONE',
+            'minAge' => $minAge,
+            'maxAge' => $maxAge,
+            'isAgeEligible' => age_allows_member($minAge, $maxAge, $playerAge),
             'communityCost' => (float) $event['community_cost'],
             'location' => $event['location'],
             'description' => $event['description'] ?? '',
@@ -133,6 +140,70 @@ function get_events(PDO $pdo, int $memberId): array
     }
 
     return $events;
+}
+
+function get_member_details(PDO $pdo, int $memberId): array
+{
+    $statement = $pdo->prepare(
+        'SELECT membership_type, player_age
+         FROM members
+         WHERE id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $memberId]);
+    $member = $statement->fetch();
+
+    return [
+        'membershipType' => (string) ($member['membership_type'] ?? ''),
+        'playerAge' => isset($member['player_age']) ? (int) $member['player_age'] : null,
+    ];
+}
+
+function path_allows_member(string $path, string $memberType): bool
+{
+    if ($path === 'EVERYONE') {
+        return in_array($memberType, ['CUP', 'COMMUNITY'], true);
+    }
+
+    return $memberType === $path;
+}
+
+function age_allows_member(?int $minAge, ?int $maxAge, ?int $playerAge): bool
+{
+    if ($minAge === null && $maxAge === null) {
+        return true;
+    }
+
+    if ($playerAge === null || $playerAge < 1) {
+        return false;
+    }
+
+    if ($minAge !== null && $playerAge < $minAge) {
+        return false;
+    }
+
+    return $maxAge === null || $playerAge <= $maxAge;
+}
+
+function read_age_range(): array
+{
+    $minAgeRaw = trim((string) ($_POST['min_age'] ?? ''));
+    $maxAgeRaw = trim((string) ($_POST['max_age'] ?? ''));
+    $minAge = $minAgeRaw === '' ? null : filter_var($minAgeRaw, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 99],
+    ]);
+    $maxAge = $maxAgeRaw === '' ? null : filter_var($maxAgeRaw, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 99],
+    ]);
+
+    if ($minAge === false || $maxAge === false || ($minAge !== null && $maxAge !== null && $minAge > $maxAge)) {
+        send_json(422, [
+            'ok' => false,
+            'message' => 'Please enter a valid age range.',
+        ]);
+    }
+
+    return [$minAge, $maxAge];
 }
 
 function send_events_response(PDO $pdo, int $memberId, string $message = ''): void
@@ -181,7 +252,7 @@ try {
         }
 
         $eventStatement = $pdo->prepare(
-            'SELECT id, event_date, max_players, event_path
+            'SELECT id, event_date, max_players, event_path, min_age, max_age
              FROM member_events
              WHERE id = :id
              LIMIT 1'
@@ -205,23 +276,25 @@ try {
             ]);
         }
 
-        $memberTypeStatement = $pdo->prepare(
-            'SELECT membership_type
-             FROM members
-             WHERE id = :id
-             LIMIT 1'
-        );
-        $memberTypeStatement->execute(['id' => $memberId]);
-        $memberType = (string) ($memberTypeStatement->fetch()['membership_type'] ?? '');
+        $memberDetails = get_member_details($pdo, $memberId);
+        $memberType = $memberDetails['membershipType'];
+        $playerAge = $memberDetails['playerAge'];
         $eventPath = (string) ($event['event_path'] ?? 'EVERYONE');
 
-        if (
-            ($eventPath === 'CUP' && !in_array($memberType, ['CUP', 'ADMIN'], true))
-            || ($eventPath === 'COMMUNITY' && !in_array($memberType, ['COMMUNITY', 'ADMIN'], true))
-        ) {
+        if (!path_allows_member($eventPath, $memberType)) {
             send_json(403, [
                 'ok' => false,
                 'message' => 'This event is not open to your membership path.',
+            ]);
+        }
+
+        $minAge = $event['min_age'] === null ? null : (int) $event['min_age'];
+        $maxAge = $event['max_age'] === null ? null : (int) $event['max_age'];
+
+        if (!age_allows_member($minAge, $maxAge, $playerAge)) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'This event is not open to your age group.',
             ]);
         }
 
@@ -319,10 +392,10 @@ try {
     $memberStatement->execute(['id' => $memberId]);
     $memberRow = $memberStatement->fetch();
 
-    if (($memberRow['membership_type'] ?? '') !== 'ADMIN') {
+    if (!in_array(($memberRow['membership_type'] ?? ''), ['ADMIN', 'TEACHER'], true)) {
         send_json(403, [
             'ok' => false,
-            'message' => 'Only admins can manage events.',
+            'message' => 'Only admins and teachers can manage events.',
         ]);
     }
 
@@ -379,6 +452,7 @@ try {
         'options' => ['min_range' => 1, 'max_range' => 999],
     ]);
     $eventPath = strtoupper(trim((string) ($_POST['event_path'] ?? 'EVERYONE')));
+    [$minAge, $maxAge] = read_age_range();
     $communityCost = filter_var($_POST['community_cost'] ?? null, FILTER_VALIDATE_FLOAT);
     $location = trim((string) ($_POST['location'] ?? 'Hawkesbury'));
     $description = trim((string) ($_POST['description'] ?? ''));
@@ -432,6 +506,8 @@ try {
                  participant_points = :participant_points,
                  max_players = :max_players,
                  event_path = :event_path,
+                 min_age = :min_age,
+                 max_age = :max_age,
                  community_cost = :community_cost,
                  location = :location,
                  description = :description,
@@ -448,6 +524,8 @@ try {
             'participant_points' => (int) $participantPoints,
             'max_players' => (int) $maxPlayers,
             'event_path' => $eventPath,
+            'min_age' => $minAge,
+            'max_age' => $maxAge,
             'community_cost' => number_format((float) $communityCost, 2, '.', ''),
             'location' => $location,
             'description' => $description,
@@ -460,9 +538,9 @@ try {
 
     $insert = $pdo->prepare(
         'INSERT INTO member_events
-            (created_by_member_id, event_name, event_date, event_time, winner_points, participant_points, max_players, event_path, community_cost, location, description, winner, attendee_csv)
+            (created_by_member_id, event_name, event_date, event_time, winner_points, participant_points, max_players, event_path, min_age, max_age, community_cost, location, description, winner, attendee_csv)
          VALUES
-            (:created_by_member_id, :event_name, :event_date, :event_time, :winner_points, :participant_points, :max_players, :event_path, :community_cost, :location, :description, :winner, :attendee_csv)'
+            (:created_by_member_id, :event_name, :event_date, :event_time, :winner_points, :participant_points, :max_players, :event_path, :min_age, :max_age, :community_cost, :location, :description, :winner, :attendee_csv)'
     );
     $insert->execute([
         'created_by_member_id' => $memberId,
@@ -473,6 +551,8 @@ try {
         'participant_points' => (int) $participantPoints,
         'max_players' => (int) $maxPlayers,
         'event_path' => $eventPath,
+        'min_age' => $minAge,
+        'max_age' => $maxAge,
         'community_cost' => number_format((float) $communityCost, 2, '.', ''),
         'location' => $location,
         'description' => $description,

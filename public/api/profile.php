@@ -167,11 +167,13 @@ try {
         $member = $memberStatement->fetch();
     }
 
+    $jwtTtl = get_member_jwt_ttl_for_mode((string) ($_POST['session_mode'] ?? 'site'));
+
     echo json_encode([
         'ok' => true,
         'message' => 'Contact details saved. You are logged in.',
-        'token' => $member ? create_member_jwt($member) : null,
-        'expiresIn' => HAWKJR_JWT_TTL_SECONDS,
+        'token' => $member ? create_member_jwt($member, $jwtTtl) : null,
+        'expiresIn' => $jwtTtl,
     ]);
 } catch (Throwable $error) {
     error_log('Profile setup error: ' . $error->getMessage());

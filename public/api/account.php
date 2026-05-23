@@ -58,6 +58,9 @@ function get_account_profile(PDO $pdo, int $memberId): array
 {
     $statement = $pdo->prepare(
         'SELECT id, username, first_name, last_name, membership_type, parent_email, parent_email_notify,
+                notify_lessons_parent_email, notify_lessons_player_text, notify_lessons_parent_text,
+                notify_events_parent_email, notify_events_player_text, notify_events_parent_text,
+                notify_games_parent_email, notify_games_player_text, notify_games_parent_text,
                 parent_name, parent_text, parent_text_notify, player_age, player_text, player_text_notify
          FROM members
          WHERE id = :id
@@ -78,6 +81,15 @@ function get_account_profile(PDO $pdo, int $memberId): array
         'membershipType' => $member['membership_type'],
         'parentEmail' => $member['parent_email'],
         'parentEmailNotify' => (bool) $member['parent_email_notify'],
+        'notifyLessonsParentEmail' => (bool) $member['notify_lessons_parent_email'],
+        'notifyLessonsPlayerText' => (bool) $member['notify_lessons_player_text'],
+        'notifyLessonsParentText' => (bool) $member['notify_lessons_parent_text'],
+        'notifyEventsParentEmail' => (bool) $member['notify_events_parent_email'],
+        'notifyEventsPlayerText' => (bool) $member['notify_events_player_text'],
+        'notifyEventsParentText' => (bool) $member['notify_events_parent_text'],
+        'notifyGamesParentEmail' => (bool) $member['notify_games_parent_email'],
+        'notifyGamesPlayerText' => (bool) $member['notify_games_player_text'],
+        'notifyGamesParentText' => (bool) $member['notify_games_parent_text'],
         'parentName' => $member['parent_name'],
         'parentText' => $member['parent_text'],
         'parentTextNotify' => (bool) $member['parent_text_notify'],
@@ -106,9 +118,18 @@ try {
     $parentEmail = trim((string) ($_POST['parent_email'] ?? ''));
     $parentText = trim((string) ($_POST['parent_text'] ?? ''));
     $playerText = trim((string) ($_POST['player_text'] ?? ''));
-    $parentEmailNotify = isset($_POST['parent_email_notify']) ? 1 : 0;
-    $parentTextNotify = isset($_POST['parent_text_notify']) ? 1 : 0;
-    $playerTextNotify = isset($_POST['player_text_notify']) ? 1 : 0;
+    $notifyLessonsParentEmail = isset($_POST['notify_lessons_parent_email']) ? 1 : 0;
+    $notifyLessonsPlayerText = isset($_POST['notify_lessons_player_text']) ? 1 : 0;
+    $notifyLessonsParentText = isset($_POST['notify_lessons_parent_text']) ? 1 : 0;
+    $notifyEventsParentEmail = isset($_POST['notify_events_parent_email']) ? 1 : 0;
+    $notifyEventsPlayerText = isset($_POST['notify_events_player_text']) ? 1 : 0;
+    $notifyEventsParentText = isset($_POST['notify_events_parent_text']) ? 1 : 0;
+    $notifyGamesParentEmail = isset($_POST['notify_games_parent_email']) ? 1 : 0;
+    $notifyGamesPlayerText = isset($_POST['notify_games_player_text']) ? 1 : 0;
+    $notifyGamesParentText = isset($_POST['notify_games_parent_text']) ? 1 : 0;
+    $parentEmailNotify = ($notifyLessonsParentEmail || $notifyEventsParentEmail || $notifyGamesParentEmail) ? 1 : 0;
+    $playerTextNotify = ($notifyLessonsPlayerText || $notifyEventsPlayerText || $notifyGamesPlayerText) ? 1 : 0;
+    $parentTextNotify = ($notifyLessonsParentText || $notifyEventsParentText || $notifyGamesParentText) ? 1 : 0;
 
     if (!filter_var($parentEmail, FILTER_VALIDATE_EMAIL)) {
         send_account_json(422, ['ok' => false, 'message' => 'Please enter a valid parent email.']);
@@ -118,6 +139,15 @@ try {
         'UPDATE members
          SET parent_email = :parent_email,
              parent_email_notify = :parent_email_notify,
+             notify_lessons_parent_email = :notify_lessons_parent_email,
+             notify_lessons_player_text = :notify_lessons_player_text,
+             notify_lessons_parent_text = :notify_lessons_parent_text,
+             notify_events_parent_email = :notify_events_parent_email,
+             notify_events_player_text = :notify_events_player_text,
+             notify_events_parent_text = :notify_events_parent_text,
+             notify_games_parent_email = :notify_games_parent_email,
+             notify_games_player_text = :notify_games_player_text,
+             notify_games_parent_text = :notify_games_parent_text,
              parent_text = :parent_text,
              parent_text_notify = :parent_text_notify,
              player_text = :player_text,
@@ -127,6 +157,15 @@ try {
     $statement->execute([
         'parent_email' => $parentEmail,
         'parent_email_notify' => $parentEmailNotify,
+        'notify_lessons_parent_email' => $notifyLessonsParentEmail,
+        'notify_lessons_player_text' => $notifyLessonsPlayerText,
+        'notify_lessons_parent_text' => $notifyLessonsParentText,
+        'notify_events_parent_email' => $notifyEventsParentEmail,
+        'notify_events_player_text' => $notifyEventsPlayerText,
+        'notify_events_parent_text' => $notifyEventsParentText,
+        'notify_games_parent_email' => $notifyGamesParentEmail,
+        'notify_games_player_text' => $notifyGamesPlayerText,
+        'notify_games_parent_text' => $notifyGamesParentText,
         'parent_text' => $parentText === '' ? null : $parentText,
         'parent_text_notify' => $parentTextNotify,
         'player_text' => $playerText === '' ? null : $playerText,

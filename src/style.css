@@ -74,15 +74,11 @@ a {
 }
 
 .brand-mark {
-  display: grid;
   width: 48px;
   height: 48px;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--green);
-  color: var(--white);
-  font-size: 0.76rem;
-  font-weight: 800;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  object-fit: cover;
 }
 
 .brand strong,
@@ -477,10 +473,24 @@ h2 {
   margin-bottom: 14px;
 }
 
-.account-title-row strong {
-  color: #b42318;
-  font-size: clamp(1rem, 2vw, 1.3rem);
+.account-app-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 9px 18px;
+  background: var(--gold);
+  color: var(--green-dark);
+  font-size: 0.95rem;
   font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(20, 35, 29, 0.12);
+}
+
+.account-app-link:hover {
+  background: #f0ca64;
 }
 
 .account-page > p:not(.eyebrow) {
@@ -501,7 +511,8 @@ h2 {
 
 .account-top-actions {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
   gap: 10px;
 }
@@ -525,7 +536,13 @@ h2 {
 }
 
 .admin-members-list {
-  overflow-x: auto;
+  overflow-x: hidden;
+}
+
+.admin-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
 }
 
 .admin-filter-tabs {
@@ -572,7 +589,11 @@ h2 {
   font-weight: 700;
 }
 
+.admin-toolbar button,
 .admin-filter-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   min-height: 40px;
   border: 1px solid rgba(12, 61, 45, 0.18);
   border-radius: 8px;
@@ -584,6 +605,27 @@ h2 {
   font-weight: 900;
 }
 
+.admin-toolbar button {
+  background: var(--green);
+  color: var(--white);
+}
+
+.admin-toolbar button:hover {
+  background: var(--green-dark);
+}
+
+.admin-filter-tabs button small {
+  display: inline-grid;
+  min-width: 24px;
+  min-height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(12, 61, 45, 0.1);
+  color: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
 .admin-filter-tabs button:hover,
 .admin-filter-tabs button.active {
   background: var(--green);
@@ -591,16 +633,21 @@ h2 {
 }
 
 .admin-members-table {
-  min-width: 920px;
+  width: 100%;
+  min-width: 0;
 }
 
 .admin-members-row {
   display: grid;
-  grid-template-columns: 1.25fr 1.35fr 1fr 0.65fr 0.45fr 0.8fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.25fr) minmax(0, 0.95fr) minmax(0, 0.72fr) minmax(52px, 0.42fr) minmax(86px, 0.68fr);
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   padding: 12px 0;
   border-bottom: 1px solid rgba(12, 61, 45, 0.12);
+}
+
+.admin-members-row > span {
+  min-width: 0;
 }
 
 .admin-members-head {
@@ -621,7 +668,8 @@ h2 {
   font-weight: 700;
 }
 
-.admin-members-row select {
+.admin-members-row select,
+.admin-manage-form select {
   width: 100%;
   min-height: 40px;
   border: 1px solid rgba(12, 61, 45, 0.22);
@@ -635,7 +683,10 @@ h2 {
 
 .admin-members-row button,
 .admin-cashout-item button,
-.admin-award-form button {
+.admin-award-form button,
+.admin-manage-form button,
+.admin-member-bottom-actions > button,
+.admin-delete-form button {
   min-height: 38px;
   border: 0;
   border-radius: 8px;
@@ -649,7 +700,9 @@ h2 {
 
 .admin-members-row button:hover,
 .admin-cashout-item button:hover,
-.admin-award-form button:hover {
+.admin-award-form button:hover,
+.admin-manage-form button:hover,
+.admin-member-bottom-actions > button:hover {
   background: var(--green-dark);
 }
 
@@ -669,9 +722,159 @@ h2 {
   color: var(--green-dark);
 }
 
+.admin-text-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(12, 61, 45, 0.46);
+}
+
+.admin-text-dialog {
+  width: min(100%, 720px);
+  max-height: min(760px, calc(100vh - 40px));
+  overflow: auto;
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: 0 24px 70px rgba(12, 61, 45, 0.24);
+}
+
+.admin-text-dialog form {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.admin-text-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.admin-text-heading h3,
+.admin-text-heading p {
+  margin: 0;
+}
+
+.admin-text-heading p {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.admin-text-heading button {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: #edf5f1;
+  color: var(--green-dark);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.admin-text-dialog label {
+  display: grid;
+  gap: 7px;
+  color: var(--green-dark);
+  font-weight: 900;
+}
+
+.admin-text-dialog select,
+.admin-text-dialog textarea {
+  width: 100%;
+  border: 1px solid rgba(12, 61, 45, 0.22);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--white);
+  color: var(--green-dark);
+  font: inherit;
+}
+
+.admin-text-dialog textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.admin-text-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-text-actions button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 14px;
+  background: #edf5f1;
+  color: var(--green-dark);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+}
+
+.admin-text-actions button[type="submit"] {
+  background: var(--green);
+  color: var(--white);
+}
+
+.admin-text-actions button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.admin-text-results {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.admin-text-results ul {
+  display: grid;
+  gap: 8px;
+  max-height: 260px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.admin-text-results li {
+  display: grid;
+  gap: 3px;
+  padding: 9px;
+  border: 1px solid rgba(12, 61, 45, 0.12);
+  border-radius: 8px;
+  background: #f7fbf9;
+}
+
+.admin-text-results small {
+  color: var(--muted);
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.admin-text-results.error {
+  color: #9f2f24;
+}
+
+.admin-text-results.success {
+  color: var(--green);
+}
+
 .admin-point-detail {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: 18px;
   padding: 14px;
   border-bottom: 1px solid rgba(12, 61, 45, 0.12);
@@ -714,7 +917,72 @@ h2 {
 }
 
 .admin-point-detail .is-negative {
-  color: #9f2f24;
+  color: #c46a16;
+}
+
+.admin-history-panel {
+  min-width: 0;
+}
+
+.admin-detail-panel {
+  min-width: 0;
+}
+
+.admin-detail-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.admin-detail-tabs button {
+  min-height: 36px;
+  border: 1px solid rgba(12, 61, 45, 0.18);
+  border-radius: 8px;
+  padding: 7px 12px;
+  background: var(--white);
+  color: var(--green-dark);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.admin-detail-tabs button:hover,
+.admin-detail-tabs button.active {
+  background: var(--green);
+  color: var(--white);
+}
+
+.admin-tab-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
+  gap: 18px;
+}
+
+.admin-history-all {
+  justify-self: start;
+  min-height: 36px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #d9edf7;
+  color: var(--green-dark);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.admin-history-all:hover {
+  background: #c4e3f1;
+}
+
+.admin-manage-form {
+  display: grid;
+  align-content: start;
+  gap: 10px;
 }
 
 .admin-award-form {
@@ -723,6 +991,7 @@ h2 {
   gap: 10px;
 }
 
+.admin-manage-form label,
 .admin-award-form label {
   display: grid;
   gap: 6px;
@@ -732,6 +1001,7 @@ h2 {
   text-transform: uppercase;
 }
 
+.admin-manage-form input:not([type="checkbox"]),
 .admin-award-form input {
   min-height: 40px;
   width: 100%;
@@ -741,6 +1011,144 @@ h2 {
   color: var(--green-dark);
   font: inherit;
   font-weight: 800;
+}
+
+.admin-manage-form fieldset {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  border: 1px solid rgba(12, 61, 45, 0.14);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.admin-notification-summary {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(12, 61, 45, 0.14);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.admin-notification-summary h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.admin-notification-groups {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.admin-notification-group {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(12, 61, 45, 0.1);
+  border-radius: 8px;
+  padding: 8px;
+  background: rgba(245, 246, 242, 0.8);
+}
+
+.admin-notification-summary strong {
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-notification-methods {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.admin-notification-method {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  border-radius: 6px;
+  padding: 6px 7px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-notification-method.is-on {
+  background: rgba(201, 233, 198, 0.74);
+  color: var(--green-dark);
+}
+
+.admin-notification-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(12, 61, 45, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.admin-notification-method.is-on .admin-notification-dot {
+  border-color: var(--green-dark);
+  background: var(--green-dark);
+}
+
+.admin-manage-form legend {
+  padding: 0 4px;
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-manage-form .account-notify-toggle {
+  align-items: center;
+  text-transform: none;
+}
+
+.admin-member-bottom-actions {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-delete-form {
+  display: grid;
+}
+
+.admin-point-detail > .admin-delete-form {
+  grid-column: 1 / -1;
+}
+
+.admin-member-bottom-actions .admin-delete-form {
+  min-width: 0;
+}
+
+.admin-member-bottom-actions > button,
+.admin-delete-form button {
+  width: 100%;
+}
+
+.admin-delete-form button,
+.admin-award-form .admin-danger-light {
+  background: #9f2f24;
+}
+
+.admin-delete-form .admin-reactivate {
+  background: var(--green);
+}
+
+.admin-delete-form button:hover,
+.admin-award-form .admin-danger-light:hover {
+  background: #762119;
+}
+
+.admin-delete-form .admin-reactivate:hover {
+  background: var(--green-dark);
 }
 
 .admin-verify-toggle {
@@ -775,6 +1183,15 @@ h2 {
   gap: 12px;
 }
 
+.account-profile-summary-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.account-contact-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .account-profile-grid label {
   display: flex;
   flex-direction: column;
@@ -802,6 +1219,68 @@ h2 {
 
 .account-profile-grid input[readonly] {
   background: rgba(217, 237, 247, 0.45);
+}
+
+.account-notification-matrix {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.account-notification-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) repeat(3, minmax(130px, 1fr));
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border-bottom: 1px solid rgba(12, 61, 45, 0.1);
+}
+
+.account-notification-head {
+  color: var(--green-dark);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.account-notification-row > span,
+.account-notification-row > strong,
+.account-notification-row > label {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+.account-notification-row > span:nth-child(n + 2),
+.account-notification-row > label:nth-child(n + 2) {
+  justify-content: center;
+  border-radius: 8px;
+  background: #f1f3f2;
+}
+
+.account-notification-row strong {
+  color: var(--green-dark);
+  font-size: 0.9rem;
+}
+
+.account-notification-row label {
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.account-notification-row label span {
+  display: none;
+}
+
+.account-notification-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--green);
 }
 
 .account-notify-toggle {
@@ -846,8 +1325,16 @@ h2 {
 
 .account-link-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.member-portal-nav {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  padding: 10px 0;
+  background: var(--paper);
 }
 
 .account-link-grid a,
@@ -856,7 +1343,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 56px;
+  min-height: 48px;
   border-radius: 8px;
   background: var(--green);
   color: var(--white);
@@ -870,13 +1357,27 @@ h2 {
 }
 
 .account-link-grid a {
-  padding: 16px;
+  min-width: 0;
+  padding: 10px 8px;
+  font-size: 0.88rem;
+  line-height: 1.15;
+  white-space: normal;
 }
 
 .account-link-grid a:hover,
 .account-back-link:hover,
 .account-logout:hover {
   background: var(--green-dark);
+}
+
+.account-link-grid a.active {
+  background: #e1e5df;
+  color: var(--green-dark);
+}
+
+.account-link-grid a.active:hover {
+  background: #d4dbd3;
+  color: var(--green-dark);
 }
 
 .account-back-link {
@@ -1086,6 +1587,10 @@ h2 {
   color: var(--green-dark);
 }
 
+.points-history-list li.is-negative-entry {
+  background: #fff0d8;
+}
+
 .points-history-list li strong,
 .points-history-list li span {
   display: block;
@@ -1109,7 +1614,7 @@ h2 {
 }
 
 .points-history-list li small.is-negative {
-  color: #9f2f24;
+  color: #c46a16;
 }
 
 .score-entry-panel {
@@ -1742,6 +2247,14 @@ h2 {
   z-index: 1;
 }
 
+.login-version {
+  margin: 10px 0 0;
+  color: rgba(12, 61, 45, 0.58);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: center;
+}
+
 .account-tabs {
   display: inline-flex;
   max-width: 100%;
@@ -2017,6 +2530,17 @@ h2 {
   .login-panel {
     margin-top: 28px;
   }
+
+  .account-link-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .account-link-grid a {
+    min-height: 38px;
+    padding: 7px 5px;
+    font-size: 0.74rem;
+  }
 }
 
 @media (max-width: 900px) {
@@ -2032,8 +2556,23 @@ h2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .account-contact-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .account-notification-row {
+    grid-template-columns: minmax(180px, 0.75fr) repeat(3, minmax(74px, 1fr));
+  }
+
   .account-link-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .account-link-grid a {
+    min-height: 42px;
+    padding: 9px 8px;
+    font-size: 0.84rem;
   }
 
   .scores-tool {
@@ -2047,11 +2586,190 @@ h2 {
   .points-counter {
     align-self: stretch;
   }
+
+  .account-admin-panel {
+    padding: 14px;
+  }
+
+  .admin-toolbar {
+    justify-content: stretch;
+  }
+
+  .admin-toolbar button {
+    width: 100%;
+    justify-content: center;
+    min-height: 46px;
+  }
+
+  .admin-filter-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-filter-tabs button {
+    justify-content: space-between;
+    min-height: 46px;
+    padding: 10px 12px;
+  }
+
+  .admin-members-head {
+    display: none;
+  }
+
+  .admin-members-table {
+    display: grid;
+    gap: 12px;
+  }
+
+  .admin-members-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid rgba(12, 61, 45, 0.14);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: 0 10px 22px rgba(12, 61, 45, 0.06);
+  }
+
+  .admin-members-row > span {
+    display: grid;
+    gap: 3px;
+  }
+
+  .admin-members-row > span[data-label]::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .admin-members-row > span:first-child::before {
+    display: none;
+  }
+
+  .admin-members-row > span:first-child strong {
+    font-size: 1rem;
+  }
+
+  .admin-row-actions,
+  .admin-members-row .admin-points-toggle {
+    width: 100%;
+  }
+
+  .admin-row-actions button,
+  .admin-members-row button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .admin-point-detail {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .admin-tab-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-detail-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-detail-tabs button {
+    min-height: 42px;
+  }
+
+  .admin-member-bottom-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-cashout-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .admin-cashout-item button {
+    width: 100%;
+    min-height: 44px;
+  }
 }
 
 @media (max-width: 700px) {
+  .admin-text-modal {
+    align-items: end;
+    padding: 0;
+  }
+
+  .admin-text-dialog {
+    width: 100%;
+    max-height: calc(100svh - 24px);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .admin-text-dialog form {
+    padding: 16px;
+  }
+
+  .admin-text-heading {
+    align-items: flex-start;
+  }
+
+  .admin-text-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-text-actions button {
+    min-height: 46px;
+  }
+
+  .admin-notification-methods {
+    grid-template-columns: 1fr;
+  }
+
   .account-profile-grid {
     grid-template-columns: 1fr;
+  }
+
+  .account-profile-summary-grid,
+  .account-contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-notification-matrix {
+    overflow-x: visible;
+  }
+
+  .account-notification-row {
+    min-width: 0;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 14px 0;
+  }
+
+  .account-notification-head {
+    display: none;
+  }
+
+  .account-notification-row > strong {
+    min-height: auto;
+    padding: 0;
+    font-size: 0.95rem;
+  }
+
+  .account-notification-row > label {
+    justify-content: flex-start !important;
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  .account-notification-row label span {
+    display: inline;
   }
 
   .account-profile-actions {
@@ -2081,8 +2799,32 @@ h2 {
     margin-top: 34px;
   }
 
-  .account-link-grid {
+  .account-top-actions {
+    display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .account-top-actions button,
+  .account-top-actions .language-toggle {
+    width: 100%;
+  }
+
+  .account-top-actions .language-toggle {
+    justify-content: center;
+  }
+
+  .admin-filter-tabs,
+  .admin-detail-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-members-row {
+    margin-inline: -2px;
+    padding: 12px;
+  }
+
+  .account-link-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .round-list li {

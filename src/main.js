@@ -7,6 +7,8 @@ const app = document.querySelector('#app')
 const siteContent = await getSiteContent()
 const API_BASE_URL = 'https://www.hawkesburyjrgolf.ca'
 const MEMBER_TOKEN_KEY = 'memberAuthToken'
+const MEMBER_APP_START_URL = '/members#my-account'
+let deferredInstallPrompt = null
 const SCORE_COPY = {
   en: {
     loadError: 'Unable to load scores right now.',
@@ -67,6 +69,9 @@ const EVENTS_COPY = {
     attendeeCsv: 'Attendee CSV',
     location: 'Location',
     description: 'Description',
+    age: 'Age',
+    ages: 'Ages',
+    ageAny: 'Any age',
     spotsOpen: 'spots open',
     attending: 'Attending',
     noAttendees: 'No attendees yet.',
@@ -80,7 +85,11 @@ const EVENTS_COPY = {
     pathLabels: {
       CUP: 'CUP',
       COMMUNITY: 'Community Event',
-      EVERYONE: 'Cup and Community Members',
+      EVERYONE: 'Both (Cup and Community)',
+    },
+    pathOnlyLabels: {
+      CUP: 'CUP only',
+      COMMUNITY: 'Community only',
     },
     communityCost: 'Cost for Community Member',
     full: 'Full',
@@ -94,6 +103,9 @@ const EVENTS_COPY = {
     attendeeCsv: 'CSV des participants',
     location: 'Lieu',
     description: 'Description',
+    age: 'Âge',
+    ages: 'Âges',
+    ageAny: 'Tous âges',
     spotsOpen: 'places disponibles',
     attending: 'Participants',
     noAttendees: 'Aucun participant pour le moment.',
@@ -107,7 +119,11 @@ const EVENTS_COPY = {
     pathLabels: {
       CUP: 'CUP',
       COMMUNITY: 'Événement communautaire',
-      EVERYONE: 'Membres CUP et communauté',
+      EVERYONE: 'Les deux (CUP et communauté)',
+    },
+    pathOnlyLabels: {
+      CUP: 'CUP seulement',
+      COMMUNITY: 'Communauté seulement',
     },
     communityCost: 'Coût pour membre communautaire',
     full: 'Complet',
@@ -115,9 +131,9 @@ const EVENTS_COPY = {
 }
 const FIND_GAME_COPY = {
   en: {
-    loadError: 'Unable to load games right now.',
-    saveError: 'Unable to save the game right now.',
-    saved: 'Game posted.',
+    loadError: 'Unable to load rounds right now.',
+    saveError: 'Unable to save the round right now.',
+    saved: 'Round posted.',
     join: 'Join',
     joined: 'Joined',
     leave: 'UnAdd',
@@ -125,11 +141,24 @@ const FIND_GAME_COPY = {
     spotsOpen: 'spots open',
     playing: 'Playing',
     location: 'Location',
+    age: 'Age',
+    ages: 'Ages',
+    ageAny: 'Any age',
+    path: 'Path',
+    pathLabels: {
+      CUP: 'CUP',
+      COMMUNITY: 'Community',
+      EVERYONE: 'Both (Cup and Community)',
+    },
+    pathOnlyLabels: {
+      CUP: 'CUP only',
+      COMMUNITY: 'Community only',
+    },
   },
   fr: {
-    loadError: 'Impossible de charger les parties pour le moment.',
-    saveError: 'Impossible d’enregistrer la partie pour le moment.',
-    saved: 'Partie publiée.',
+    loadError: 'Impossible de charger les rondes pour le moment.',
+    saveError: 'Impossible d’enregistrer la ronde pour le moment.',
+    saved: 'Ronde publiée.',
     join: 'Participer',
     joined: 'Inscrit',
     leave: 'Retirer',
@@ -137,6 +166,19 @@ const FIND_GAME_COPY = {
     spotsOpen: 'places disponibles',
     playing: 'Joueurs',
     location: 'Lieu',
+    age: 'Âge',
+    ages: 'Âges',
+    ageAny: 'Tous âges',
+    path: 'Parcours',
+    pathLabels: {
+      CUP: 'CUP',
+      COMMUNITY: 'Communauté',
+      EVERYONE: 'Les deux (CUP et communauté)',
+    },
+    pathOnlyLabels: {
+      CUP: 'CUP seulement',
+      COMMUNITY: 'Communauté seulement',
+    },
   },
 }
 const LESSON_COPY = {
@@ -159,6 +201,19 @@ const LESSON_COPY = {
     students: 'Students',
     location: 'Location',
     max: 'Maximum',
+    age: 'Age',
+    ages: 'Ages',
+    ageAny: 'Any age',
+    path: 'Path',
+    pathLabels: {
+      CUP: 'CUP',
+      COMMUNITY: 'Community',
+      EVERYONE: 'Both (Cup and Community)',
+    },
+    pathOnlyLabels: {
+      CUP: 'CUP only',
+      COMMUNITY: 'Community only',
+    },
   },
   fr: {
     loadError: 'Impossible de charger les leçons pour le moment.',
@@ -179,6 +234,19 @@ const LESSON_COPY = {
     students: 'Élèves',
     location: 'Lieu',
     max: 'Maximum',
+    age: 'Âge',
+    ages: 'Âges',
+    ageAny: 'Tous âges',
+    path: 'Parcours',
+    pathLabels: {
+      CUP: 'CUP',
+      COMMUNITY: 'Communauté',
+      EVERYONE: 'Les deux (CUP et communauté)',
+    },
+    pathOnlyLabels: {
+      CUP: 'CUP seulement',
+      COMMUNITY: 'Communauté seulement',
+    },
   },
 }
 const ADMIN_COPY = {
@@ -190,24 +258,59 @@ const ADMIN_COPY = {
     player: 'Player',
     parentEmail: 'Parent Email',
     status: 'Status',
+    memberInfo: 'Member',
+    active: 'Active',
+    activeYes: 'Yes',
+    activeNo: 'No',
     path: 'Path',
+    age: 'Age',
+    ageNotSet: 'Age not set',
+    notifications: 'Notifications',
     points: 'Points',
     emailVerified: 'Email confirmed',
     emailNotVerified: 'Email Not Verified',
     save: 'Save',
+    manage: 'Manage',
+    close: 'Close',
     cashoutTitle: 'Pending cash out requests',
     approveCashout: 'Approve',
     requested: 'Requested',
     pointHistory: 'Point history',
+    pointsTab: 'Points',
+    roundsTab: 'Rounds',
+    eventsTab: 'Events',
+    lessonsTab: 'Lessons',
     viewPoints: 'View',
     hidePoints: 'Hide',
     noPointHistory: 'No point history yet.',
-    awardPoints: 'Add Points',
+    showAllPoints: 'Show all',
+    pointHistoryWindowTitle: 'Point history',
+    noRounds: 'No rounds yet.',
+    noEvents: 'No events yet.',
+    noLessons: 'No lessons yet.',
+    lessonPosted: 'Lesson Posted',
+    eventPosted: 'Event Posted',
+    roundPosted: 'Round Posted',
+    none: 'None',
+    updatePoints: 'Update',
     awardReason: 'Reason',
+    pointsPlaceholder: 'Example: +10 or -5',
     awardPlaceholder: 'Example: Putting challenge',
+    parentEmailNotify: 'Email',
+    parentTextNotify: 'Parent',
+    playerTextNotify: 'Junior',
+    deleteMember: 'Set Inactive',
+    activateMember: 'Reactivate',
+    deleteConfirm: 'Set this member inactive? You can reactivate them later from this same Manage panel.',
     noStaff: 'No admins or teachers found.',
     noCup: 'No Cup members found.',
     noCommunity: 'No Community members found.',
+    noInactive: 'No inactive members found.',
+    textLoading: 'Preparing text preview...',
+    textNoRecipients: 'No text numbers found for this selection.',
+    textSentPreview: 'Text preview ready.',
+    textError: 'Unable to prepare the text preview right now.',
+    textRecipientCount: 'recipients',
   },
   fr: {
     loadError: 'Impossible de charger les membres pour le moment.',
@@ -217,24 +320,59 @@ const ADMIN_COPY = {
     player: 'Joueur',
     parentEmail: 'Courriel parent',
     status: 'Statut',
+    memberInfo: 'Membre',
+    active: 'Actif',
+    activeYes: 'Oui',
+    activeNo: 'Non',
     path: 'Parcours',
+    age: 'Âge',
+    ageNotSet: 'Âge non indiqué',
+    notifications: 'Avis',
     points: 'Points',
     emailVerified: 'Courriel confirmé',
     emailNotVerified: 'Courriel non vérifié',
     save: 'Enregistrer',
+    manage: 'Gérer',
+    close: 'Fermer',
     cashoutTitle: 'Demandes d’utilisation de points en attente',
     approveCashout: 'Approuver',
     requested: 'Demandé',
     pointHistory: 'Historique des points',
+    pointsTab: 'Points',
+    roundsTab: 'Rondes',
+    eventsTab: 'Événements',
+    lessonsTab: 'Leçons',
     viewPoints: 'Voir',
     hidePoints: 'Masquer',
     noPointHistory: 'Aucun historique de points pour le moment.',
-    awardPoints: 'Ajouter des points',
+    showAllPoints: 'Tout voir',
+    pointHistoryWindowTitle: 'Historique des points',
+    noRounds: 'Aucune ronde pour le moment.',
+    noEvents: 'Aucun événement pour le moment.',
+    noLessons: 'Aucune leçon pour le moment.',
+    lessonPosted: 'Leçon publiée',
+    eventPosted: 'Événement publié',
+    roundPosted: 'Ronde publiée',
+    none: 'Aucun',
+    updatePoints: 'Mettre à jour',
     awardReason: 'Raison',
+    pointsPlaceholder: 'Exemple : +10 ou -5',
     awardPlaceholder: 'Exemple : défi de putting',
+    parentEmailNotify: 'Courriel',
+    parentTextNotify: 'Parent',
+    playerTextNotify: 'Junior',
+    deleteMember: 'Rendre inactif',
+    activateMember: 'Réactiver',
+    deleteConfirm: 'Rendre ce membre inactif? Vous pourrez le réactiver plus tard dans ce même panneau.',
     noStaff: 'Aucun admin ou enseignant trouvé.',
     noCup: 'Aucun membre Cup trouvé.',
     noCommunity: 'Aucun membre communauté trouvé.',
+    noInactive: 'Aucun membre inactif trouvé.',
+    textLoading: 'Préparation de l’aperçu texto...',
+    textNoRecipients: 'Aucun numéro texto trouvé pour cette sélection.',
+    textSentPreview: 'Aperçu texto prêt.',
+    textError: 'Impossible de préparer l’aperçu texto pour le moment.',
+    textRecipientCount: 'destinataires',
   },
 }
 let pendingProfileToken = sessionStorage.getItem('pendingProfileToken') || ''
@@ -247,6 +385,7 @@ let currentAdminMembers = []
 let currentAdminCashouts = []
 let currentAdminFilter = 'staff'
 let expandedAdminMemberId = null
+let currentAdminDetailTab = 'points'
 let hasCheckedSession = false
 
 function getLanguage() {
@@ -316,9 +455,20 @@ function setLanguage(language) {
   render()
 }
 
+function isMemberPortalPath() {
+  return ['/member', '/members'].includes(window.location.pathname.replace(/\/+$/, ''))
+}
+
 function getCurrentRoute() {
-  const routeId = window.location.hash.replace('#', '') || 'home'
-  return siteContent.pageMap.get(routeId) || siteContent.pageMap.get('home')
+  const isMemberPortal = isMemberPortalPath()
+  const routeId = window.location.hash.replace('#', '') || (isMemberPortal ? 'my-account' : 'home')
+  const page = siteContent.pageMap.get(routeId) || siteContent.pageMap.get(isMemberPortal ? 'my-account' : 'home')
+
+  if (isMemberPortal && page?.template !== 'login' && !page?.accountArea) {
+    return siteContent.pageMap.get('my-account')
+  }
+
+  return page
 }
 
 function getTokenPayload(token) {
@@ -383,6 +533,7 @@ async function checkMemberSession() {
 async function render() {
   const language = getLanguage()
   const copy = siteContent.shared[language]
+  const isMemberPortal = isMemberPortalPath()
   let page = getCurrentRoute()
 
   if (page.accountArea && !hasCheckedSession) {
@@ -404,6 +555,7 @@ async function render() {
     copy,
     isLoggedIn,
     member: currentMember,
+    isMemberPortal,
   })
 
   if (page.id === 'scores') {
@@ -463,6 +615,8 @@ async function handleAccountSubmit(form) {
   const submitButton = form.querySelector('button[type="submit"]')
   const formData = new FormData(form)
   const formType = form.dataset.accountForm
+
+  formData.set('session_mode', isMemberPortalPath() ? 'app' : 'site')
 
   if (formType === 'profile') {
     const tokenInput = form.querySelector('[data-profile-token]')
@@ -579,6 +733,84 @@ async function handleAccountSubmit(form) {
   }
 }
 
+async function refreshMemberTokenForMode(mode) {
+  if (!memberToken) {
+    return false
+  }
+
+  const formData = new FormData()
+  formData.set('session_mode', mode === 'app' ? 'app' : 'site')
+
+  const response = await fetch(`${API_BASE_URL}/api/session-token.php`, {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${memberToken}`,
+    },
+  })
+  const result = await response.json()
+
+  if (!response.ok || !result.ok || !result.token) {
+    throw new Error(result.message || 'Unable to refresh session.')
+  }
+
+  markMemberLoggedIn(result.token)
+  return true
+}
+
+function isRunningStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true
+}
+
+async function promptForMemberAppInstall() {
+  if (isRunningStandalone()) {
+    return
+  }
+
+  if (deferredInstallPrompt) {
+    const installPrompt = deferredInstallPrompt
+    deferredInstallPrompt = null
+
+    try {
+      installPrompt.prompt()
+      await installPrompt.userChoice
+    } catch (error) {
+      deferredInstallPrompt = installPrompt
+    }
+
+    return
+  }
+
+  const language = getLanguage()
+  const isiOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent)
+
+  if (isiOS) {
+    window.alert(language === 'fr'
+      ? 'Pour installer l’espace membre, appuyez sur ... au bas de l’écran, choisissez Partager, puis faites défiler vers Ajouter à l’écran d’accueil.'
+      : 'To install the member area, press ... at the bottom of the screen, choose Share, then scroll down to Add to Home Screen.')
+  }
+}
+
+async function handleSessionModeLink(link) {
+  const mode = link.dataset.sessionModeLink || 'site'
+  const href = mode === 'app'
+    ? MEMBER_APP_START_URL
+    : link.getAttribute('href') || '/'
+
+  try {
+    if (mode === 'app') {
+      await promptForMemberAppInstall()
+    }
+
+    await refreshMemberTokenForMode(mode)
+  } catch (error) {
+    clearMemberLogin()
+  } finally {
+    window.location.href = href
+  }
+}
+
 function showAccountForm(panel, tabName) {
   const tabs = panel.querySelectorAll('[data-account-tab]')
   const forms = panel.querySelectorAll('[data-account-form]')
@@ -642,21 +874,25 @@ function setAccountProfileFormValues(form, member) {
     playerTextInput.value = member?.playerText || ''
   }
 
-  const parentEmailNotify = form.querySelector('input[name="parent_email_notify"]')
-  const parentTextNotify = form.querySelector('input[name="parent_text_notify"]')
-  const playerTextNotify = form.querySelector('input[name="player_text_notify"]')
-
-  if (parentEmailNotify) {
-    parentEmailNotify.checked = Boolean(member?.parentEmailNotify)
+  const notificationSettings = {
+    notify_lessons_parent_email: member?.notifyLessonsParentEmail,
+    notify_lessons_player_text: member?.notifyLessonsPlayerText,
+    notify_lessons_parent_text: member?.notifyLessonsParentText,
+    notify_events_parent_email: member?.notifyEventsParentEmail,
+    notify_events_player_text: member?.notifyEventsPlayerText,
+    notify_events_parent_text: member?.notifyEventsParentText,
+    notify_games_parent_email: member?.notifyGamesParentEmail,
+    notify_games_player_text: member?.notifyGamesPlayerText,
+    notify_games_parent_text: member?.notifyGamesParentText,
   }
 
-  if (parentTextNotify) {
-    parentTextNotify.checked = Boolean(member?.parentTextNotify)
-  }
+  Object.entries(notificationSettings).forEach(([name, value]) => {
+    const input = form.querySelector(`input[name="${name}"]`)
 
-  if (playerTextNotify) {
-    playerTextNotify.checked = Boolean(member?.playerTextNotify)
-  }
+    if (input) {
+      input.checked = Boolean(value)
+    }
+  })
 }
 
 function adminPathOption(value, label, selected) {
@@ -666,6 +902,15 @@ function adminPathOption(value, label, selected) {
 function getFilteredAdminMembers(members) {
   return members.filter((member) => {
     const type = String(member.membershipType || '').toUpperCase()
+    const isActive = member.isActive !== false
+
+    if (currentAdminFilter === 'inactive') {
+      return !isActive
+    }
+
+    if (!isActive) {
+      return false
+    }
 
     if (currentAdminFilter === 'staff') {
       return ['ADMIN', 'TEACHER'].includes(type)
@@ -698,13 +943,464 @@ function getAdminEmptyLabel(language) {
     return copy.noCommunity
   }
 
+  if (currentAdminFilter === 'inactive') {
+    return copy.noInactive
+  }
+
   return copy.empty
+}
+
+function getAdminFilterCounts(members) {
+  return members.reduce((counts, member) => {
+    const type = String(member.membershipType || '').toUpperCase()
+    const isActive = member.isActive !== false
+
+    if (!isActive) {
+      counts.inactive += 1
+      return counts
+    }
+
+    if (['ADMIN', 'TEACHER'].includes(type)) {
+      counts.staff += 1
+    }
+
+    if (type === 'CUP') {
+      counts.cup += 1
+    }
+
+    if (type === 'COMMUNITY') {
+      counts.community += 1
+    }
+
+    return counts
+  }, {
+    staff: 0,
+    cup: 0,
+    community: 0,
+    inactive: 0,
+  })
+}
+
+function updateAdminFilterCounts(panel, members) {
+  const counts = getAdminFilterCounts(members)
+
+  Object.entries(counts).forEach(([filter, count]) => {
+    const countEl = panel?.querySelector(`[data-admin-filter-count="${filter}"]`)
+
+    if (countEl) {
+      countEl.textContent = String(count)
+    }
+  })
+}
+
+function updateAdminFilterButtons(panel) {
+  panel?.querySelectorAll('[data-admin-filter]').forEach((button) => {
+    button.classList.toggle('active', button.dataset.adminFilter === currentAdminFilter)
+  })
+}
+
+function setAdminTextModalOpen(panel, isOpen) {
+  const modal = panel?.querySelector('[data-admin-text-modal]')
+  const form = modal?.querySelector('[data-admin-text-form]')
+
+  if (!modal) {
+    return
+  }
+
+  modal.classList.toggle('is-hidden', !isOpen)
+  modal.setAttribute('aria-hidden', String(!isOpen))
+
+  if (isOpen) {
+    modal.querySelector('textarea[name="message"]')?.focus()
+  } else {
+    form?.reset()
+    const results = modal.querySelector('[data-admin-text-results]')
+
+    if (results) {
+      results.innerHTML = ''
+      results.classList.remove('error', 'success')
+    }
+  }
+}
+
+function normalizeTextNumber(value) {
+  return String(value || '').replace(/[^\d+]/g, '')
+}
+
+function addTextRecipient(recipients, seenNumbers, number, name, type) {
+  const normalizedNumber = normalizeTextNumber(number)
+
+  if (!normalizedNumber || seenNumbers.has(normalizedNumber)) {
+    return
+  }
+
+  seenNumbers.add(normalizedNumber)
+  recipients.push({
+    to: normalizedNumber,
+    name: String(name || '').trim(),
+    type,
+  })
+}
+
+function getAdminTextRecipients(target) {
+  const recipients = []
+  const seenNumbers = new Set()
+
+  currentAdminMembers
+    .filter((member) => member?.isActive !== false)
+    .forEach((member) => {
+      const playerName = member.name || member.username || ''
+      const parentName = member.parentName || (playerName ? `Parent of ${playerName}` : 'Parent')
+
+      if (target === 'all' || target === 'parents') {
+        addTextRecipient(recipients, seenNumbers, member.parentText, parentName, 'parent')
+      }
+
+      if (target === 'all' || target === 'juniors') {
+        addTextRecipient(recipients, seenNumbers, member.playerText, playerName, 'junior')
+      }
+    })
+
+  return recipients
+}
+
+function renderAdminTextResults(resultsEl, result, language) {
+  const copy = ADMIN_COPY[language]
+  const rows = Array.isArray(result.results) ? result.results : []
+
+  resultsEl.classList.toggle('success', Boolean(result.ok))
+  resultsEl.classList.toggle('error', !result.ok)
+  resultsEl.innerHTML = `
+    <strong>${escapeHtml(result.message || copy.textSentPreview)}</strong>
+    <small>${Number(result.sent || 0)} ${escapeHtml(copy.textRecipientCount)} / ${Number(result.failed || 0)} failed</small>
+    ${rows.length ? `
+      <ul>
+        ${rows.map((row) => `
+          <li class="${row.ok ? 'success' : 'error'}">
+            <span>${escapeHtml(row.name || '')}${row.name ? ' - ' : ''}${escapeHtml(row.to || '')}</span>
+            <small>${escapeHtml(row.message || row.sid || '')}</small>
+          </li>
+        `).join('')}
+      </ul>
+    ` : ''}
+  `
+}
+
+async function handleAdminTextSubmit(form) {
+  const panel = form.closest('[data-admin-panel]')
+  const language = getLanguage()
+  const copy = ADMIN_COPY[language]
+  const resultsEl = form.querySelector('[data-admin-text-results]')
+  const submitButton = form.querySelector('button[type="submit"]')
+  const formData = new FormData(form)
+  const target = String(formData.get('target') || 'all')
+  const message = String(formData.get('message') || '').trim()
+  const recipients = getAdminTextRecipients(target)
+
+  if (!resultsEl) {
+    return
+  }
+
+  if (!recipients.length) {
+    resultsEl.textContent = copy.textNoRecipients
+    resultsEl.classList.add('error')
+    resultsEl.classList.remove('success')
+    return
+  }
+
+  resultsEl.textContent = copy.textLoading
+  resultsEl.classList.remove('error', 'success')
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/textme.php`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        message,
+        recipients,
+      }),
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || copy.textError)
+    }
+
+    renderAdminTextResults(resultsEl, result, language)
+  } catch (error) {
+    resultsEl.textContent = error.message || copy.textError
+    resultsEl.classList.add('error')
+    resultsEl.classList.remove('success')
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+}
+
+function renderAdminDetailTabs(copy, activeTab) {
+  const tabs = [
+    ['points', copy.pointsTab],
+    ['rounds', copy.roundsTab],
+    ['events', copy.eventsTab],
+    ['lessons', copy.lessonsTab],
+  ]
+
+  return `
+    <div class="admin-detail-tabs" role="tablist" aria-label="${copy.manage}">
+      ${tabs.map(([value, label]) => `
+        <button type="button" class="${activeTab === value ? 'active' : ''}" data-admin-detail-tab="${value}">
+          ${label}
+        </button>
+      `).join('')}
+    </div>
+  `
+}
+
+function renderAdminPointsTab(member, copy, language) {
+  const entries = Array.isArray(member.pointEntries) ? member.pointEntries : []
+  const visibleEntries = entries.slice(0, 5)
+
+  return `
+    <div class="admin-tab-grid">
+      <div class="admin-history-panel">
+        <h3>${copy.pointHistory}</h3>
+        ${entries.length ? `
+          <ul>
+            ${visibleEntries.map((entry) => {
+              const typeLabel = POINTS_COPY[language].types[entry.type] || entry.type
+              const amountClass = Number(entry.points || 0) < 0 ? 'is-negative' : 'is-positive'
+
+              return `
+                <li>
+                  <span>
+                    <strong>${escapeHtml(entry.description || typeLabel)}</strong>
+                    <small>${escapeHtml(typeLabel)} - ${formatRoundDate(entry.date, language)}</small>
+                  </span>
+                  <small class="${amountClass}">${formatPointAmount(Number(entry.points || 0), language)}</small>
+                </li>
+              `
+            }).join('')}
+          </ul>
+          ${entries.length > 5 ? `
+            <button class="admin-history-all" type="button" data-admin-points-all data-member-id="${Number(member.id || 0)}">
+              ${copy.showAllPoints}
+            </button>
+          ` : ''}
+        ` : `<p>${copy.noPointHistory}</p>`}
+      </div>
+      <form class="admin-award-form" data-admin-award-form>
+        <input type="hidden" name="action" value="update_points" />
+        <input type="hidden" name="member_id" value="${Number(member.id || 0)}" />
+        <label>
+          <span>${copy.points} (+/-)</span>
+          <input type="number" name="points" min="-999" max="999" step="1" inputmode="numeric" placeholder="${copy.pointsPlaceholder}" required />
+        </label>
+        <label>
+          <span>${copy.awardReason}</span>
+          <input type="text" name="description" maxlength="160" placeholder="${copy.awardPlaceholder}" required />
+        </label>
+        <button type="submit">${copy.updatePoints}</button>
+      </form>
+    </div>
+  `
+}
+
+function renderAdminRoundsTab(member, copy, language) {
+  const rounds = Array.isArray(member.rounds) ? member.rounds : []
+
+  return rounds.length ? `
+    <div class="admin-history-panel">
+      <h3>${copy.roundsTab}</h3>
+      <ul>
+        ${rounds.map((round) => `
+          <li>
+            <span>
+              <strong>${formatRoundDate(round.date, language)} - ${escapeHtml(round.score)}</strong>
+              <small>${escapeHtml(round.tee || '')} tee - ${escapeHtml(round.format || '')}</small>
+            </span>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+  ` : `<div class="admin-history-panel"><h3>${copy.roundsTab}</h3><p>${copy.noRounds}</p></div>`
+}
+
+function renderAdminEventsTab(member, copy, language) {
+  const events = Array.isArray(member.events) ? member.events : []
+
+  return events.length ? `
+    <div class="admin-history-panel">
+      <h3>${copy.eventsTab}</h3>
+      <ul>
+        ${events.map((event) => `
+          <li>
+            <span>
+              <strong>${escapeHtml(event.name || copy.eventsTab)}</strong>
+              <small>${escapeHtml(event.role || '')} - ${escapeHtml(formatEventDateTime({ eventDate: event.date, eventTime: event.time }, language))}</small>
+              <small>${escapeHtml(accountStreamLabel(event.path))}${event.location ? ` - ${escapeHtml(event.location)}` : ''}</small>
+            </span>
+            <small>${Number(event.participantPoints || 0)} / ${Number(event.winnerPoints || 0)} pts</small>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+  ` : `<div class="admin-history-panel"><h3>${copy.eventsTab}</h3><p>${copy.noEvents}</p></div>`
+}
+
+function renderAdminLessonsTab(member, copy, language) {
+  const lessons = Array.isArray(member.lessons) ? member.lessons : []
+
+  return lessons.length ? `
+    <div class="admin-history-panel">
+      <h3>${copy.lessonsTab}</h3>
+      <ul>
+        ${lessons.map((lesson) => `
+          <li>
+            <span>
+              <strong>${escapeHtml(lesson.role || copy.lessonsTab)} - ${escapeHtml(formatEventDateTime({ eventDate: lesson.date, eventTime: lesson.time }, language))}</strong>
+              <small>${escapeHtml(lesson.type || '')} - ${escapeHtml(accountStreamLabel(lesson.path))}${lesson.location ? ` - ${escapeHtml(lesson.location)}` : ''}</small>
+              ${lesson.notes ? `<small>${escapeHtml(lesson.notes)}</small>` : ''}
+            </span>
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+  ` : `<div class="admin-history-panel"><h3>${copy.lessonsTab}</h3><p>${copy.noLessons}</p></div>`
+}
+
+function renderAdminDetailTabContent(member, copy, language, activeTab) {
+  if (activeTab === 'rounds') {
+    return renderAdminRoundsTab(member, copy, language)
+  }
+
+  if (activeTab === 'events') {
+    return renderAdminEventsTab(member, copy, language)
+  }
+
+  if (activeTab === 'lessons') {
+    return renderAdminLessonsTab(member, copy, language)
+  }
+
+  return renderAdminPointsTab(member, copy, language)
+}
+
+function renderAdminNotificationSummary(member, copy) {
+  const methods = [
+    [copy.parentEmailNotify, 'ParentEmail', 'parentEmailNotify'],
+    [copy.playerTextNotify, 'PlayerText', 'playerTextNotify'],
+    [copy.parentTextNotify, 'ParentText', 'parentTextNotify'],
+  ]
+  const rows = [
+    [copy.lessonPosted, 'notifyLessons'],
+    [copy.eventPosted, 'notifyEvents'],
+    [copy.roundPosted, 'notifyGames'],
+  ]
+  const hasNewNotificationValues = rows.some(([, prefix]) => methods.some(([, suffix]) => Boolean(member?.[`${prefix}${suffix}`])))
+
+  return `
+    <div class="admin-notification-summary">
+      <h3>${copy.notifications}</h3>
+      <div class="admin-notification-groups">
+        ${rows.map(([label, prefix]) => `
+          <section class="admin-notification-group">
+            <strong>${label}</strong>
+            <div class="admin-notification-methods">
+              ${methods.map(([methodLabel, suffix, legacyKey]) => {
+                const enabled = hasNewNotificationValues
+                  ? Boolean(member?.[`${prefix}${suffix}`])
+                  : Boolean(member?.[legacyKey])
+                return `
+                  <span class="admin-notification-method ${enabled ? 'is-on' : 'is-off'}">
+                    <span class="admin-notification-dot" aria-hidden="true"></span>
+                    ${escapeHtml(methodLabel)}
+                  </span>
+                `
+              }).join('')}
+            </div>
+          </section>
+        `).join('')}
+      </div>
+    </div>
+  `
+}
+
+function openAdminPointHistoryWindow(memberId, language) {
+  const copy = ADMIN_COPY[language]
+  const member = currentAdminMembers.find((item) => Number(item.id || 0) === Number(memberId || 0))
+  const entries = Array.isArray(member?.pointEntries) ? member.pointEntries : []
+  const name = member?.name || member?.username || copy.player
+  const rows = entries.length
+    ? entries.map((entry) => {
+      const typeLabel = POINTS_COPY[language].types[entry.type] || entry.type
+      const amount = Number(entry.points || 0)
+      const amountClass = amount < 0 ? 'negative' : 'positive'
+
+      return `
+        <li>
+          <span>
+            <strong>${escapeHtml(entry.description || typeLabel)}</strong>
+            <small>${escapeHtml(typeLabel)} - ${formatRoundDate(entry.date, language)}</small>
+          </span>
+          <b class="${amountClass}">${formatPointAmount(amount, language)}</b>
+        </li>
+      `
+    }).join('')
+    : `<p>${copy.noPointHistory}</p>`
+  const historyWindow = window.open('', '_blank')
+
+  if (!historyWindow) {
+    return
+  }
+
+  historyWindow.document.write(`
+    <!doctype html>
+    <html lang="${language}">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>${escapeHtml(copy.pointHistoryWindowTitle)} - ${escapeHtml(name)}</title>
+        <style>
+          body { margin: 0; padding: 24px; color: #0c3d2d; font-family: Arial, sans-serif; background: #f7fbf9; }
+          main { max-width: 980px; margin: 0 auto; }
+          h1 { margin: 0 0 6px; font-size: 1.6rem; }
+          p { color: #5d6b64; font-weight: 700; }
+          ul { display: grid; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+          li { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 12px; border: 1px solid rgba(12, 61, 45, 0.14); border-radius: 8px; background: #fff; }
+          strong, small { display: block; }
+          small { margin-top: 3px; color: #5d6b64; font-weight: 700; }
+          b { white-space: nowrap; }
+          .positive { color: #217a4b; }
+          .negative { color: #c46a16; }
+        </style>
+      </head>
+      <body>
+        <main>
+          <h1>${escapeHtml(copy.pointHistoryWindowTitle)}</h1>
+          <p>${escapeHtml(name)} - ${entries.length} ${escapeHtml(POINTS_COPY[language].pointPlural)}</p>
+          <ul>${rows}</ul>
+        </main>
+      </body>
+    </html>
+  `)
+  historyWindow.document.close()
 }
 
 function renderAdminMembers(panel, members, language) {
   const container = panel.querySelector('[data-admin-members]')
   const copy = ADMIN_COPY[language]
   const filteredMembers = getFilteredAdminMembers(members)
+
+  updateAdminFilterCounts(panel, members)
+  updateAdminFilterButtons(panel)
 
   if (!container) {
     return
@@ -721,79 +1417,73 @@ function renderAdminMembers(panel, members, language) {
         <span>${copy.player}</span>
         <span>${copy.parentEmail}</span>
         <span>${copy.status}</span>
-        <span>${copy.path}</span>
+        <span>${copy.path} / ${copy.age}</span>
         <span>${copy.points}</span>
         <span></span>
       </div>
       ${filteredMembers.map((member) => {
         const membershipType = String(member.membershipType || '').toUpperCase()
         const isVerified = Boolean(member.emailVerified)
+        const isActive = member.isActive !== false
         const isExpanded = Number(member.id || 0) === Number(expandedAdminMemberId || 0)
-        const entries = Array.isArray(member.pointEntries) ? member.pointEntries : []
 
         return `
-          <form class="admin-members-row" data-admin-member-form role="row">
-            <input type="hidden" name="action" value="update_member" />
-            <input type="hidden" name="member_id" value="${Number(member.id || 0)}" />
-            <span>
+          <div class="admin-members-row" role="row">
+            <span data-label="${escapeHtml(copy.memberInfo)}">
               <strong>${escapeHtml(member.name || member.username || '')}</strong>
-              <small>${escapeHtml(member.username || '')}</small>
+              <small>${escapeHtml(member.username || '')} - ${isActive ? copy.activeYes : copy.activeNo}</small>
             </span>
-            <span>${escapeHtml(member.parentEmail || '')}</span>
-            <label class="account-notify-toggle admin-verify-toggle">
-              <input type="checkbox" name="email_verified" ${isVerified ? 'checked' : ''} />
-              <span>${isVerified ? copy.emailVerified : copy.emailNotVerified}</span>
-            </label>
-            <span>
-              <select name="membership_type">
-                ${adminPathOption('CUP', 'Cup', membershipType)}
-                ${adminPathOption('COMMUNITY', 'Community', membershipType)}
-                ${adminPathOption('TEACHER', 'Teacher', membershipType)}
-                ${adminPathOption('ADMIN', 'Admin', membershipType)}
-              </select>
+            <span data-label="${escapeHtml(copy.parentEmail)}">${escapeHtml(member.parentEmail || '')}</span>
+            <span data-label="${escapeHtml(copy.status)}">
+              <strong>${isVerified ? copy.emailVerified : copy.emailNotVerified}</strong>
             </span>
-            <span><strong>${Number(member.points || 0)}</strong></span>
+            <span data-label="${escapeHtml(`${copy.path} / ${copy.age}`)}">
+              <strong>${escapeHtml(accountStreamLabel(membershipType))}</strong>
+              <small>${member.playerAge ? `${copy.age} ${Number(member.playerAge)}` : copy.ageNotSet}</small>
+            </span>
+            <span data-label="${escapeHtml(copy.points)}"><strong>${Number(member.points || 0)}</strong></span>
             <span class="admin-row-actions">
-              <button class="admin-points-toggle" type="button" data-admin-points-toggle data-member-id="${Number(member.id || 0)}">${isExpanded ? copy.hidePoints : copy.viewPoints}</button>
-              <button type="submit">${copy.save}</button>
+              <button class="admin-points-toggle" type="button" data-admin-points-toggle data-member-id="${Number(member.id || 0)}">${isExpanded ? copy.close : copy.manage}</button>
             </span>
-          </form>
+          </div>
           ${isExpanded ? `
             <section class="admin-point-detail">
-              <div>
-                <h3>${copy.pointHistory}</h3>
-                ${entries.length ? `
-                  <ul>
-                    ${entries.map((entry) => {
-                      const typeLabel = POINTS_COPY[language].types[entry.type] || entry.type
-                      const amountClass = Number(entry.points || 0) < 0 ? 'is-negative' : 'is-positive'
-
-                      return `
-                        <li>
-                          <span>
-                            <strong>${escapeHtml(entry.description || typeLabel)}</strong>
-                            <small>${escapeHtml(typeLabel)} - ${formatRoundDate(entry.date, language)}</small>
-                          </span>
-                          <small class="${amountClass}">${formatPointAmount(Number(entry.points || 0), language)}</small>
-                        </li>
-                      `
-                    }).join('')}
-                  </ul>
-                ` : `<p>${copy.noPointHistory}</p>`}
-              </div>
-              <form class="admin-award-form" data-admin-award-form>
-                <input type="hidden" name="action" value="add_points" />
+              <form id="admin-member-form-${Number(member.id || 0)}" class="admin-manage-form" data-admin-member-form>
+                <input type="hidden" name="action" value="update_member" />
                 <input type="hidden" name="member_id" value="${Number(member.id || 0)}" />
+                <input type="hidden" name="email_verified_present" value="1" />
+                <h3>${copy.manage}</h3>
                 <label>
-                  <span>${copy.points}</span>
-                  <input type="number" name="points" min="1" max="999" inputmode="numeric" required />
+                  <span>${copy.age}</span>
+                  <input type="number" name="player_age" min="1" max="18" inputmode="numeric" value="${member.playerAge ? Number(member.playerAge) : ''}" required />
                 </label>
                 <label>
-                  <span>${copy.awardReason}</span>
-                  <input type="text" name="description" maxlength="160" placeholder="${copy.awardPlaceholder}" required />
+                  <span>${copy.path}</span>
+                  <select name="membership_type">
+                    ${adminPathOption('CUP', 'Cup', membershipType)}
+                    ${adminPathOption('COMMUNITY', 'Community', membershipType)}
+                    ${adminPathOption('TEACHER', 'Teacher', membershipType)}
+                    ${adminPathOption('ADMIN', 'Admin', membershipType)}
+                  </select>
                 </label>
-                <button type="submit">${copy.awardPoints}</button>
+                <label class="account-notify-toggle admin-verify-toggle">
+                  <input type="checkbox" name="email_verified" ${isVerified ? 'checked' : ''} />
+                  <span>${isVerified ? copy.emailVerified : copy.emailNotVerified}</span>
+                </label>
+                ${renderAdminNotificationSummary(member, copy)}
               </form>
+              <div class="admin-detail-panel">
+                ${renderAdminDetailTabs(copy, currentAdminDetailTab)}
+                ${renderAdminDetailTabContent(member, copy, language, currentAdminDetailTab)}
+              </div>
+              <div class="admin-member-bottom-actions">
+                <button type="submit" form="admin-member-form-${Number(member.id || 0)}">${copy.save}</button>
+                <form class="admin-delete-form" data-admin-delete-form>
+                  <input type="hidden" name="action" value="${isActive ? 'set_inactive_member' : 'activate_member'}" />
+                  <input type="hidden" name="member_id" value="${Number(member.id || 0)}" />
+                  <button class="${isActive ? '' : 'admin-reactivate'}" type="submit">${isActive ? copy.deleteMember : copy.activateMember}</button>
+                </form>
+              </div>
             </section>
           ` : ''}
         `
@@ -875,8 +1565,9 @@ async function handleAdminMemberSubmit(form) {
   const panel = form.closest('[data-admin-panel]')
   const language = getLanguage()
   const status = panel?.querySelector('[data-admin-status]')
-  const button = form.querySelector('button[type="submit"]')
+  const button = form.querySelector('button[type="submit"]') || (form.id ? document.querySelector(`button[form="${form.id}"]`) : null)
   const formData = new FormData(form)
+  const action = String(formData.get('action') || '')
 
   if (status) {
     status.textContent = ADMIN_COPY[language].saving
@@ -904,6 +1595,11 @@ async function handleAdminMemberSubmit(form) {
 
     currentAdminMembers = result.members || []
     currentAdminCashouts = result.cashoutRequests || []
+
+    if (action === 'set_inactive_member') {
+      currentAdminFilter = 'inactive'
+    }
+
     renderAdminCashouts(panel, currentAdminCashouts, language)
     renderAdminMembers(panel, currentAdminMembers, language)
 
@@ -1419,9 +2115,10 @@ function renderPointsState(tool, result, language) {
       ${entries.map((entry) => {
         const typeLabel = POINTS_COPY[language].types[entry.type] || entry.type
         const amountClass = entry.points < 0 ? 'is-negative' : 'is-positive'
+        const rowClass = entry.points < 0 ? 'is-negative-entry' : ''
 
         return `
-          <li>
+          <li class="${rowClass}">
             <div>
               <strong>${entry.description || typeLabel}</strong>
               <span>${typeLabel} - ${formatRoundDate(entry.date, language)}</span>
@@ -1555,6 +2252,39 @@ function formatCurrency(value, language) {
   }).format(amount)
 }
 
+function pathAllowsCurrentMember(path) {
+  const memberType = String(currentMember?.membershipType || '').toUpperCase()
+
+  if (path === 'EVERYONE') {
+    return ['CUP', 'COMMUNITY'].includes(memberType)
+  }
+
+  return memberType === path
+}
+
+function pathOnlyLabel(copy, path) {
+  return copy.pathOnlyLabels?.[path] || copy.pathLabels?.[path] || path
+}
+
+function ageRangeLabel(minAge, maxAge, language, copy = FIND_GAME_COPY[language]) {
+  const min = Number(minAge || 0)
+  const max = Number(maxAge || 0)
+
+  if (min > 0 && max > 0) {
+    return min === max ? `${copy.age} ${min}` : `${copy.ages} ${min}-${max}`
+  }
+
+  if (min > 0) {
+    return `${copy.age} ${min}+`
+  }
+
+  if (max > 0) {
+    return language === 'fr' ? `${copy.age} ${max} et moins` : `${copy.age} ${max} and under`
+  }
+
+  return copy.ageAny
+}
+
 function renderEventCollection(container, events, language, title = '', options = {}) {
   if (!container) {
     return
@@ -1579,9 +2309,15 @@ function renderEventCollection(container, events, language, title = '', options 
           ? null
           : Number(event.spotsRemaining)
         const isFull = maxPlayers > 0 && spotsRemaining <= 0
-        const joinLabel = isFull ? EVENTS_COPY[language].full : EVENTS_COPY[language].join
         const winner = String(event.winner || '').trim()
         const eventPath = String(event.eventPath || 'EVERYONE')
+        const canJoinPath = pathAllowsCurrentMember(eventPath)
+        const ageLabel = ageRangeLabel(event.minAge, event.maxAge, language, EVENTS_COPY[language])
+        const canJoinAge = event.isAgeEligible !== false
+        const joinLabel = !canJoinPath
+          ? pathOnlyLabel(EVENTS_COPY[language], eventPath)
+          : !canJoinAge ? ageLabel
+          : isFull ? EVENTS_COPY[language].full : EVENTS_COPY[language].join
         const communityCost = Number(event.communityCost || 0)
         const costLabel = eventPath === 'CUP'
           ? ''
@@ -1594,6 +2330,7 @@ function renderEventCollection(container, events, language, title = '', options 
               <span>${escapeHtml(formatEventDateTime(event, language))}</span>
               <span>${EVENTS_COPY[language].location}: ${escapeHtml(event.location)}</span>
               <span>${EVENTS_COPY[language].path}: ${EVENTS_COPY[language].pathLabels[eventPath] || eventPath}</span>
+              <span>${EVENTS_COPY[language].age}: ${escapeHtml(ageLabel)}</span>
               ${costLabel ? `<span>${escapeHtml(costLabel)}</span>` : ''}
               ${event.description ? `<p class="event-card-description">${escapeHtml(event.description)}</p>` : ''}
               ${showWinner && winner ? `<span>${EVENTS_COPY[language].winner}: ${escapeHtml(winner)}</span>` : ''}
@@ -1628,7 +2365,7 @@ function renderEventCollection(container, events, language, title = '', options 
                   type="button"
                   data-event-action="join"
                   data-event-id="${Number(event.id || 0)}"
-                  ${isFull ? 'disabled' : ''}
+                  ${(isFull || !canJoinPath || !canJoinAge) ? 'disabled' : ''}
                 >${joinLabel}</button>
               ` : ''}
             </div>
@@ -1649,13 +2386,13 @@ function renderEventCollection(container, events, language, title = '', options 
 
 function renderEventsState(tool, result, language) {
   const allEvents = [...(result.upcoming || []), ...(result.past || [])]
-  const isAdmin = currentMember?.membershipType === 'ADMIN'
-  const showAdminActions = isAdmin && isEventAdminModeOpen
+  const canManageEvents = ['ADMIN', 'TEACHER'].includes(currentMember?.membershipType)
+  const showAdminActions = canManageEvents && isEventAdminModeOpen
   const adminPanel = tool.querySelector('[data-event-admin-panel]')
   const adminToggle = tool.querySelector('[data-event-admin-toggle]')
 
   currentEventsById = new Map(allEvents.map((event) => [String(event.id), event]))
-  adminPanel?.classList.toggle('is-hidden', isAdmin && !isEventAdminModeOpen)
+  adminPanel?.classList.toggle('is-hidden', !showAdminActions)
 
   if (adminToggle) {
     adminToggle.textContent = isEventAdminModeOpen
@@ -1700,9 +2437,15 @@ function renderFindGamesState(tool, games, language) {
         const spotsRemaining = Number(game.spotsRemaining || 0)
         const isFull = spotsRemaining <= 0
         const isPoster = Number(game.createdByMemberId || 0) === currentMemberId
+        const gamePath = String(game.gamePath || 'EVERYONE')
+        const canJoinPath = pathAllowsCurrentMember(gamePath)
+        const ageLabel = ageRangeLabel(game.minAge, game.maxAge, language, FIND_GAME_COPY[language])
+        const canJoinAge = game.isAgeEligible !== false
         const buttonLabel = game.isJoined
           ? isPoster ? FIND_GAME_COPY[language].joined : FIND_GAME_COPY[language].leave
-          : isFull ? FIND_GAME_COPY[language].full : FIND_GAME_COPY[language].join
+          : !canJoinPath ? pathOnlyLabel(FIND_GAME_COPY[language], gamePath)
+            : !canJoinAge ? ageLabel
+            : isFull ? FIND_GAME_COPY[language].full : FIND_GAME_COPY[language].join
 
         return `
           <li class="${isFull ? 'is-full' : ''}">
@@ -1712,6 +2455,8 @@ function renderFindGamesState(tool, games, language) {
                 eventTime: game.gameTime,
               }, language))}</strong>
               <span>${FIND_GAME_COPY[language].location}: ${escapeHtml(game.location)}</span>
+              <span>${FIND_GAME_COPY[language].path}: ${FIND_GAME_COPY[language].pathLabels[gamePath] || gamePath}</span>
+              <span>${FIND_GAME_COPY[language].age}: ${escapeHtml(ageLabel)}</span>
               <p class="event-card-description">${escapeHtml(game.roundDetails)}</p>
             </div>
             <div class="event-card-points">
@@ -1721,7 +2466,7 @@ function renderFindGamesState(tool, games, language) {
                 type="button"
                 data-find-game-action="${game.isJoined ? 'leave' : 'join'}"
                 data-game-id="${Number(game.id || 0)}"
-                ${(isPoster || (!game.isJoined && isFull)) ? 'disabled' : ''}
+                ${(isPoster || (!game.isJoined && (isFull || !canJoinPath || !canJoinAge))) ? 'disabled' : ''}
               >${buttonLabel}</button>
             </div>
             <div class="event-attendees">
@@ -1804,6 +2549,8 @@ function renderLessonsState(tool, result, language) {
           const students = Array.isArray(slot.students) ? slot.students : []
           const isProvider = Number(slot.providerMemberId || 0) === currentMemberId
           const canDeleteSlot = canTeach && isProvider && students.length === 0
+          const lessonPath = String(slot.lessonPath || 'EVERYONE')
+          const ageLabel = ageRangeLabel(slot.minAge, slot.maxAge, language, LESSON_COPY[language])
 
           return `
             <li class="is-booked">
@@ -1811,6 +2558,8 @@ function renderLessonsState(tool, result, language) {
                 <strong>${escapeHtml(formatEventDateTime({ eventDate: slot.lessonDate, eventTime: slot.lessonTime }, language))}</strong>
                 <span>${LESSON_COPY[language].provider}: ${memberNameHtml(slot.providerName, slot.providerMembershipType)}</span>
                 <span>${lessonTypeLabel(slot.lessonType, language)} • ${LESSON_COPY[language].max}: ${Number(slot.maxStudents || 1)}</span>
+                <span>${LESSON_COPY[language].path}: ${LESSON_COPY[language].pathLabels[lessonPath] || lessonPath}</span>
+                <span>${LESSON_COPY[language].age}: ${escapeHtml(ageLabel)}</span>
                 <span>${LESSON_COPY[language].location}: ${escapeHtml(slot.location)}</span>
                 ${slot.notes ? `<p class="event-card-description">${escapeHtml(slot.notes)}</p>` : ''}
               </div>
@@ -1841,9 +2590,15 @@ function renderLessonsState(tool, result, language) {
           const students = Array.isArray(slot.students) ? slot.students : []
           const isFull = Number(slot.spotsRemaining || 0) <= 0
           const isProvider = Number(slot.providerMemberId || 0) === currentMemberId
+          const lessonPath = String(slot.lessonPath || 'EVERYONE')
+          const canJoinPath = pathAllowsCurrentMember(lessonPath)
+          const ageLabel = ageRangeLabel(slot.minAge, slot.maxAge, language, LESSON_COPY[language])
+          const canJoinAge = slot.isAgeEligible !== false
           const buttonLabel = slot.isJoined
             ? LESSON_COPY[language].leave
-            : isFull ? LESSON_COPY[language].full : LESSON_COPY[language].join
+            : !canJoinPath ? pathOnlyLabel(LESSON_COPY[language], lessonPath)
+              : !canJoinAge ? ageLabel
+              : isFull ? LESSON_COPY[language].full : LESSON_COPY[language].join
 
           return `
             <li class="${isFull ? 'is-full' : ''}">
@@ -1851,6 +2606,8 @@ function renderLessonsState(tool, result, language) {
                 <strong>${escapeHtml(formatEventDateTime({ eventDate: slot.lessonDate, eventTime: slot.lessonTime }, language))}</strong>
                 <span>${LESSON_COPY[language].provider}: ${memberNameHtml(slot.providerName, slot.providerMembershipType)}</span>
                 <span>${lessonTypeLabel(slot.lessonType, language)} • ${LESSON_COPY[language].max}: ${Number(slot.maxStudents || 1)}</span>
+                <span>${LESSON_COPY[language].path}: ${LESSON_COPY[language].pathLabels[lessonPath] || lessonPath}</span>
+                <span>${LESSON_COPY[language].age}: ${escapeHtml(ageLabel)}</span>
                 <span>${LESSON_COPY[language].location}: ${escapeHtml(slot.location)}</span>
                 ${slot.notes ? `<p class="event-card-description">${escapeHtml(slot.notes)}</p>` : ''}
               </div>
@@ -1861,7 +2618,7 @@ function renderLessonsState(tool, result, language) {
                   type="button"
                   data-lesson-slot-action="${slot.isJoined ? 'leave_slot' : 'join_slot'}"
                   data-slot-id="${Number(slot.id || 0)}"
-                  ${(!canJoinLesson || isProvider || (!slot.isJoined && isFull)) ? 'disabled' : ''}
+                  ${(!canJoinLesson || isProvider || (!slot.isJoined && (isFull || !canJoinPath || !canJoinAge))) ? 'disabled' : ''}
                 >${isProvider ? LESSON_COPY[language].joined : buttonLabel}</button>
               </div>
               <div class="event-attendees">
@@ -1881,6 +2638,7 @@ function renderLessonsState(tool, result, language) {
         ${requests.map((request) => {
           const isRequester = Number(request.requesterMemberId || 0) === currentMemberId
           const isAccepted = Boolean(request.acceptedByMemberId)
+          const lessonPath = String(request.lessonPath || request.requesterMembershipType || 'EVERYONE')
 
           return `
             <li class="${isAccepted ? 'is-full' : ''}">
@@ -1888,6 +2646,7 @@ function renderLessonsState(tool, result, language) {
                 <strong>${escapeHtml(formatEventDateTime({ eventDate: request.preferredDate, eventTime: request.preferredTime }, language))}</strong>
                 <span>${LESSON_COPY[language].requester}: ${memberNameWithPathHtml(request.requesterName, request.requesterMembershipType)}</span>
                 <span>${lessonTypeLabel(request.lessonType, language)} • ${LESSON_COPY[language].max}: ${Number(request.maxStudents || 1)}</span>
+                <span>${LESSON_COPY[language].path}: ${LESSON_COPY[language].pathLabels[lessonPath] || lessonPath}</span>
                 ${request.notes ? `<p class="event-card-description">${escapeHtml(request.notes)}</p>` : ''}
                 ${isAccepted ? `<span>${LESSON_COPY[language].accepted}: ${memberNameHtml(request.acceptedByName, request.acceptedByMembershipType)}</span>` : ''}
               </div>
@@ -1995,6 +2754,7 @@ function initializeEventsTool(language) {
     return
   }
 
+  isEventAdminModeOpen = false
   initializeDatePickers(tool)
   loadEvents(tool, language)
 }
@@ -2071,6 +2831,8 @@ function editEventFromList(button) {
   form.querySelector('input[name="participant_points"]').value = Number(event.participantPoints || 0)
   form.querySelector('input[name="max_players"]').value = Number(event.maxPlayers || 1)
   form.querySelector('select[name="event_path"]').value = event.eventPath || 'EVERYONE'
+  form.querySelector('input[name="min_age"]').value = event.minAge || ''
+  form.querySelector('input[name="max_age"]').value = event.maxAge || ''
   form.querySelector('input[name="community_cost"]').value = Number(event.communityCost || 0).toFixed(2)
   form.querySelector('input[name="location"]').value = event.location || 'Hawkesbury'
   form.querySelector('textarea[name="description"]').value = event.description || ''
@@ -2494,6 +3256,14 @@ document.addEventListener('click', (event) => {
     return
   }
 
+  const sessionModeLink = event.target.closest('[data-session-mode-link]')
+
+  if (sessionModeLink) {
+    event.preventDefault()
+    handleSessionModeLink(sessionModeLink)
+    return
+  }
+
   const adminToggle = event.target.closest('[data-admin-toggle]')
 
   if (adminToggle) {
@@ -2504,6 +3274,33 @@ document.addEventListener('click', (event) => {
     return
   }
 
+  const adminTextOpen = event.target.closest('[data-admin-text-open]')
+
+  if (adminTextOpen) {
+    const panel = adminTextOpen.closest('[data-admin-panel]')
+
+    setAdminTextModalOpen(panel, true)
+    return
+  }
+
+  const adminTextClose = event.target.closest('[data-admin-text-close]')
+
+  if (adminTextClose) {
+    const panel = adminTextClose.closest('[data-admin-panel]')
+
+    setAdminTextModalOpen(panel, false)
+    return
+  }
+
+  const adminTextModal = event.target.closest('[data-admin-text-modal]')
+
+  if (adminTextModal && event.target === adminTextModal) {
+    const panel = adminTextModal.closest('[data-admin-panel]')
+
+    setAdminTextModalOpen(panel, false)
+    return
+  }
+
   const adminFilter = event.target.closest('[data-admin-filter]')
 
   if (adminFilter) {
@@ -2511,9 +3308,6 @@ document.addEventListener('click', (event) => {
     const language = getLanguage()
 
     currentAdminFilter = adminFilter.dataset.adminFilter || 'staff'
-    panel?.querySelectorAll('[data-admin-filter]').forEach((button) => {
-      button.classList.toggle('active', button === adminFilter)
-    })
     renderAdminMembers(panel, currentAdminMembers, language)
     return
   }
@@ -2524,8 +3318,27 @@ document.addEventListener('click', (event) => {
     const panel = adminPointsToggle.closest('[data-admin-panel]')
     const memberId = Number(adminPointsToggle.dataset.memberId || 0)
 
-    expandedAdminMemberId = expandedAdminMemberId === memberId ? null : memberId
+    const isClosing = expandedAdminMemberId === memberId
+    expandedAdminMemberId = isClosing ? null : memberId
+    currentAdminDetailTab = 'points'
     renderAdminMembers(panel, currentAdminMembers, getLanguage())
+    return
+  }
+
+  const adminDetailTab = event.target.closest('[data-admin-detail-tab]')
+
+  if (adminDetailTab) {
+    const panel = adminDetailTab.closest('[data-admin-panel]')
+
+    currentAdminDetailTab = adminDetailTab.dataset.adminDetailTab || 'points'
+    renderAdminMembers(panel, currentAdminMembers, getLanguage())
+    return
+  }
+
+  const adminPointsAll = event.target.closest('[data-admin-points-all]')
+
+  if (adminPointsAll) {
+    openAdminPointHistoryWindow(Number(adminPointsAll.dataset.memberId || 0), getLanguage())
     return
   }
 
@@ -2730,6 +3543,20 @@ document.addEventListener('submit', (event) => {
     return
   }
 
+  const adminDeleteForm = event.target.closest('[data-admin-delete-form]')
+
+  if (adminDeleteForm) {
+    event.preventDefault()
+
+    const action = adminDeleteForm.querySelector('input[name="action"]')?.value || ''
+
+    if (action === 'activate_member' || window.confirm(ADMIN_COPY[getLanguage()].deleteConfirm)) {
+      handleAdminMemberSubmit(adminDeleteForm)
+    }
+
+    return
+  }
+
   const adminMemberForm = event.target.closest('[data-admin-member-form]')
 
   if (adminMemberForm) {
@@ -2743,6 +3570,14 @@ document.addEventListener('submit', (event) => {
   if (adminCashoutForm) {
     event.preventDefault()
     handleAdminMemberSubmit(adminCashoutForm)
+    return
+  }
+
+  const adminTextForm = event.target.closest('[data-admin-text-form]')
+
+  if (adminTextForm) {
+    event.preventDefault()
+    handleAdminTextSubmit(adminTextForm)
     return
   }
 
@@ -2771,6 +3606,25 @@ document.addEventListener('input', (event) => {
     updatePlayerTextField(playerAge)
   }
 })
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault()
+  deferredInstallPrompt = event
+})
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null
+})
+
+if ('serviceWorker' in navigator) {
+  const registerServiceWorker = () => navigator.serviceWorker.register('/sw.js').catch(() => null)
+
+  if (document.readyState === 'complete') {
+    registerServiceWorker()
+  } else {
+    window.addEventListener('load', registerServiceWorker)
+  }
+}
 
 window.addEventListener('hashchange', render)
 await checkMemberSession()

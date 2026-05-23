@@ -15,4 +15,15 @@ if (savedSecret !== null) {
   writeFileSync(secretPath, savedSecret)
 }
 
+const distIndexPath = resolve('dist/index.html')
+const memberIndexPath = resolve('dist/member/index.html')
+const membersIndexPath = resolve('dist/members/index.html')
+
+if (existsSync(distIndexPath)) {
+  mkdirSync(dirname(memberIndexPath), { recursive: true })
+  writeFileSync(memberIndexPath, readFileSync(distIndexPath, 'utf8'))
+  mkdirSync(dirname(membersIndexPath), { recursive: true })
+  writeFileSync(membersIndexPath, readFileSync(distIndexPath, 'utf8'))
+}
+
 process.exit(result.status ?? 1)

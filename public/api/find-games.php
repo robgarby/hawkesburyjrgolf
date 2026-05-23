@@ -90,10 +90,63 @@ function get_find_game_players(PDO $pdo, int $gameId): array
     );
 }
 
+function get_member_details(PDO $pdo, int $memberId): array
+{
+    $statement = $pdo->prepare(
+        'SELECT membership_type, player_age
+         FROM members
+         WHERE id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $memberId]);
+
+    $member = $statement->fetch();
+
+    return [
+        'membershipType' => (string) ($member['membership_type'] ?? ''),
+        'playerAge' => isset($member['player_age']) ? (int) $member['player_age'] : null,
+    ];
+}
+
+function read_path(string $fieldName): string
+{
+    $path = strtoupper(trim((string) ($_POST[$fieldName] ?? 'EVERYONE')));
+
+    return in_array($path, ['CUP', 'COMMUNITY', 'EVERYONE'], true) ? $path : 'EVERYONE';
+}
+
+function path_allows_member(string $path, string $memberType): bool
+{
+    if ($path === 'EVERYONE') {
+        return in_array($memberType, ['CUP', 'COMMUNITY'], true);
+    }
+
+    return $memberType === $path;
+}
+
+function age_allows_member(?int $minAge, ?int $maxAge, ?int $playerAge): bool
+{
+    if ($minAge === null && $maxAge === null) {
+        return true;
+    }
+
+    if ($playerAge === null || $playerAge < 1) {
+        return false;
+    }
+
+    if ($minAge !== null && $playerAge < $minAge) {
+        return false;
+    }
+
+    return $maxAge === null || $playerAge <= $maxAge;
+}
+
 function get_find_games(PDO $pdo, int $memberId): array
 {
+    $memberDetails = get_member_details($pdo, $memberId);
+    $playerAge = $memberDetails['playerAge'];
     $statement = $pdo->query(
-        'SELECT id, created_by_member_id, game_date, game_time, spots_open, round_details, location, created_at
+        'SELECT id, created_by_member_id, game_date, game_time, spots_open, game_path, min_age, max_age, round_details, location, created_at
          FROM member_find_games
          ORDER BY game_date ASC, game_time ASC, id ASC'
     );
@@ -109,6 +162,8 @@ function get_find_games(PDO $pdo, int $memberId): array
         $playerCount = count($players);
         $spotsOpen = (int) $game['spots_open'];
         $spotsRemaining = max(0, $spotsOpen - max(0, $playerCount - 1));
+        $minAge = $game['min_age'] === null ? null : (int) $game['min_age'];
+        $maxAge = $game['max_age'] === null ? null : (int) $game['max_age'];
 
         $games[] = [
             'id' => (int) $game['id'],
@@ -117,6 +172,10 @@ function get_find_games(PDO $pdo, int $memberId): array
             'gameTime' => substr((string) $game['game_time'], 0, 5),
             'spotsOpen' => $spotsOpen,
             'spotsRemaining' => $spotsRemaining,
+            'gamePath' => $game['game_path'] ?? 'EVERYONE',
+            'minAge' => $minAge,
+            'maxAge' => $maxAge,
+            'isAgeEligible' => age_allows_member($minAge, $maxAge, $playerAge),
             'roundDetails' => $game['round_details'],
             'location' => $game['location'],
             'players' => $players,
@@ -145,6 +204,9 @@ try {
 
     ensure_members_table($pdo);
     ensure_member_find_games_table($pdo);
+    $memberDetails = get_member_details($pdo, $memberId);
+    $memberType = $memberDetails['membershipType'];
+    $playerAge = $memberDetails['playerAge'];
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         send_games_response($pdo, $memberId);
@@ -172,7 +234,7 @@ try {
         }
 
         $gameStatement = $pdo->prepare(
-            'SELECT id, game_date, spots_open
+            'SELECT id, game_date, spots_open, game_path, min_age, max_age
              FROM member_find_games
              WHERE id = :id
              LIMIT 1'
@@ -193,6 +255,23 @@ try {
             send_json(422, [
                 'ok' => false,
                 'message' => 'Past games cannot be joined.',
+            ]);
+        }
+
+        if (!path_allows_member((string) ($game['game_path'] ?? 'EVERYONE'), $memberType)) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'This game is not open to your membership path.',
+            ]);
+        }
+
+        $minAge = $game['min_age'] === null ? null : (int) $game['min_age'];
+        $maxAge = $game['max_age'] === null ? null : (int) $game['max_age'];
+
+        if (!age_allows_member($minAge, $maxAge, $playerAge)) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'This game is not open to your age group.',
             ]);
         }
 
@@ -293,6 +372,15 @@ try {
     $spotsOpen = filter_var($_POST['spots_open'] ?? null, FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1, 'max_range' => 12],
     ]);
+    $gamePath = read_path('game_path');
+    $minAgeRaw = trim((string) ($_POST['min_age'] ?? ''));
+    $maxAgeRaw = trim((string) ($_POST['max_age'] ?? ''));
+    $minAge = $minAgeRaw === '' ? null : filter_var($minAgeRaw, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 99],
+    ]);
+    $maxAge = $maxAgeRaw === '' ? null : filter_var($maxAgeRaw, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 99],
+    ]);
     $roundDetails = trim((string) ($_POST['round_details'] ?? ''));
     $location = trim((string) ($_POST['location'] ?? 'Hawkesbury'));
 
@@ -310,23 +398,40 @@ try {
         ]);
     }
 
+    if ($minAge === false || $maxAge === false || ($minAge !== null && $maxAge !== null && $minAge > $maxAge)) {
+        send_json(422, [
+            'ok' => false,
+            'message' => 'Please enter a valid age range.',
+        ]);
+    }
+
     if ($location === '') {
         $location = 'Hawkesbury';
+    }
+
+    if (!path_allows_member($gamePath, $memberType)) {
+        send_json(403, [
+            'ok' => false,
+            'message' => 'You can only post games for your own membership path or both paths.',
+        ]);
     }
 
     $pdo->beginTransaction();
 
     $insert = $pdo->prepare(
         'INSERT INTO member_find_games
-            (created_by_member_id, game_date, game_time, spots_open, round_details, location)
+            (created_by_member_id, game_date, game_time, spots_open, game_path, min_age, max_age, round_details, location)
          VALUES
-            (:created_by_member_id, :game_date, :game_time, :spots_open, :round_details, :location)'
+            (:created_by_member_id, :game_date, :game_time, :spots_open, :game_path, :min_age, :max_age, :round_details, :location)'
     );
     $insert->execute([
         'created_by_member_id' => $memberId,
         'game_date' => $gameDate,
         'game_time' => $gameTime,
         'spots_open' => (int) $spotsOpen,
+        'game_path' => $gamePath,
+        'min_age' => $minAge,
+        'max_age' => $maxAge,
         'round_details' => $roundDetails,
         'location' => $location,
     ]);
