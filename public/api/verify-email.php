@@ -13,7 +13,9 @@ if ($token === '') {
 
 try {
     $pdo = get_database();
-    ensure_members_table($pdo);
+    run_schema_setup('Email verification service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
 
     $tokenHash = hash('sha256', $token);
     $statement = $pdo->prepare(

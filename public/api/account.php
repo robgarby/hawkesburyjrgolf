@@ -61,7 +61,8 @@ function get_account_profile(PDO $pdo, int $memberId): array
                 notify_lessons_parent_email, notify_lessons_player_text, notify_lessons_parent_text,
                 notify_events_parent_email, notify_events_player_text, notify_events_parent_text,
                 notify_games_parent_email, notify_games_player_text, notify_games_parent_text,
-                parent_name, parent_text, parent_text_notify, player_age, player_text, player_text_notify
+                parent_name, parent_text, parent_text_notify, player_age, player_text, player_text_notify,
+                show_public_stats
          FROM members
          WHERE id = :id
          LIMIT 1'
@@ -96,13 +97,16 @@ function get_account_profile(PDO $pdo, int $memberId): array
         'playerAge' => $member['player_age'] ? (int) $member['player_age'] : null,
         'playerText' => $member['player_text'],
         'playerTextNotify' => (bool) $member['player_text_notify'],
+        'showPublicStats' => (bool) $member['show_public_stats'],
     ];
 }
 
 try {
     $memberId = get_account_member_id();
     $pdo = get_database();
-    ensure_members_table($pdo);
+    run_schema_setup('Account service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         send_account_json(200, [
@@ -130,6 +134,7 @@ try {
     $parentEmailNotify = ($notifyLessonsParentEmail || $notifyEventsParentEmail || $notifyGamesParentEmail) ? 1 : 0;
     $playerTextNotify = ($notifyLessonsPlayerText || $notifyEventsPlayerText || $notifyGamesPlayerText) ? 1 : 0;
     $parentTextNotify = ($notifyLessonsParentText || $notifyEventsParentText || $notifyGamesParentText) ? 1 : 0;
+    $showPublicStats = isset($_POST['show_public_stats']) && (string) $_POST['show_public_stats'] !== '0' ? 1 : 0;
 
     if (!filter_var($parentEmail, FILTER_VALIDATE_EMAIL)) {
         send_account_json(422, ['ok' => false, 'message' => 'Please enter a valid parent email.']);
@@ -151,7 +156,8 @@ try {
              parent_text = :parent_text,
              parent_text_notify = :parent_text_notify,
              player_text = :player_text,
-             player_text_notify = :player_text_notify
+             player_text_notify = :player_text_notify,
+             show_public_stats = :show_public_stats
          WHERE id = :id'
     );
     $statement->execute([
@@ -170,6 +176,7 @@ try {
         'parent_text_notify' => $parentTextNotify,
         'player_text' => $playerText === '' ? null : $playerText,
         'player_text_notify' => $playerTextNotify,
+        'show_public_stats' => $showPublicStats,
         'id' => $memberId,
     ]);
 

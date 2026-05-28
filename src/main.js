@@ -68,6 +68,7 @@ const EVENTS_COPY = {
     points: 'pts',
     attendeeCsv: 'Attendee CSV',
     location: 'Location',
+    holes: 'Holes',
     description: 'Description',
     age: 'Age',
     ages: 'Ages',
@@ -81,14 +82,19 @@ const EVENTS_COPY = {
     edit: 'Edit',
     remove: 'Remove',
     removeConfirm: 'Remove this event?',
+    addPlayer: 'Add Player to Event',
+    hideAddPlayer: 'Hide Add Player',
+    player: 'Player',
+    savePlayer: 'Save',
+    noPlayers: 'No active juniors available.',
     path: 'Path',
     pathLabels: {
-      CUP: 'CUP',
+      CUP: 'Member Event',
       COMMUNITY: 'Community Event',
-      EVERYONE: 'Both (Cup and Community)',
+      EVERYONE: 'Both (Member and Community)',
     },
     pathOnlyLabels: {
-      CUP: 'CUP only',
+      CUP: 'Member only',
       COMMUNITY: 'Community only',
     },
     communityCost: 'Cost for Community Member',
@@ -102,6 +108,7 @@ const EVENTS_COPY = {
     points: 'pts',
     attendeeCsv: 'CSV des participants',
     location: 'Lieu',
+    holes: 'Trous',
     description: 'Description',
     age: 'Âge',
     ages: 'Âges',
@@ -115,14 +122,19 @@ const EVENTS_COPY = {
     edit: 'Modifier',
     remove: 'Supprimer',
     removeConfirm: 'Supprimer cet événement?',
+    addPlayer: 'Ajouter un joueur à l’événement',
+    hideAddPlayer: 'Masquer l’ajout de joueur',
+    player: 'Joueur',
+    savePlayer: 'Enregistrer',
+    noPlayers: 'Aucun junior actif disponible.',
     path: 'Parcours',
     pathLabels: {
-      CUP: 'CUP',
+      CUP: 'Membre',
       COMMUNITY: 'Événement communautaire',
-      EVERYONE: 'Les deux (CUP et communauté)',
+      EVERYONE: 'Les deux (membre et communauté)',
     },
     pathOnlyLabels: {
-      CUP: 'CUP seulement',
+      CUP: 'Membre seulement',
       COMMUNITY: 'Communauté seulement',
     },
     communityCost: 'Coût pour membre communautaire',
@@ -141,17 +153,28 @@ const FIND_GAME_COPY = {
     spotsOpen: 'spots open',
     playing: 'Playing',
     location: 'Location',
+    textPreviewTitle: 'Text preview only',
+    textPreviewIntro: 'No texts were sent. These people match the Find a Game text settings for this round:',
+    textPreviewEmpty: 'No one would receive a text for this round.',
+    textPreviewPlayer: 'Junior',
+    textPreviewParent: 'Parent',
+    textPreviewMessage: 'Message',
+    textPreviewMissing: 'The game was posted, but the text preview did not come back from the API. The updated find-games.php file likely needs to be uploaded.',
+    textPreviewClose: 'Close',
+    edit: 'Edit',
+    remove: 'Remove',
+    removeConfirm: 'Remove this round?',
     age: 'Age',
     ages: 'Ages',
     ageAny: 'Any age',
     path: 'Path',
     pathLabels: {
-      CUP: 'CUP',
+      CUP: 'Member',
       COMMUNITY: 'Community',
-      EVERYONE: 'Both (Cup and Community)',
+      EVERYONE: 'Both (Member and Community)',
     },
     pathOnlyLabels: {
-      CUP: 'CUP only',
+      CUP: 'Member only',
       COMMUNITY: 'Community only',
     },
   },
@@ -166,17 +189,28 @@ const FIND_GAME_COPY = {
     spotsOpen: 'places disponibles',
     playing: 'Joueurs',
     location: 'Lieu',
+    textPreviewTitle: 'Aperçu texto seulement',
+    textPreviewIntro: 'Aucun texto envoyé. Ces personnes correspondent aux avis texto pour cette ronde :',
+    textPreviewEmpty: 'Personne ne recevrait un texto pour cette ronde.',
+    textPreviewPlayer: 'Junior',
+    textPreviewParent: 'Parent',
+    textPreviewMessage: 'Message',
+    textPreviewMissing: 'La ronde a été publiée, mais l’aperçu texto n’est pas revenu de l’API. Le fichier find-games.php mis à jour doit probablement être téléversé.',
+    textPreviewClose: 'Fermer',
+    edit: 'Modifier',
+    remove: 'Supprimer',
+    removeConfirm: 'Supprimer cette ronde?',
     age: 'Âge',
     ages: 'Âges',
     ageAny: 'Tous âges',
     path: 'Parcours',
     pathLabels: {
-      CUP: 'CUP',
+      CUP: 'Membre',
       COMMUNITY: 'Communauté',
-      EVERYONE: 'Les deux (CUP et communauté)',
+      EVERYONE: 'Les deux (membre et communauté)',
     },
     pathOnlyLabels: {
-      CUP: 'CUP seulement',
+      CUP: 'Membre seulement',
       COMMUNITY: 'Communauté seulement',
     },
   },
@@ -206,12 +240,12 @@ const LESSON_COPY = {
     ageAny: 'Any age',
     path: 'Path',
     pathLabels: {
-      CUP: 'CUP',
+      CUP: 'Member',
       COMMUNITY: 'Community',
-      EVERYONE: 'Both (Cup and Community)',
+      EVERYONE: 'Both (Member and Community)',
     },
     pathOnlyLabels: {
-      CUP: 'CUP only',
+      CUP: 'Member only',
       COMMUNITY: 'Community only',
     },
   },
@@ -239,12 +273,12 @@ const LESSON_COPY = {
     ageAny: 'Tous âges',
     path: 'Parcours',
     pathLabels: {
-      CUP: 'CUP',
+      CUP: 'Membre',
       COMMUNITY: 'Communauté',
-      EVERYONE: 'Les deux (CUP et communauté)',
+      EVERYONE: 'Les deux (membre et communauté)',
     },
     pathOnlyLabels: {
-      CUP: 'CUP seulement',
+      CUP: 'Membre seulement',
       COMMUNITY: 'Communauté seulement',
     },
   },
@@ -256,7 +290,12 @@ const ADMIN_COPY = {
     saving: 'Saving member...',
     empty: 'No members found.',
     player: 'Player',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    parentName: 'Parent Name',
     parentEmail: 'Parent Email',
+    parentText: 'Parent Text',
+    playerText: 'Player Text',
     status: 'Status',
     memberInfo: 'Member',
     active: 'Active',
@@ -266,6 +305,11 @@ const ADMIN_COPY = {
     age: 'Age',
     ageNotSet: 'Age not set',
     notifications: 'Notifications',
+    notificationsReadOnly: 'Notification settings are visible to Admin, but only Super Admin can edit them.',
+    publicStats: 'Scores, points, and rank visibility',
+    displayScores: 'Display Scores',
+    hideScores: 'Hide Scores',
+    publicStatsNote: 'Competitive team points must always show.',
     points: 'Points',
     emailVerified: 'Email confirmed',
     emailNotVerified: 'Email Not Verified',
@@ -303,7 +347,7 @@ const ADMIN_COPY = {
     activateMember: 'Reactivate',
     deleteConfirm: 'Set this member inactive? You can reactivate them later from this same Manage panel.',
     noStaff: 'No admins or teachers found.',
-    noCup: 'No Cup members found.',
+    noCup: 'No Member players found.',
     noCommunity: 'No Community members found.',
     noInactive: 'No inactive members found.',
     textLoading: 'Preparing text preview...',
@@ -318,7 +362,12 @@ const ADMIN_COPY = {
     saving: 'Enregistrement...',
     empty: 'Aucun membre trouvé.',
     player: 'Joueur',
+    firstName: 'Prénom',
+    lastName: 'Nom',
+    parentName: 'Nom parent',
     parentEmail: 'Courriel parent',
+    parentText: 'Texto parent',
+    playerText: 'Texto joueur',
     status: 'Statut',
     memberInfo: 'Membre',
     active: 'Actif',
@@ -328,6 +377,11 @@ const ADMIN_COPY = {
     age: 'Âge',
     ageNotSet: 'Âge non indiqué',
     notifications: 'Avis',
+    notificationsReadOnly: 'Les avis sont visibles par Admin, mais seulement Super Admin peut les modifier.',
+    publicStats: 'Visibilité des scores, points et classement',
+    displayScores: 'Afficher les scores',
+    hideScores: 'Masquer les scores',
+    publicStatsNote: 'Les points d’équipe compétitive doivent toujours être affichés.',
     points: 'Points',
     emailVerified: 'Courriel confirmé',
     emailNotVerified: 'Courriel non vérifié',
@@ -365,7 +419,7 @@ const ADMIN_COPY = {
     activateMember: 'Réactiver',
     deleteConfirm: 'Rendre ce membre inactif? Vous pourrez le réactiver plus tard dans ce même panneau.',
     noStaff: 'Aucun admin ou enseignant trouvé.',
-    noCup: 'Aucun membre Cup trouvé.',
+    noCup: 'Aucun joueur membre trouvé.',
     noCommunity: 'Aucun membre communauté trouvé.',
     noInactive: 'Aucun membre inactif trouvé.',
     textLoading: 'Préparation de l’aperçu texto...',
@@ -380,13 +434,24 @@ let memberToken = localStorage.getItem(MEMBER_TOKEN_KEY) || ''
 let isLoggedIn = isStoredTokenCurrent(memberToken)
 let currentMember = getTokenPayload(memberToken)
 let currentEventsById = new Map()
+let currentFindGamesById = new Map()
 let isEventAdminModeOpen = false
 let currentAdminMembers = []
 let currentAdminCashouts = []
 let currentAdminFilter = 'staff'
 let expandedAdminMemberId = null
-let currentAdminDetailTab = 'points'
+let currentAdminPointsPath = 'CUP'
+let currentAdminRoundsPath = 'CUP'
+let expandedAdminPointsMembers = new Set()
+let expandedAdminRoundMembers = new Set()
+let showAllAdminRoundMembers = new Set()
+let currentRankingResult = null
+let expandedRankingRoundMembers = new Set()
 let hasCheckedSession = false
+
+if (isRunningStandalone()) {
+  document.documentElement.classList.add('is-standalone-app')
+}
 
 function getLanguage() {
   return localStorage.getItem('language') === 'fr' ? 'fr' : 'en'
@@ -412,7 +477,7 @@ function memberPathLabel(membershipType = '') {
   const type = String(membershipType || '').toUpperCase()
 
   if (type === 'CUP') {
-    return 'CUP'
+    return 'Member'
   }
 
   if (type === 'COMMUNITY') {
@@ -432,7 +497,7 @@ function accountStreamLabel(membershipType = '') {
   const type = String(membershipType || '').toUpperCase()
 
   if (type === 'CUP') {
-    return 'Cup'
+    return 'Member'
   }
 
   if (type === 'COMMUNITY') {
@@ -443,11 +508,23 @@ function accountStreamLabel(membershipType = '') {
     return 'Admin'
   }
 
+  if (type === 'SUPER_ADMIN') {
+    return 'Super Admin'
+  }
+
   if (type === 'TEACHER') {
     return 'Teacher'
   }
 
+  if (type === 'COACH') {
+    return 'Coach'
+  }
+
   return type
+}
+
+function currentMemberCanSeeAdminPanel() {
+  return ['SUPER_ADMIN', 'ADMIN'].includes(String(currentMember?.membershipType || '').toUpperCase())
 }
 
 function setLanguage(language) {
@@ -533,7 +610,7 @@ async function checkMemberSession() {
 async function render() {
   const language = getLanguage()
   const copy = siteContent.shared[language]
-  const isMemberPortal = isMemberPortalPath()
+  const isMemberPortalRoute = isMemberPortalPath()
   let page = getCurrentRoute()
 
   if (page.accountArea && !hasCheckedSession) {
@@ -544,6 +621,13 @@ async function render() {
     window.location.hash = 'login'
     page = siteContent.pageMap.get('login')
   }
+
+  if (page.id === 'admin-panel' && !currentMemberCanSeeAdminPanel()) {
+    window.location.hash = 'my-account'
+    page = siteContent.pageMap.get('my-account')
+  }
+
+  const isMemberPortal = isMemberPortalRoute || (page.accountArea && isLoggedIn)
 
   document.documentElement.lang = language
   updateSeo(page, language, copy)
@@ -566,6 +650,10 @@ async function render() {
     initializePointsTool(language)
   }
 
+  if (page.id === 'ranking') {
+    initializeRankingTool(language)
+  }
+
   if (page.id === 'events') {
     initializeEventsTool(language)
   }
@@ -580,6 +668,14 @@ async function render() {
 
   if (page.id === 'my-account') {
     initializeAccountProfile(language)
+  }
+
+  if (page.id === 'admin-panel') {
+    const adminPanel = document.querySelector('[data-admin-panel]')
+
+    if (adminPanel) {
+      loadAdminMembers(adminPanel, language)
+    }
   }
 }
 
@@ -647,7 +743,7 @@ async function handleAccountSubmit(form) {
           : formType === 'forgot'
             ? 'Sending password reset link...'
           : 'Checking account...'
-    status.classList.remove('error', 'success')
+    status.classList.remove('error', 'success', 'account-created')
   }
 
   if (submitButton) {
@@ -666,6 +762,18 @@ async function handleAccountSubmit(form) {
       status.textContent = result.message || 'Unable to log in right now.'
       status.classList.toggle('success', response.ok && result.ok)
       status.classList.toggle('error', !response.ok || !result.ok)
+      status.classList.toggle('account-created', response.ok && result.ok && formType === 'join')
+    }
+
+    if (response.ok && result.ok && formType === 'join') {
+      form.classList.add('account-created')
+
+      if (submitButton) {
+        submitButton.textContent = submitButton.dataset.createdLabel || 'Account created'
+        submitButton.disabled = true
+      }
+
+      form.querySelector('[data-register-new-junior]')?.classList.remove('is-hidden')
     }
 
     const shouldShowProfile = response.ok
@@ -727,7 +835,7 @@ async function handleAccountSubmit(form) {
       status.classList.add('error')
     }
   } finally {
-    if (submitButton) {
+    if (submitButton && !form.classList.contains('account-created')) {
       submitButton.disabled = false
     }
   }
@@ -787,9 +895,14 @@ async function promptForMemberAppInstall() {
 
   if (isiOS) {
     window.alert(language === 'fr'
-      ? 'Pour installer l’espace membre, appuyez sur ... au bas de l’écran, choisissez Partager, puis faites défiler vers Ajouter à l’écran d’accueil.'
-      : 'To install the member area, press ... at the bottom of the screen, choose Share, then scroll down to Add to Home Screen.')
+      ? 'Pour installer l’espace membre sur iPhone, appuyez sur ... au bas du navigateur, choisissez Partager, puis Ajouter à l’écran d’accueil.'
+      : 'To install the member area on iPhone, press ... at the bottom of the browser, choose Share, then Add to Home Screen.')
+    return
   }
+
+  window.alert(language === 'fr'
+    ? 'Si l’invite d’installation ne s’affiche pas, ouvrez le menu du navigateur et choisissez Installer l’application ou Ajouter à l’écran d’accueil.'
+    : 'If the install prompt does not appear, open your browser menu and choose Install app or Add to Home screen.')
 }
 
 async function handleSessionModeLink(link) {
@@ -827,6 +940,38 @@ function showAccountForm(panel, tabName) {
   forms.forEach((form) => {
     form.classList.toggle('is-hidden', form.dataset.accountForm !== tabName)
   })
+
+  if (tabName === 'join') {
+    resetJoinCreatedState(panel.querySelector('[data-account-form="join"]'), true)
+  }
+}
+
+function resetJoinCreatedState(form, clearFields = false) {
+  if (!form) {
+    return
+  }
+
+  const status = form.querySelector('[data-account-status]')
+  const submitButton = form.querySelector('button[type="submit"]')
+  const newJuniorButton = form.querySelector('[data-register-new-junior]')
+
+  form.classList.remove('account-created')
+
+  if (status) {
+    status.textContent = ''
+    status.classList.remove('error', 'success', 'account-created')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = false
+    submitButton.textContent = submitButton.dataset.defaultLabel || 'Join and create account'
+  }
+
+  newJuniorButton?.classList.add('is-hidden')
+
+  if (clearFields) {
+    form.reset()
+  }
 }
 
 function updatePlayerTextField(input) {
@@ -874,6 +1019,17 @@ function setAccountProfileFormValues(form, member) {
     playerTextInput.value = member?.playerText || ''
   }
 
+  const showPublicStats = member?.showPublicStats !== false
+  const publicStatsValue = form.querySelector('[data-account-public-stats-value]')
+
+  form.querySelectorAll('[data-account-public-stats]').forEach((input) => {
+    input.checked = input.value === (showPublicStats ? '1' : '0')
+  })
+
+  if (publicStatsValue) {
+    publicStatsValue.value = showPublicStats ? '1' : '0'
+  }
+
   const notificationSettings = {
     notify_lessons_parent_email: member?.notifyLessonsParentEmail,
     notify_lessons_player_text: member?.notifyLessonsPlayerText,
@@ -913,7 +1069,7 @@ function getFilteredAdminMembers(members) {
     }
 
     if (currentAdminFilter === 'staff') {
-      return ['ADMIN', 'TEACHER'].includes(type)
+      return ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'COACH'].includes(type)
     }
 
     if (currentAdminFilter === 'cup') {
@@ -960,7 +1116,7 @@ function getAdminFilterCounts(members) {
       return counts
     }
 
-    if (['ADMIN', 'TEACHER'].includes(type)) {
+    if (['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'COACH'].includes(type)) {
       counts.staff += 1
     }
 
@@ -1146,183 +1302,39 @@ async function handleAdminTextSubmit(form) {
   }
 }
 
-function renderAdminDetailTabs(copy, activeTab) {
-  const tabs = [
-    ['points', copy.pointsTab],
-    ['rounds', copy.roundsTab],
-    ['events', copy.eventsTab],
-    ['lessons', copy.lessonsTab],
-  ]
-
-  return `
-    <div class="admin-detail-tabs" role="tablist" aria-label="${copy.manage}">
-      ${tabs.map(([value, label]) => `
-        <button type="button" class="${activeTab === value ? 'active' : ''}" data-admin-detail-tab="${value}">
-          ${label}
-        </button>
-      `).join('')}
-    </div>
-  `
-}
-
-function renderAdminPointsTab(member, copy, language) {
-  const entries = Array.isArray(member.pointEntries) ? member.pointEntries : []
-  const visibleEntries = entries.slice(0, 5)
-
-  return `
-    <div class="admin-tab-grid">
-      <div class="admin-history-panel">
-        <h3>${copy.pointHistory}</h3>
-        ${entries.length ? `
-          <ul>
-            ${visibleEntries.map((entry) => {
-              const typeLabel = POINTS_COPY[language].types[entry.type] || entry.type
-              const amountClass = Number(entry.points || 0) < 0 ? 'is-negative' : 'is-positive'
-
-              return `
-                <li>
-                  <span>
-                    <strong>${escapeHtml(entry.description || typeLabel)}</strong>
-                    <small>${escapeHtml(typeLabel)} - ${formatRoundDate(entry.date, language)}</small>
-                  </span>
-                  <small class="${amountClass}">${formatPointAmount(Number(entry.points || 0), language)}</small>
-                </li>
-              `
-            }).join('')}
-          </ul>
-          ${entries.length > 5 ? `
-            <button class="admin-history-all" type="button" data-admin-points-all data-member-id="${Number(member.id || 0)}">
-              ${copy.showAllPoints}
-            </button>
-          ` : ''}
-        ` : `<p>${copy.noPointHistory}</p>`}
-      </div>
-      <form class="admin-award-form" data-admin-award-form>
-        <input type="hidden" name="action" value="update_points" />
-        <input type="hidden" name="member_id" value="${Number(member.id || 0)}" />
-        <label>
-          <span>${copy.points} (+/-)</span>
-          <input type="number" name="points" min="-999" max="999" step="1" inputmode="numeric" placeholder="${copy.pointsPlaceholder}" required />
-        </label>
-        <label>
-          <span>${copy.awardReason}</span>
-          <input type="text" name="description" maxlength="160" placeholder="${copy.awardPlaceholder}" required />
-        </label>
-        <button type="submit">${copy.updatePoints}</button>
-      </form>
-    </div>
-  `
-}
-
-function renderAdminRoundsTab(member, copy, language) {
-  const rounds = Array.isArray(member.rounds) ? member.rounds : []
-
-  return rounds.length ? `
-    <div class="admin-history-panel">
-      <h3>${copy.roundsTab}</h3>
-      <ul>
-        ${rounds.map((round) => `
-          <li>
-            <span>
-              <strong>${formatRoundDate(round.date, language)} - ${escapeHtml(round.score)}</strong>
-              <small>${escapeHtml(round.tee || '')} tee - ${escapeHtml(round.format || '')}</small>
-            </span>
-          </li>
-        `).join('')}
-      </ul>
-    </div>
-  ` : `<div class="admin-history-panel"><h3>${copy.roundsTab}</h3><p>${copy.noRounds}</p></div>`
-}
-
-function renderAdminEventsTab(member, copy, language) {
-  const events = Array.isArray(member.events) ? member.events : []
-
-  return events.length ? `
-    <div class="admin-history-panel">
-      <h3>${copy.eventsTab}</h3>
-      <ul>
-        ${events.map((event) => `
-          <li>
-            <span>
-              <strong>${escapeHtml(event.name || copy.eventsTab)}</strong>
-              <small>${escapeHtml(event.role || '')} - ${escapeHtml(formatEventDateTime({ eventDate: event.date, eventTime: event.time }, language))}</small>
-              <small>${escapeHtml(accountStreamLabel(event.path))}${event.location ? ` - ${escapeHtml(event.location)}` : ''}</small>
-            </span>
-            <small>${Number(event.participantPoints || 0)} / ${Number(event.winnerPoints || 0)} pts</small>
-          </li>
-        `).join('')}
-      </ul>
-    </div>
-  ` : `<div class="admin-history-panel"><h3>${copy.eventsTab}</h3><p>${copy.noEvents}</p></div>`
-}
-
-function renderAdminLessonsTab(member, copy, language) {
-  const lessons = Array.isArray(member.lessons) ? member.lessons : []
-
-  return lessons.length ? `
-    <div class="admin-history-panel">
-      <h3>${copy.lessonsTab}</h3>
-      <ul>
-        ${lessons.map((lesson) => `
-          <li>
-            <span>
-              <strong>${escapeHtml(lesson.role || copy.lessonsTab)} - ${escapeHtml(formatEventDateTime({ eventDate: lesson.date, eventTime: lesson.time }, language))}</strong>
-              <small>${escapeHtml(lesson.type || '')} - ${escapeHtml(accountStreamLabel(lesson.path))}${lesson.location ? ` - ${escapeHtml(lesson.location)}` : ''}</small>
-              ${lesson.notes ? `<small>${escapeHtml(lesson.notes)}</small>` : ''}
-            </span>
-          </li>
-        `).join('')}
-      </ul>
-    </div>
-  ` : `<div class="admin-history-panel"><h3>${copy.lessonsTab}</h3><p>${copy.noLessons}</p></div>`
-}
-
-function renderAdminDetailTabContent(member, copy, language, activeTab) {
-  if (activeTab === 'rounds') {
-    return renderAdminRoundsTab(member, copy, language)
-  }
-
-  if (activeTab === 'events') {
-    return renderAdminEventsTab(member, copy, language)
-  }
-
-  if (activeTab === 'lessons') {
-    return renderAdminLessonsTab(member, copy, language)
-  }
-
-  return renderAdminPointsTab(member, copy, language)
-}
-
-function renderAdminNotificationSummary(member, copy) {
+function renderAdminNotificationSummary(member, copy, canEdit = false) {
   const methods = [
-    [copy.parentEmailNotify, 'ParentEmail', 'parentEmailNotify'],
-    [copy.playerTextNotify, 'PlayerText', 'playerTextNotify'],
-    [copy.parentTextNotify, 'ParentText', 'parentTextNotify'],
+    [copy.parentEmailNotify, 'ParentEmail', 'parentEmailNotify', 'parent_email'],
+    [copy.playerTextNotify, 'PlayerText', 'playerTextNotify', 'player_text'],
+    [copy.parentTextNotify, 'ParentText', 'parentTextNotify', 'parent_text'],
   ]
   const rows = [
-    [copy.lessonPosted, 'notifyLessons'],
-    [copy.eventPosted, 'notifyEvents'],
-    [copy.roundPosted, 'notifyGames'],
+    [copy.lessonPosted, 'notifyLessons', 'lessons'],
+    [copy.eventPosted, 'notifyEvents', 'events'],
+    [copy.roundPosted, 'notifyGames', 'games'],
   ]
   const hasNewNotificationValues = rows.some(([, prefix]) => methods.some(([, suffix]) => Boolean(member?.[`${prefix}${suffix}`])))
 
   return `
     <div class="admin-notification-summary">
       <h3>${copy.notifications}</h3>
+      ${canEdit ? '' : `<p class="admin-readonly-note">${copy.notificationsReadOnly}</p>`}
       <div class="admin-notification-groups">
-        ${rows.map(([label, prefix]) => `
+        ${rows.map(([label, prefix, fieldPrefix]) => `
           <section class="admin-notification-group">
             <strong>${label}</strong>
             <div class="admin-notification-methods">
-              ${methods.map(([methodLabel, suffix, legacyKey]) => {
+              ${methods.map(([methodLabel, suffix, legacyKey, fieldSuffix]) => {
                 const enabled = hasNewNotificationValues
                   ? Boolean(member?.[`${prefix}${suffix}`])
                   : Boolean(member?.[legacyKey])
+                const name = `notify_${fieldPrefix}_${fieldSuffix}`
                 return `
-                  <span class="admin-notification-method ${enabled ? 'is-on' : 'is-off'}">
+                  <label class="admin-notification-method ${enabled ? 'is-on' : 'is-off'}">
+                    ${canEdit ? `<input type="checkbox" name="${name}" ${enabled ? 'checked' : ''} />` : ''}
                     <span class="admin-notification-dot" aria-hidden="true"></span>
                     ${escapeHtml(methodLabel)}
-                  </span>
+                  </label>
                 `
               }).join('')}
             </div>
@@ -1398,6 +1410,7 @@ function renderAdminMembers(panel, members, language) {
   const container = panel.querySelector('[data-admin-members]')
   const copy = ADMIN_COPY[language]
   const filteredMembers = getFilteredAdminMembers(members)
+  const canSuperAdmin = currentMember?.membershipType === 'SUPER_ADMIN'
 
   updateAdminFilterCounts(panel, members)
   updateAdminFilterButtons(panel)
@@ -1418,7 +1431,6 @@ function renderAdminMembers(panel, members, language) {
         <span>${copy.parentEmail}</span>
         <span>${copy.status}</span>
         <span>${copy.path} / ${copy.age}</span>
-        <span>${copy.points}</span>
         <span></span>
       </div>
       ${filteredMembers.map((member) => {
@@ -1441,9 +1453,8 @@ function renderAdminMembers(panel, members, language) {
               <strong>${escapeHtml(accountStreamLabel(membershipType))}</strong>
               <small>${member.playerAge ? `${copy.age} ${Number(member.playerAge)}` : copy.ageNotSet}</small>
             </span>
-            <span data-label="${escapeHtml(copy.points)}"><strong>${Number(member.points || 0)}</strong></span>
             <span class="admin-row-actions">
-              <button class="admin-points-toggle" type="button" data-admin-points-toggle data-member-id="${Number(member.id || 0)}">${isExpanded ? copy.close : copy.manage}</button>
+              <button class="admin-points-toggle ${isExpanded ? 'is-close' : ''}" type="button" data-admin-points-toggle data-member-id="${Number(member.id || 0)}">${isExpanded ? copy.close : copy.manage}</button>
             </span>
           </div>
           ${isExpanded ? `
@@ -1451,38 +1462,75 @@ function renderAdminMembers(panel, members, language) {
               <form id="admin-member-form-${Number(member.id || 0)}" class="admin-manage-form" data-admin-member-form>
                 <input type="hidden" name="action" value="update_member" />
                 <input type="hidden" name="member_id" value="${Number(member.id || 0)}" />
-                <input type="hidden" name="email_verified_present" value="1" />
+                ${canSuperAdmin ? '<input type="hidden" name="email_verified_present" value="1" />' : ''}
                 <h3>${copy.manage}</h3>
                 <label>
-                  <span>${copy.age}</span>
-                  <input type="number" name="player_age" min="1" max="18" inputmode="numeric" value="${member.playerAge ? Number(member.playerAge) : ''}" required />
+                  <span>${copy.firstName}</span>
+                  <input type="text" name="first_name" value="${escapeHtml(member.firstName || '')}" />
                 </label>
                 <label>
+                  <span>${copy.lastName}</span>
+                  <input type="text" name="last_name" value="${escapeHtml(member.lastName || '')}" />
+                </label>
+                <label>
+                  <span>${copy.parentName}</span>
+                  <input type="text" name="parent_name" value="${escapeHtml(member.parentName || '')}" />
+                </label>
+                <label>
+                  <span>${copy.parentEmail}</span>
+                  <input type="email" name="parent_email" value="${escapeHtml(member.parentEmail || '')}" />
+                </label>
+                <label>
+                  <span>${copy.parentText}</span>
+                  <input type="tel" name="parent_text" value="${escapeHtml(member.parentText || '')}" />
+                </label>
+                <label>
+                  <span>${copy.playerText}</span>
+                  <input type="tel" name="player_text" value="${escapeHtml(member.playerText || '')}" />
+                </label>
+                <label>
+                  <span>${copy.age}</span>
+                  <input type="number" name="player_age" min="1" max="18" inputmode="numeric" value="${member.playerAge ? Number(member.playerAge) : ''}" />
+                </label>
+                <fieldset class="account-public-stats-toggle admin-public-stats-toggle">
+                  <legend>${copy.publicStats}</legend>
+                  <div class="account-public-stats-options">
+                    <label>
+                      <input type="radio" name="show_public_stats_choice_${Number(member.id || 0)}" value="1" data-account-public-stats data-public-stats-display ${member.showPublicStats !== false ? 'checked' : ''} />
+                      <span>${copy.displayScores}</span>
+                    </label>
+                    <label>
+                      <input type="radio" name="show_public_stats_choice_${Number(member.id || 0)}" value="0" data-account-public-stats data-public-stats-hide ${member.showPublicStats === false ? 'checked' : ''} />
+                      <span>${copy.hideScores}</span>
+                    </label>
+                  </div>
+                  <input type="hidden" name="show_public_stats" value="${member.showPublicStats !== false ? '1' : '0'}" data-account-public-stats-value />
+                  <p>${copy.publicStatsNote}</p>
+                </fieldset>
+                ${canSuperAdmin ? `<label>
                   <span>${copy.path}</span>
                   <select name="membership_type">
-                    ${adminPathOption('CUP', 'Cup', membershipType)}
+                    ${adminPathOption('CUP', 'Member', membershipType)}
                     ${adminPathOption('COMMUNITY', 'Community', membershipType)}
+                    ${adminPathOption('COACH', 'Coach', membershipType)}
                     ${adminPathOption('TEACHER', 'Teacher', membershipType)}
                     ${adminPathOption('ADMIN', 'Admin', membershipType)}
+                    ${adminPathOption('SUPER_ADMIN', 'Super Admin', membershipType)}
                   </select>
                 </label>
                 <label class="account-notify-toggle admin-verify-toggle">
                   <input type="checkbox" name="email_verified" ${isVerified ? 'checked' : ''} />
                   <span>${isVerified ? copy.emailVerified : copy.emailNotVerified}</span>
-                </label>
-                ${renderAdminNotificationSummary(member, copy)}
+                </label>` : ''}
+                ${renderAdminNotificationSummary(member, copy, canSuperAdmin)}
               </form>
-              <div class="admin-detail-panel">
-                ${renderAdminDetailTabs(copy, currentAdminDetailTab)}
-                ${renderAdminDetailTabContent(member, copy, language, currentAdminDetailTab)}
-              </div>
               <div class="admin-member-bottom-actions">
                 <button type="submit" form="admin-member-form-${Number(member.id || 0)}">${copy.save}</button>
-                <form class="admin-delete-form" data-admin-delete-form>
+                ${canSuperAdmin ? `<form class="admin-delete-form" data-admin-delete-form>
                   <input type="hidden" name="action" value="${isActive ? 'set_inactive_member' : 'activate_member'}" />
                   <input type="hidden" name="member_id" value="${Number(member.id || 0)}" />
                   <button class="${isActive ? '' : 'admin-reactivate'}" type="submit">${isActive ? copy.deleteMember : copy.activateMember}</button>
-                </form>
+                </form>` : ''}
               </div>
             </section>
           ` : ''}
@@ -1561,6 +1609,38 @@ async function loadAdminMembers(panel, language) {
   }
 }
 
+async function loadAdminTextMembers(panel, language) {
+  const status = panel.querySelector('[data-admin-status]')
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/textme.php`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || ADMIN_COPY[language].loadError)
+    }
+
+    currentAdminMembers = result.members || []
+
+    if (status) {
+      status.textContent = ''
+      status.classList.remove('error', 'success')
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || ADMIN_COPY[language].loadError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  }
+}
+
 async function handleAdminMemberSubmit(form) {
   const panel = form.closest('[data-admin-panel]')
   const language = getLanguage()
@@ -1600,6 +1680,10 @@ async function handleAdminMemberSubmit(form) {
       currentAdminFilter = 'inactive'
     }
 
+    if (action === 'create_member') {
+      form.reset()
+    }
+
     renderAdminCashouts(panel, currentAdminCashouts, language)
     renderAdminMembers(panel, currentAdminMembers, language)
 
@@ -1614,8 +1698,8 @@ async function handleAdminMemberSubmit(form) {
       status.classList.add('error')
       status.classList.remove('success')
     }
-
-    if (button) {
+  } finally {
+    if (button && button.isConnected) {
       button.disabled = false
     }
   }
@@ -1873,11 +1957,66 @@ function formatRoundMeta(round, language) {
   const teeLabel = scoreTool.teeOptions?.[round.tee]?.[language] || round.tee || ''
   const formatLabel = scoreTool.formatOptions?.[round.format]?.[language] || round.format || ''
 
-  return [teeLabel, formatLabel].filter(Boolean).join(' • ')
+  return [round.format === 'score' ? teeLabel : '', formatLabel].filter(Boolean).join(' • ')
+}
+
+function getRoundScoreDisplay(round, language) {
+  const scoreTool = siteContent.pageMap.get('scores').scoreTool
+  const format = String(round?.format || '')
+
+  if (format === 'practice') {
+    return language === 'fr' ? 'Aucun score' : 'No score'
+  }
+
+  if (format === 'stableford') {
+    return `${scoreTool.stablefordScoreLabel[language]} ${round.score}`
+  }
+
+  return `${SCORE_COPY[language].scorePrefix} ${round.score}`
+}
+
+function updateScoreFormForFormat(form, language) {
+  const scoreTool = siteContent.pageMap.get('scores').scoreTool
+  const format = form?.querySelector('[data-score-format]')?.value || 'practice'
+  const teeSelect = form?.querySelector('[data-score-tee]')
+  const teeField = teeSelect?.closest('label')
+  const scoreField = form?.querySelector('[data-score-field]')
+  const scoreInput = form?.querySelector('[data-score-input]')
+  const scoreLabel = form?.querySelector('[data-score-label]')
+  const usesScore = format !== 'practice'
+  const numericScore = ['score', 'stableford'].includes(format)
+
+  teeField?.classList.toggle('is-hidden', format !== 'score')
+
+  if (teeSelect) {
+    teeSelect.disabled = format !== 'score'
+    teeSelect.required = format === 'score'
+  }
+
+  scoreField?.classList.toggle('is-hidden', !usesScore)
+
+  if (scoreInput) {
+    scoreInput.disabled = !usesScore
+    scoreInput.required = usesScore
+    scoreInput.type = numericScore ? 'number' : 'text'
+    scoreInput.inputMode = numericScore ? 'numeric' : 'text'
+    scoreInput.min = numericScore ? '0' : ''
+    scoreInput.max = numericScore ? '999' : ''
+    scoreInput.step = numericScore ? '1' : ''
+    scoreInput.placeholder = format === 'match-play' ? 'Example: Won 3 and 2' : ''
+  }
+
+  if (scoreLabel) {
+    scoreLabel.textContent = format === 'stableford'
+      ? scoreTool.stablefordScoreLabel[language]
+      : format === 'match-play'
+        ? scoreTool.matchScoreLabel[language]
+        : scoreTool.regularScoreLabel[language]
+  }
 }
 
 function setTodayAsDefaultRoundDate(tool) {
-  const dateInput = tool.querySelector('[data-round-date]')
+  const dateInput = tool.querySelector('[data-round-date], [data-point-date]')
 
   if (!dateInput || dateInput.value) {
     const picker = dateInput?.closest('[data-date-picker]')
@@ -1939,7 +2078,7 @@ function renderScoresState(tool, rounds, language) {
     <ul>
       ${rounds.map((round, index) => `
         <li>
-          <strong>${SCORE_COPY[language].scorePrefix} ${round.score}</strong>
+          <strong>${escapeHtml(getRoundScoreDisplay(round, language))}</strong>
           <span>${formatRoundDate(round.roundDate, language)}</span>
           <span>${formatRoundMeta(round, language)}</span>
           <small>+1 ${SCORE_COPY[language].pointsSuffix}</small>
@@ -1959,6 +2098,136 @@ function renderScoresState(tool, rounds, language) {
   roundList.classList.toggle('is-expanded', Boolean(isExpanded))
 }
 
+function setAdminReportToolbarPath(tool, path) {
+  tool?.querySelectorAll('[data-admin-report-path]').forEach((button) => {
+    const isActive = button.dataset.adminReportPath === path
+
+    button.classList.toggle('active', isActive)
+    button.setAttribute('aria-selected', String(isActive))
+  })
+}
+
+function renderAdminRoundsReport(tool, result, language) {
+  const scoreTool = siteContent.pageMap.get('scores').scoreTool
+  const list = tool.querySelector('[data-admin-rounds-list]')
+  const path = currentAdminRoundsPath
+  const members = Array.isArray(result.roundsReport?.[path]) ? result.roundsReport[path] : []
+
+  setAdminReportToolbarPath(tool, path)
+
+  if (!list) {
+    return
+  }
+
+  if (!members.length) {
+    list.innerHTML = `<p>${list.dataset.emptyLabel || scoreTool.adminEmpty[language]}</p>`
+    return
+  }
+
+  list.innerHTML = `
+    <div class="admin-report-heading">
+      <h2>${scoreTool.adminTitle[language]}</h2>
+      <span>${members.length} ${path === 'CUP' ? scoreTool.cupButton[language] : scoreTool.communityButton[language]}</span>
+    </div>
+    <ul class="admin-rounds-report-list">
+      ${members.map((member) => {
+        const memberId = Number(member.id || 0)
+        const rounds = Array.isArray(member.rounds) ? member.rounds : []
+        const isExpanded = expandedAdminRoundMembers.has(memberId)
+        const showAllRounds = showAllAdminRoundMembers.has(memberId)
+        const visibleRounds = showAllRounds ? rounds : rounds.slice(0, 5)
+
+        return `
+          <li class="admin-rounds-report-item ${isExpanded ? 'is-expanded' : ''}">
+            <div class="admin-member-report-row">
+              <button class="admin-member-report-name" type="button" data-admin-rounds-toggle data-member-id="${memberId}" aria-expanded="${isExpanded ? 'true' : 'false'}">
+                <strong>${escapeHtml(member.name || '')}</strong>
+                <span>${Number(member.roundsPlayed || 0)} ${scoreTool.roundsLabel[language]}</span>
+              </button>
+              <button type="button" data-admin-rounds-toggle data-member-id="${memberId}" aria-expanded="${isExpanded ? 'true' : 'false'}">
+                ${isExpanded ? scoreTool.collapseRounds[language] : scoreTool.expandRounds[language]}
+              </button>
+            </div>
+            ${isExpanded ? `
+              <div class="admin-member-round-details">
+                ${rounds.length ? `
+                  <ul>
+                    ${visibleRounds.map((round) => `
+                      <li>
+                        <strong>${formatRoundDate(round.roundDate, language)}</strong>
+                        <span>${escapeHtml(getRoundScoreDisplay(round, language))}</span>
+                        <small>${formatRoundMeta(round, language)}</small>
+                      </li>
+                    `).join('')}
+                  </ul>
+                  ${rounds.length > 5 ? `
+                    <button class="round-list-toggle admin-rounds-show-all" type="button" data-admin-rounds-all-toggle data-member-id="${memberId}" aria-expanded="${showAllRounds ? 'true' : 'false'}">
+                      <span>${showAllRounds ? scoreTool.showLatest[language] : scoreTool.showAll[language]}</span>
+                      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <path d="M5 7.5 10 12.5 15 7.5" />
+                      </svg>
+                    </button>
+                  ` : ''}
+                ` : `<p>${scoreTool.empty[language]}</p>`}
+              </div>
+            ` : ''}
+          </li>
+        `
+      }).join('')}
+    </ul>
+  `
+}
+
+function renderAdminScoreJuniorOptions(tool, result, language, preferredMemberId = '') {
+  const scoreTool = siteContent.pageMap.get('scores').scoreTool
+  const select = tool.querySelector('[data-admin-score-member]')
+
+  if (!select) {
+    return
+  }
+
+  const activeJuniors = result.activeJuniors || {}
+  const groups = ['CUP', 'COMMUNITY']
+  const preferredValue = String(preferredMemberId || select.value || '')
+  let optionCount = 0
+
+  select.innerHTML = groups.map((group) => {
+    const juniors = Array.isArray(activeJuniors[group]) ? activeJuniors[group] : []
+
+    if (!juniors.length) {
+      return ''
+    }
+
+    optionCount += juniors.length
+
+    return `
+      <optgroup label="${group === 'CUP' ? scoreTool.cupButton[language] : scoreTool.communityButton[language]}">
+        ${juniors.map((junior) => {
+          const id = String(junior.id || '')
+          const username = junior.username ? ` (${junior.username})` : ''
+          const label = `${junior.name || 'Junior'}${username}`
+
+          return `<option value="${escapeHtml(id)}">${escapeHtml(label)}</option>`
+        }).join('')}
+      </optgroup>
+    `
+  }).join('')
+
+  if (!optionCount) {
+    select.innerHTML = `<option value="">${scoreTool.adminNoJuniors[language]}</option>`
+    select.disabled = true
+    select.closest('[data-score-form]')?.querySelector('button[type="submit"]')?.setAttribute('disabled', '')
+    return
+  }
+
+  select.disabled = false
+  select.closest('[data-score-form]')?.querySelector('button[type="submit"]')?.removeAttribute('disabled')
+
+  if (preferredValue && Array.from(select.options).some((option) => option.value === preferredValue)) {
+    select.value = preferredValue
+  }
+}
+
 async function loadScores(tool, language) {
   const status = tool.querySelector('[data-score-status]')
 
@@ -1976,7 +2245,12 @@ async function loadScores(tool, language) {
       throw new Error(result.message || SCORE_COPY[language].loadError)
     }
 
-    renderScoresState(tool, result.rounds || [], language)
+    if (result.adminView) {
+      renderAdminScoreJuniorOptions(tool, result, language)
+      renderAdminRoundsReport(tool, result, language)
+    } else {
+      renderScoresState(tool, result.rounds || [], language)
+    }
 
     if (status) {
       status.textContent = ''
@@ -1998,7 +2272,13 @@ function initializeScoresTool(language) {
     return
   }
 
-  setTodayAsDefaultRoundDate(tool)
+  const form = tool.querySelector('[data-score-form]')
+
+  if (form) {
+    setTodayAsDefaultRoundDate(tool)
+    updateScoreFormForFormat(form, language)
+  }
+
   loadScores(tool, language)
 }
 
@@ -2008,6 +2288,7 @@ async function handleScoreSubmit(form) {
   const status = form.querySelector('[data-score-status]')
   const submitButton = form.querySelector('button[type="submit"]')
   const formData = new FormData(form)
+  const submittedMemberId = String(formData.get('member_id') || '')
 
   if (status) {
     status.textContent = siteContent.pageMap.get('scores').scoreTool.saveMessage[language]
@@ -2035,7 +2316,15 @@ async function handleScoreSubmit(form) {
 
     form.reset()
     setTodayAsDefaultRoundDate(tool)
-    renderScoresState(tool, result.rounds || [], language)
+    updateScoreFormForFormat(form, language)
+
+    if (result.adminView) {
+      renderAdminScoreJuniorOptions(tool, result, language, submittedMemberId)
+      renderAdminRoundsReport(tool, result, language)
+    } else {
+      renderScoresState(tool, result.rounds || [], language)
+    }
+
     closeDatePickers()
 
     if (status) {
@@ -2051,7 +2340,7 @@ async function handleScoreSubmit(form) {
     }
   } finally {
     if (submitButton) {
-      submitButton.disabled = false
+      submitButton.disabled = Boolean(form.querySelector('[data-admin-score-member]')?.disabled)
     }
   }
 }
@@ -2065,14 +2354,21 @@ function formatPointAmount(points, language) {
 }
 
 function renderPointsState(tool, result, language) {
+  if (result.adminView) {
+    renderAdminPointsReport(tool, result, language)
+    return
+  }
+
   const balance = Number(result.balance) || 0
   const balanceEl = tool.querySelector('[data-points-balance]')
   const cashoutInput = tool.querySelector('[data-cashout-points]')
   const pointsList = tool.querySelector('[data-points-list]')
   const cashoutRequestsList = tool.querySelector('[data-cashout-requests]')
+  const pointsTool = siteContent.pageMap.get('points').pointsTool
   const pendingCashouts = (result.cashoutRequests || []).filter((request) => request.status === 'REQUESTED')
   const pendingTotal = pendingCashouts.reduce((total, request) => total + (Number(request.points) || 0), 0)
   const availableBalance = Math.max(0, balance - pendingTotal)
+  const isExpanded = pointsList?.classList.contains('is-expanded')
 
   if (balanceEl) {
     balanceEl.textContent = String(balance)
@@ -2120,15 +2416,145 @@ function renderPointsState(tool, result, language) {
         return `
           <li class="${rowClass}">
             <div>
-              <strong>${entry.description || typeLabel}</strong>
-              <span>${typeLabel} - ${formatRoundDate(entry.date, language)}</span>
+              <strong>${escapeHtml(entry.description || typeLabel)}</strong>
+              <span>${escapeHtml(typeLabel)} - ${formatRoundDate(entry.date, language)}</span>
             </div>
             <small class="${amountClass}">${formatPointAmount(entry.points, language)}</small>
           </li>
         `
       }).join('')}
     </ul>
+    ${entries.length > 5 ? `
+      <button class="round-list-toggle points-list-toggle" type="button" data-points-list-toggle aria-expanded="${isExpanded ? 'true' : 'false'}">
+        <span>${isExpanded ? pointsTool.showLatest[language] : pointsTool.showAll[language]}</span>
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5 7.5 10 12.5 15 7.5" />
+        </svg>
+      </button>
+    ` : ''}
   `
+
+  pointsList.classList.toggle('is-expanded', Boolean(isExpanded))
+}
+
+function renderAdminPointsReport(tool, result, language) {
+  const pointsTool = siteContent.pageMap.get('points').pointsTool
+  const list = tool.querySelector('[data-admin-points-list]')
+  const count = tool.querySelector('[data-admin-points-count]')
+  const path = currentAdminPointsPath
+  const members = Array.isArray(result.leaderboard?.[path]) ? result.leaderboard[path] : []
+
+  setAdminReportToolbarPath(tool, path)
+
+  if (count) {
+    count.textContent = `${members.length} ${path === 'CUP' ? pointsTool.cupButton[language] : pointsTool.communityButton[language]}`
+  }
+
+  if (!list) {
+    return
+  }
+
+  if (!members.length) {
+    list.innerHTML = `<p>${list.dataset.emptyLabel || pointsTool.adminEmpty[language]}</p>`
+    return
+  }
+
+  list.innerHTML = `
+    <ul>
+      ${members.map((member, index) => {
+        const memberId = Number(member.id || 0)
+        const entries = Array.isArray(member.entries) ? member.entries : []
+        const isExpanded = expandedAdminPointsMembers.has(memberId)
+
+        return `
+          <li class="admin-points-report-item ${isExpanded ? 'is-expanded' : ''}">
+            <button class="admin-member-rank" type="button" data-admin-points-report-toggle data-member-id="${memberId}" aria-expanded="${isExpanded ? 'true' : 'false'}">
+              <small>${index + 1}</small>
+              <div>
+                <strong>${escapeHtml(member.name || '')}</strong>
+                <span>${Number(member.roundsPlayed || 0)} ${siteContent.pageMap.get('scores').scoreTool.roundsLabel[language]}</span>
+              </div>
+            </button>
+            <small class="is-positive">${formatPointAmount(Number(member.points || 0), language)}</small>
+            ${isExpanded ? `
+              <div class="admin-member-point-details">
+                ${entries.length ? `
+                  <ul>
+                    ${entries.map((entry) => {
+                      const typeLabel = POINTS_COPY[language].types[entry.type] || entry.type
+                      const amountClass = Number(entry.points || 0) < 0 ? 'is-negative' : 'is-positive'
+
+                      return `
+                        <li>
+                          <div>
+                            <strong>${escapeHtml(entry.description || typeLabel)}</strong>
+                            <span>${escapeHtml(typeLabel)} - ${formatRoundDate(entry.date, language)}</span>
+                          </div>
+                          <small class="${amountClass}">${formatPointAmount(Number(entry.points || 0), language)}</small>
+                        </li>
+                      `
+                    }).join('')}
+                  </ul>
+                ` : `<p>${pointsTool.empty[language]}</p>`}
+              </div>
+            ` : ''}
+          </li>
+        `
+      }).join('')}
+    </ul>
+  `
+}
+
+function renderAdminPointsJuniorOptions(tool, result, language, preferredMemberId = '') {
+  const pointsTool = siteContent.pageMap.get('points').pointsTool
+  const select = tool.querySelector('[data-admin-points-member]')
+
+  if (!select) {
+    return
+  }
+
+  const activeJuniors = result.activeJuniors || {}
+  const groups = ['CUP', 'COMMUNITY']
+  const preferredValue = String(preferredMemberId || select.value || '')
+  let optionCount = 0
+
+  select.innerHTML = groups.map((group) => {
+    const juniors = Array.isArray(activeJuniors[group]) ? activeJuniors[group] : []
+
+    if (!juniors.length) {
+      return ''
+    }
+
+    optionCount += juniors.length
+
+    return `
+      <optgroup label="${group === 'CUP' ? pointsTool.cupButton[language] : pointsTool.communityButton[language]}">
+        ${juniors.map((junior) => {
+          const id = String(junior.id || '')
+          const username = junior.username ? ` (${junior.username})` : ''
+          const label = `${junior.name || 'Junior'}${username}`
+
+          return `<option value="${escapeHtml(id)}">${escapeHtml(label)}</option>`
+        }).join('')}
+      </optgroup>
+    `
+  }).join('')
+
+  const submitButton = select.closest('[data-admin-points-entry-form]')?.querySelector('button[type="submit"]')
+
+  if (!optionCount) {
+    select.innerHTML = `<option value="">${pointsTool.adminNoJuniors[language]}</option>`
+    select.disabled = true
+    submitButton?.setAttribute('disabled', '')
+    return
+  }
+
+  select.disabled = false
+  submitButton?.removeAttribute('disabled')
+
+  if (preferredValue && Array.from(select.options).some((option) => option.value === preferredValue)) {
+    select.value = preferredValue
+  }
 }
 
 async function loadPoints(tool, language) {
@@ -2146,6 +2572,10 @@ async function loadPoints(tool, language) {
 
     if (!response.ok || !result.ok) {
       throw new Error(result.message || POINTS_COPY[language].loadError)
+    }
+
+    if (result.adminView) {
+      renderAdminPointsJuniorOptions(tool, result, language)
     }
 
     renderPointsState(tool, result, language)
@@ -2170,7 +2600,165 @@ function initializePointsTool(language) {
     return
   }
 
+  const form = tool.querySelector('[data-admin-points-entry-form]')
+
+  if (form) {
+    setTodayAsDefaultRoundDate(tool)
+  }
+
   loadPoints(tool, language)
+}
+
+function getRankingCopy(language) {
+  return siteContent.pageMap.get('ranking').rankingTool
+}
+
+function getRankingRowsForPanel(result, panelId) {
+  if (panelId === 'rounds') {
+    return Array.isArray(result.rounds) ? result.rounds : []
+  }
+
+  if (panelId === 'scores') {
+    return Array.isArray(result.scores) ? result.scores : []
+  }
+
+  return Array.isArray(result.points) ? result.points : []
+}
+
+function renderRankingMetric(member, panelId, rankingTool, language) {
+  const points = formatPointAmount(Number(member.points || 0), language)
+  const rounds = `${Number(member.roundsPlayed || 0)} ${rankingTool.roundsLabel[language]}`
+  const lowestScore = member.lowestScore === null || member.lowestScore === undefined
+    ? rankingTool.noScore[language]
+    : `${rankingTool.lowestScoreLabel[language]} ${Number(member.lowestScore)}`
+
+  if (panelId === 'rounds') {
+    return `
+      <strong>${rounds}</strong>
+      <span>${lowestScore}</span>
+    `
+  }
+
+  if (panelId === 'scores') {
+    return `
+      <strong>${lowestScore}</strong>
+      <span>${rounds}</span>
+    `
+  }
+
+  return `
+    <strong>${points}</strong>
+    <span>${rounds}</span>
+  `
+}
+
+function renderRankingRecentRounds(member, rankingTool, language) {
+  const rounds = Array.isArray(member.recentRegularRounds) ? member.recentRegularRounds : []
+
+  return `
+    <div class="ranking-round-detail">
+      <h3>${rankingTool.recentRegularRounds[language]}</h3>
+      ${rounds.length ? `
+        <ul>
+          ${rounds.map((round) => `
+            <li>
+              <strong>${formatRoundDate(round.roundDate, language)}</strong>
+              <span>${Number(round.score || 0)}</span>
+              <small>${escapeHtml(round.tee || '')}</small>
+            </li>
+          `).join('')}
+        </ul>
+      ` : `<p>${rankingTool.noRegularRounds[language]}</p>`}
+    </div>
+  `
+}
+
+function renderRankingPanel(list, rows, panelId, language) {
+  const rankingTool = getRankingCopy(language)
+
+  if (panelId === 'travel-team') {
+    list.innerHTML = `<p>${rankingTool.travelTeamPending[language]}</p>`
+    return
+  }
+
+  if (!rows.length) {
+    list.innerHTML = `<p>${rankingTool.empty[language]}</p>`
+    return
+  }
+
+  list.innerHTML = `
+    <ol class="ranking-list-items">
+      ${rows.map((member, index) => {
+        const memberId = Number(member.id || 0)
+        const canExpandRounds = panelId === 'rounds'
+        const isExpanded = canExpandRounds && expandedRankingRoundMembers.has(memberId)
+
+        return `
+        <li class="${isExpanded ? 'is-expanded' : ''}">
+          <span class="ranking-place">${index + 1}</span>
+          <div class="ranking-player">
+            ${canExpandRounds ? `
+              <button type="button" data-ranking-round-toggle data-member-id="${memberId}" aria-expanded="${isExpanded ? 'true' : 'false'}">
+                <strong>${escapeHtml(member.name || '')}</strong>
+                <small>Member</small>
+              </button>
+            ` : `
+              <strong>${escapeHtml(member.name || '')}</strong>
+              <small>Member</small>
+            `}
+          </div>
+          <div class="ranking-metric">
+            ${renderRankingMetric(member, panelId, rankingTool, language)}
+          </div>
+          ${isExpanded ? renderRankingRecentRounds(member, rankingTool, language) : ''}
+        </li>
+        `
+      }).join('')}
+    </ol>
+  `
+}
+
+function renderRankingState(tool, result, language) {
+  tool.querySelectorAll('[data-ranking-list]').forEach((list) => {
+    const panelId = list.dataset.rankingList || 'points'
+    renderRankingPanel(list, getRankingRowsForPanel(result, panelId), panelId, language)
+  })
+}
+
+async function loadRankings(tool, language) {
+  const rankingTool = getRankingCopy(language)
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/ranking.php`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || rankingTool.loadError[language])
+    }
+
+    currentRankingResult = result
+    renderRankingState(tool, result, language)
+  } catch (error) {
+    tool.querySelectorAll('[data-ranking-list]').forEach((list) => {
+      list.innerHTML = `<p class="error">${escapeHtml(error.message || rankingTool.loadError[language])}</p>`
+    })
+  }
+}
+
+function initializeRankingTool(language) {
+  const tool = document.querySelector('[data-ranking-tool]')
+
+  if (!tool) {
+    return
+  }
+
+  loadRankings(tool, language)
 }
 
 async function handleCashoutSubmit(form) {
@@ -2222,6 +2810,63 @@ async function handleCashoutSubmit(form) {
   } finally {
     if (submitButton) {
       submitButton.disabled = false
+    }
+  }
+}
+
+async function handleAdminPointsEntrySubmit(form) {
+  const tool = form.closest('[data-points-tool]')
+  const language = getLanguage()
+  const pointsTool = siteContent.pageMap.get('points').pointsTool
+  const status = tool.querySelector('[data-points-status]')
+  const submitButton = form.querySelector('button[type="submit"]')
+  const formData = new FormData(form)
+  const submittedMemberId = String(formData.get('member_id') || '')
+
+  if (status) {
+    status.textContent = pointsTool.adminSaving[language]
+    status.classList.remove('error', 'success')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/points.php`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || POINTS_COPY[language].saveError)
+    }
+
+    form.reset()
+    setTodayAsDefaultRoundDate(tool)
+    renderAdminPointsJuniorOptions(tool, result, language, submittedMemberId)
+    renderPointsState(tool, result, language)
+    closeDatePickers()
+
+    if (status) {
+      status.textContent = result.message || POINTS_COPY[language].saved
+      status.classList.add('success')
+      status.classList.remove('error')
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || POINTS_COPY[language].saveError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = Boolean(form.querySelector('[data-admin-points-member]')?.disabled)
     }
   }
 }
@@ -2285,6 +2930,31 @@ function ageRangeLabel(minAge, maxAge, language, copy = FIND_GAME_COPY[language]
   return copy.ageAny
 }
 
+function renderEventPlayerOptions(activeJuniors, language) {
+  const groups = ['CUP', 'COMMUNITY']
+  const html = groups.map((group) => {
+    const juniors = Array.isArray(activeJuniors?.[group]) ? activeJuniors[group] : []
+
+    if (!juniors.length) {
+      return ''
+    }
+
+    return `
+      <optgroup label="${EVENTS_COPY[language].pathLabels[group] || group}">
+        ${juniors.map((junior) => {
+          const id = String(junior.id || '')
+          const username = junior.username ? ` (${junior.username})` : ''
+          const label = `${junior.name || 'Junior'}${username}`
+
+          return `<option value="${escapeHtml(id)}">${escapeHtml(label)}</option>`
+        }).join('')}
+      </optgroup>
+    `
+  }).join('')
+
+  return html || `<option value="">${EVENTS_COPY[language].noPlayers}</option>`
+}
+
 function renderEventCollection(container, events, language, title = '', options = {}) {
   if (!container) {
     return
@@ -2293,6 +2963,9 @@ function renderEventCollection(container, events, language, title = '', options 
   const showJoin = Boolean(options.showJoin)
   const showWinner = Boolean(options.showWinner)
   const showAdminActions = Boolean(options.showAdminActions)
+  const activeJuniors = options.activeJuniors || {}
+  const playerOptions = renderEventPlayerOptions(activeJuniors, language)
+  const hasPlayerOptions = !playerOptions.includes('<option value="">')
 
   if (!events.length) {
     container.innerHTML = `${title ? `<h3>${title}</h3>` : ''}<p>${container.dataset.emptyLabel || ''}</p>`
@@ -2313,6 +2986,28 @@ function renderEventCollection(container, events, language, title = '', options 
         const eventPath = String(event.eventPath || 'EVERYONE')
         const canJoinPath = pathAllowsCurrentMember(eventPath)
         const ageLabel = ageRangeLabel(event.minAge, event.maxAge, language, EVENTS_COPY[language])
+        const currentMemberType = String(currentMember?.membershipType || '').toUpperCase()
+        const currentMemberId = Number(currentMember?.id || currentMember?.sub || 0)
+        const isEventOwner = Number(event.createdByMemberId || 0) === currentMemberId
+        const canEditEvent = showAdminActions && (
+          event.canEdit === true
+          || (event.canEdit === undefined && (
+            currentMemberType === 'SUPER_ADMIN'
+            || (currentMemberType === 'ADMIN' && isEventOwner)
+          ))
+        )
+        const canDeleteEvent = showAdminActions && (
+          event.canDelete === true
+          || (event.canDelete === undefined && (
+            currentMemberType === 'SUPER_ADMIN'
+            || (currentMemberType === 'ADMIN' && isEventOwner)
+          ))
+        )
+        const canAddPlayerToEvent = showAdminActions && (
+          event.canAddPlayer === true
+          || (event.canAddPlayer === undefined && currentMemberType === 'SUPER_ADMIN')
+        )
+        const canManage = canEditEvent || canDeleteEvent || canAddPlayerToEvent
         const canJoinAge = event.isAgeEligible !== false
         const joinLabel = !canJoinPath
           ? pathOnlyLabel(EVENTS_COPY[language], eventPath)
@@ -2339,19 +3034,28 @@ function renderEventCollection(container, events, language, title = '', options 
               <span>${Number(event.winnerPoints || 0)} ${EVENTS_COPY[language].points} winner</span>
               <span>${Number(event.participantPoints || 0)} ${EVENTS_COPY[language].points} participant</span>
               ${maxPlayers > 0 ? `<span class="event-spots">${Math.max(0, spotsRemaining)} ${EVENTS_COPY[language].spotsOpen}</span>` : ''}
-              ${showAdminActions ? `
-                <button
+              ${canManage ? `
+                ${canEditEvent ? `<button
                   class="event-join-button"
                   type="button"
                   data-event-edit
                   data-event-id="${Number(event.id || 0)}"
-                >${EVENTS_COPY[language].edit}</button>
-                <button
+                >${EVENTS_COPY[language].edit}</button>` : ''}
+                ${canDeleteEvent ? `<button
                   class="event-join-button is-danger"
                   type="button"
                   data-event-action="delete_event"
                   data-event-id="${Number(event.id || 0)}"
-                >${EVENTS_COPY[language].remove}</button>
+                >${EVENTS_COPY[language].remove}</button>` : ''}
+                ${canAddPlayerToEvent ? `<button
+                  class="event-join-button is-secondary"
+                  type="button"
+                  data-event-add-player-toggle
+                  data-event-id="${Number(event.id || 0)}"
+                  data-show-label="${EVENTS_COPY[language].addPlayer}"
+                  data-hide-label="${EVENTS_COPY[language].hideAddPlayer}"
+                  aria-expanded="false"
+                >${EVENTS_COPY[language].addPlayer}</button>` : ''}
               ` : showJoin ? event.isJoined ? `
                 <button
                   class="event-join-button is-secondary"
@@ -2376,6 +3080,19 @@ function renderEventCollection(container, events, language, title = '', options 
                   ${attendees.map((attendee) => `<li>${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}</li>`).join('')}
                 </ul>
               ` : `<p>${EVENTS_COPY[language].noAttendees}</p>`}
+              ${canAddPlayerToEvent ? `
+                <form class="event-add-player-form is-hidden" data-event-add-player-form>
+                  <input type="hidden" name="action" value="add_attendee" />
+                  <input type="hidden" name="event_id" value="${Number(event.id || 0)}" />
+                  <label>
+                    <span>${EVENTS_COPY[language].player}</span>
+                    <select name="member_id" required ${hasPlayerOptions ? '' : 'disabled'}>
+                      ${playerOptions}
+                    </select>
+                  </label>
+                  <button type="submit" ${hasPlayerOptions ? '' : 'disabled'}>${EVENTS_COPY[language].savePlayer}</button>
+                </form>
+              ` : ''}
             </div>
           </li>
         `
@@ -2386,13 +3103,14 @@ function renderEventCollection(container, events, language, title = '', options 
 
 function renderEventsState(tool, result, language) {
   const allEvents = [...(result.upcoming || []), ...(result.past || [])]
-  const canManageEvents = ['ADMIN', 'TEACHER'].includes(currentMember?.membershipType)
-  const showAdminActions = canManageEvents && isEventAdminModeOpen
+  const currentMemberType = String(currentMember?.membershipType || '').toUpperCase()
+  const canAddEvents = ['SUPER_ADMIN', 'ADMIN'].includes(currentMemberType)
+  const showAdminActions = canAddEvents
   const adminPanel = tool.querySelector('[data-event-admin-panel]')
   const adminToggle = tool.querySelector('[data-event-admin-toggle]')
 
   currentEventsById = new Map(allEvents.map((event) => [String(event.id), event]))
-  adminPanel?.classList.toggle('is-hidden', !showAdminActions)
+  adminPanel?.classList.toggle('is-hidden', !(canAddEvents && isEventAdminModeOpen))
 
   if (adminToggle) {
     adminToggle.textContent = isEventAdminModeOpen
@@ -2404,6 +3122,7 @@ function renderEventsState(tool, result, language) {
   renderEventCollection(tool.querySelector('[data-upcoming-events]'), result.upcoming || [], language, '', {
     showAdminActions,
     showJoin: !showAdminActions,
+    activeJuniors: result.activeJuniors,
   })
   renderEventCollection(
     tool.querySelector('[data-past-events]'),
@@ -2413,12 +3132,14 @@ function renderEventsState(tool, result, language) {
     {
       showAdminActions,
       showWinner: true,
+      activeJuniors: result.activeJuniors,
     },
   )
 }
 
 function renderFindGamesState(tool, games, language) {
   const list = tool.querySelector('[data-find-game-list]')
+  currentFindGamesById = new Map((Array.isArray(games) ? games : []).map((game) => [String(game.id), game]))
 
   if (!list) {
     return
@@ -2434,15 +3155,20 @@ function renderFindGamesState(tool, games, language) {
       ${games.map((game) => {
         const players = Array.isArray(game.players) ? game.players : []
         const currentMemberId = Number(currentMember?.id || currentMember?.sub || 0)
+        const currentMemberType = String(currentMember?.membershipType || '').toUpperCase()
         const spotsRemaining = Number(game.spotsRemaining || 0)
         const isFull = spotsRemaining <= 0
-        const isPoster = Number(game.createdByMemberId || 0) === currentMemberId
+        const canManage = game.canManage === true
+          || (game.canManage === undefined && (
+            Number(game.createdByMemberId || 0) === currentMemberId
+            || currentMemberType === 'SUPER_ADMIN'
+          ))
         const gamePath = String(game.gamePath || 'EVERYONE')
         const canJoinPath = pathAllowsCurrentMember(gamePath)
         const ageLabel = ageRangeLabel(game.minAge, game.maxAge, language, FIND_GAME_COPY[language])
         const canJoinAge = game.isAgeEligible !== false
         const buttonLabel = game.isJoined
-          ? isPoster ? FIND_GAME_COPY[language].joined : FIND_GAME_COPY[language].leave
+          ? FIND_GAME_COPY[language].leave
           : !canJoinPath ? pathOnlyLabel(FIND_GAME_COPY[language], gamePath)
             : !canJoinAge ? ageLabel
             : isFull ? FIND_GAME_COPY[language].full : FIND_GAME_COPY[language].join
@@ -2455,19 +3181,35 @@ function renderFindGamesState(tool, games, language) {
                 eventTime: game.gameTime,
               }, language))}</strong>
               <span>${FIND_GAME_COPY[language].location}: ${escapeHtml(game.location)}</span>
+              <span>${FIND_GAME_COPY[language].holes}: ${Number(game.gameHoles || 9)}</span>
               <span>${FIND_GAME_COPY[language].path}: ${FIND_GAME_COPY[language].pathLabels[gamePath] || gamePath}</span>
               <span>${FIND_GAME_COPY[language].age}: ${escapeHtml(ageLabel)}</span>
               <p class="event-card-description">${escapeHtml(game.roundDetails)}</p>
             </div>
             <div class="event-card-points">
               <span class="event-spots">${spotsRemaining} ${FIND_GAME_COPY[language].spotsOpen}</span>
-              <button
-                class="event-join-button ${game.isJoined ? 'is-secondary' : ''}"
-                type="button"
-                data-find-game-action="${game.isJoined ? 'leave' : 'join'}"
-                data-game-id="${Number(game.id || 0)}"
-                ${(isPoster || (!game.isJoined && (isFull || !canJoinPath || !canJoinAge))) ? 'disabled' : ''}
-              >${buttonLabel}</button>
+              ${canManage ? `
+                <button
+                  class="event-join-button"
+                  type="button"
+                  data-find-game-edit
+                  data-game-id="${Number(game.id || 0)}"
+                >${FIND_GAME_COPY[language].edit}</button>
+                <button
+                  class="event-join-button is-danger"
+                  type="button"
+                  data-find-game-action="delete_game"
+                  data-game-id="${Number(game.id || 0)}"
+                >${FIND_GAME_COPY[language].remove}</button>
+              ` : `
+                <button
+                  class="event-join-button ${game.isJoined ? 'is-secondary' : ''}"
+                  type="button"
+                  data-find-game-action="${game.isJoined ? 'leave' : 'join'}"
+                  data-game-id="${Number(game.id || 0)}"
+                  ${(!game.isJoined && (isFull || !canJoinPath || !canJoinAge)) ? 'disabled' : ''}
+                >${buttonLabel}</button>
+              `}
             </div>
             <div class="event-attendees">
               <strong>${FIND_GAME_COPY[language].playing}</strong>
@@ -2482,6 +3224,104 @@ function renderFindGamesState(tool, games, language) {
       }).join('')}
     </ul>
   `
+}
+
+function renderFindGameTextPreview(tool, preview, language) {
+  const previewPanel = tool?.querySelector('[data-find-game-text-preview]')
+  const modalContent = tool?.querySelector('[data-find-game-text-modal-content]')
+
+  if (!previewPanel && !modalContent) {
+    return
+  }
+
+  if (!preview) {
+    if (previewPanel) {
+      previewPanel.hidden = true
+      previewPanel.innerHTML = ''
+    }
+
+    if (modalContent) {
+      modalContent.innerHTML = ''
+    }
+
+    return
+  }
+
+  const copy = FIND_GAME_COPY[language]
+  const recipients = Array.isArray(preview.recipients) ? preview.recipients : []
+  const message = String(preview.message || '')
+  const isMissing = Boolean(preview.previewMissing)
+  const contextLabel = String(preview.contextLabel || 'round')
+  const intro = `No texts were sent. These people match the text settings for this ${contextLabel}:`
+  const empty = `No one would receive a text for this ${contextLabel}.`
+  const previewHtml = `
+    <div class="find-game-text-preview-heading">
+      <strong>${copy.textPreviewTitle}</strong>
+      <span>${recipients.length} ${ADMIN_COPY[language].textRecipientCount}</span>
+    </div>
+    <p>${isMissing ? copy.textPreviewMissing : recipients.length ? intro : empty}</p>
+    ${message ? `<p><strong>${copy.textPreviewMessage}:</strong> ${escapeHtml(message)}</p>` : ''}
+    ${recipients.length ? `
+      <ul>
+        ${recipients.map((recipient) => {
+          const type = recipient.recipientType === 'parent' ? copy.textPreviewParent : copy.textPreviewPlayer
+
+          return `
+            <li>
+              <strong>${escapeHtml(recipient.name || '')}</strong>
+              <span>${escapeHtml(type)}${recipient.phone ? ` ${escapeHtml(recipient.phone)}` : ''}</span>
+            </li>
+          `
+        }).join('')}
+      </ul>
+    ` : ''}
+  `
+
+  if (previewPanel) {
+    previewPanel.hidden = false
+    previewPanel.innerHTML = previewHtml
+  }
+
+  if (modalContent) {
+    modalContent.innerHTML = `
+      ${previewHtml}
+      <div class="find-game-text-dialog-actions">
+        <button type="button" data-find-game-text-close>${copy.textPreviewClose}</button>
+      </div>
+    `
+  }
+}
+
+function setFindGameTextModalOpen(tool, isOpen) {
+  const modal = tool?.querySelector('[data-find-game-text-modal]')
+
+  if (!modal) {
+    return
+  }
+
+  modal.classList.toggle('is-hidden', !isOpen)
+  modal.setAttribute('aria-hidden', String(!isOpen))
+
+  if (isOpen) {
+    modal.querySelector('[data-find-game-text-close]')?.focus()
+  }
+}
+
+function getTextResultsSummary(result, language) {
+  const rows = Array.isArray(result?.textResults) ? result.textResults : []
+
+  if (!rows.length) {
+    return ''
+  }
+
+  const sent = rows.filter((row) => row?.ok).length
+  const failed = rows.length - sent
+
+  if (language === 'fr') {
+    return ` Textos envoyes : ${sent}${failed ? `, echoues : ${failed}` : ''}.`
+  }
+
+  return ` Texts sent: ${sent}${failed ? `, failed: ${failed}` : ''}.`
 }
 
 async function loadFindGames(tool, language) {
@@ -2502,6 +3342,7 @@ async function loadFindGames(tool, language) {
     }
 
     renderFindGamesState(tool, result.games || [], language)
+    renderFindGameTextPreview(tool, null, language)
 
     if (status) {
       status.textContent = ''
@@ -2536,7 +3377,7 @@ function renderLessonsState(tool, result, language) {
   const slotsContainer = tool.querySelector('[data-lesson-slots]')
   const requestsContainer = tool.querySelector('[data-lesson-requests]')
   const currentMemberId = Number(currentMember?.id || currentMember?.sub || 0)
-  const canTeach = ['ADMIN', 'TEACHER'].includes(currentMember?.membershipType)
+  const canTeach = ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'COACH'].includes(currentMember?.membershipType)
   const canJoinLesson = ['CUP', 'COMMUNITY'].includes(currentMember?.membershipType)
   const booked = result.booked || []
   const slots = result.slots || []
@@ -2770,6 +3611,8 @@ function resetEventForm(form) {
   const submitButton = form.querySelector('[data-event-submit]')
   const cancelButton = form.querySelector('[data-event-cancel-edit]')
   const locationInput = form.querySelector('input[name="location"]')
+  const notifyInput = form.querySelector('input[name="notify_others"]')
+  const notifyField = form.querySelector('[data-event-notify-field]')
 
   form.reset()
 
@@ -2784,6 +3627,13 @@ function resetEventForm(form) {
   if (locationInput) {
     locationInput.value = 'Hawkesbury'
   }
+
+  if (notifyInput) {
+    notifyInput.checked = true
+    notifyInput.disabled = false
+  }
+
+  notifyField?.classList.remove('is-hidden')
 
   if (title) {
     title.textContent = title.dataset.addTitle || title.textContent
@@ -2812,6 +3662,17 @@ function editEventFromList(button) {
   const title = form.querySelector('[data-event-form-title]')
   const submitButton = form.querySelector('[data-event-submit]')
   const cancelButton = form.querySelector('[data-event-cancel-edit]')
+  const adminToggle = tool?.querySelector('[data-event-admin-toggle]')
+  const notifyInput = form.querySelector('input[name="notify_others"]')
+  const notifyField = form.querySelector('[data-event-notify-field]')
+
+  isEventAdminModeOpen = true
+  form.classList.remove('is-hidden')
+
+  if (adminToggle) {
+    adminToggle.textContent = adminToggle.dataset.hideLabel || adminToggle.textContent
+    adminToggle.setAttribute('aria-expanded', 'true')
+  }
 
   if (actionInput) {
     actionInput.value = 'update_event'
@@ -2839,6 +3700,13 @@ function editEventFromList(button) {
   form.querySelector('input[name="winner"]').value = event.winner || ''
   form.querySelector('textarea[name="attendee_csv"]').value = event.attendeeCsv || ''
 
+  if (notifyInput) {
+    notifyInput.checked = false
+    notifyInput.disabled = true
+  }
+
+  notifyField?.classList.add('is-hidden')
+
   if (title) {
     title.textContent = title.dataset.editTitle || title.textContent
   }
@@ -2864,6 +3732,11 @@ async function handleEventSubmit(form) {
   const status = tool.querySelector('[data-events-status]')
   const submitButton = form.querySelector('button[type="submit"]')
   const formData = new FormData(form)
+  const action = String(formData.get('action') || 'add_event')
+
+  if (action === 'update_event') {
+    formData.delete('notify_others')
+  }
 
   if (status) {
     status.textContent = siteContent.pageMap.get('events').eventsTool.saving[language]
@@ -2890,10 +3763,17 @@ async function handleEventSubmit(form) {
     }
 
     resetEventForm(form)
+
+    if (action === 'update_event') {
+      isEventAdminModeOpen = false
+    }
+
     renderEventsState(tool, result, language)
+    renderFindGameTextPreview(tool, null, language)
+    setFindGameTextModalOpen(tool, false)
 
     if (status) {
-      status.textContent = result.message || EVENTS_COPY[language].saved
+      status.textContent = `${result.message || EVENTS_COPY[language].saved}${getTextResultsSummary(result, language)}`
       status.classList.add('success')
       status.classList.remove('error')
     }
@@ -2969,6 +3849,168 @@ async function handleEventAction(button) {
   }
 }
 
+async function handleEventAddPlayerSubmit(form) {
+  const tool = form.closest('[data-events-tool]')
+  const language = getLanguage()
+  const status = tool?.querySelector('[data-events-status]')
+  const submitButton = form.querySelector('button[type="submit"]')
+  const formData = new FormData(form)
+
+  if (status) {
+    status.textContent = siteContent.pageMap.get('events').eventsTool.saving[language]
+    status.classList.remove('error', 'success')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/events.php`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || EVENTS_COPY[language].saveError)
+    }
+
+    renderEventsState(tool, result, language)
+
+    if (status) {
+      status.textContent = result.message || EVENTS_COPY[language].saved
+      status.classList.add('success')
+      status.classList.remove('error')
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || EVENTS_COPY[language].saveError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+}
+
+function resetFindGameForm(form) {
+  if (!form) {
+    return
+  }
+
+  const actionInput = form.querySelector('input[name="action"]')
+  const gameIdInput = form.querySelector('input[name="game_id"]')
+  const dateInput = form.querySelector('input[name="game_date"]')
+  const title = form.querySelector('[data-find-game-form-title]')
+  const submitButton = form.querySelector('[data-find-game-submit]')
+  const cancelButton = form.querySelector('[data-find-game-cancel-edit]')
+  const locationInput = form.querySelector('input[name="location"]')
+  const notifyInput = form.querySelector('input[name="notify_others"]')
+
+  form.reset()
+
+  if (actionInput) {
+    actionInput.value = 'post_game'
+  }
+
+  if (gameIdInput) {
+    gameIdInput.value = ''
+  }
+
+  if (dateInput) {
+    dateInput.value = ''
+  }
+
+  if (locationInput) {
+    locationInput.value = 'Hawkesbury'
+  }
+
+  if (notifyInput) {
+    notifyInput.checked = true
+  }
+
+  if (title) {
+    title.textContent = title.dataset.addTitle || title.textContent
+  }
+
+  if (submitButton) {
+    submitButton.textContent = submitButton.dataset.saveLabel || submitButton.textContent
+  }
+
+  cancelButton?.classList.add('is-hidden')
+  initializeDatePickers(form)
+}
+
+function editFindGameFromList(button) {
+  const game = currentFindGamesById.get(String(button.dataset.gameId))
+  const tool = button.closest('[data-find-game-tool]')
+  const form = tool?.querySelector('[data-find-game-form]')
+
+  if (!game || !form) {
+    return
+  }
+
+  const actionInput = form.querySelector('input[name="action"]')
+  const gameIdInput = form.querySelector('input[name="game_id"]')
+  const dateInput = form.querySelector('input[name="game_date"]')
+  const title = form.querySelector('[data-find-game-form-title]')
+  const submitButton = form.querySelector('[data-find-game-submit]')
+  const cancelButton = form.querySelector('[data-find-game-cancel-edit]')
+
+  form.classList.remove('is-hidden')
+
+  if (actionInput) {
+    actionInput.value = 'update_game'
+  }
+
+  if (gameIdInput) {
+    gameIdInput.value = game.id
+  }
+
+  if (dateInput) {
+    dateInput.value = game.gameDate || ''
+  }
+
+  form.querySelector('input[name="game_time"]').value = game.gameTime || ''
+  form.querySelector('select[name="game_holes"]').value = String(game.gameHoles || 9)
+  form.querySelector('input[name="spots_open"]').value = Number(game.spotsOpen || 1)
+  form.querySelector('select[name="game_path"]').value = game.gamePath || 'EVERYONE'
+  form.querySelector('input[name="min_age"]').value = game.minAge || ''
+  form.querySelector('input[name="max_age"]').value = game.maxAge || ''
+  form.querySelector('input[name="location"]').value = game.location || 'Hawkesbury'
+  form.querySelector('textarea[name="round_details"]').value = game.roundDetails || ''
+  const notifyInput = form.querySelector('input[name="notify_others"]')
+
+  if (notifyInput) {
+    notifyInput.checked = true
+  }
+
+  if (title) {
+    title.textContent = title.dataset.editTitle || title.textContent
+  }
+
+  if (submitButton) {
+    submitButton.textContent = submitButton.dataset.updateLabel || submitButton.textContent
+  }
+
+  cancelButton?.classList.remove('is-hidden')
+
+  const picker = dateInput?.closest('[data-date-picker]')
+
+  if (picker && dateInput?.value) {
+    updateDatePickerValue(picker, dateInput.value, getLanguage())
+  }
+
+  form.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 async function handleFindGameSubmit(form) {
   const tool = form.closest('[data-find-game-tool]')
   const language = getLanguage()
@@ -3000,18 +4042,13 @@ async function handleFindGameSubmit(form) {
       throw new Error(result.message || FIND_GAME_COPY[language].saveError)
     }
 
-    form.reset()
-    const locationInput = form.querySelector('input[name="location"]')
-
-    if (locationInput) {
-      locationInput.value = 'Hawkesbury'
-    }
-
-    initializeDatePickers(form)
+    resetFindGameForm(form)
     renderFindGamesState(tool, result.games || [], language)
+    renderFindGameTextPreview(tool, null, language)
+    setFindGameTextModalOpen(tool, false)
 
     if (status) {
-      status.textContent = result.message || FIND_GAME_COPY[language].saved
+      status.textContent = `${result.message || FIND_GAME_COPY[language].saved}${getTextResultsSummary(result, language)}`
       status.classList.add('success')
       status.classList.remove('error')
     }
@@ -3033,8 +4070,13 @@ async function handleFindGameAction(button) {
   const language = getLanguage()
   const status = tool?.querySelector('[data-find-game-status]')
   const formData = new FormData()
+  const action = button.dataset.findGameAction || 'join'
 
-  formData.append('action', button.dataset.findGameAction || 'join')
+  if (action === 'delete_game' && !window.confirm(FIND_GAME_COPY[language].removeConfirm)) {
+    return
+  }
+
+  formData.append('action', action)
   formData.append('game_id', button.dataset.gameId)
 
   if (status) {
@@ -3060,6 +4102,11 @@ async function handleFindGameAction(button) {
     }
 
     renderFindGamesState(tool, result.games || [], language)
+    renderFindGameTextPreview(tool, null, language)
+
+    if (action === 'delete_game') {
+      resetFindGameForm(tool?.querySelector('[data-find-game-form]'))
+    }
 
     if (status) {
       status.textContent = result.message || FIND_GAME_COPY[language].saved
@@ -3110,11 +4157,14 @@ async function handleLessonSubmit(form) {
 
     form.reset()
     form.querySelector('input[name="location"]') && (form.querySelector('input[name="location"]').value = 'Hawkesbury')
+    form.querySelector('input[name="notify_others"]') && (form.querySelector('input[name="notify_others"]').checked = true)
     initializeDatePickers(form)
     renderLessonsState(tool, result, language)
+    renderFindGameTextPreview(tool, null, language)
+    setFindGameTextModalOpen(tool, false)
 
     if (status) {
-      status.textContent = result.message || LESSON_COPY[language].saved
+      status.textContent = `${result.message || LESSON_COPY[language].saved}${getTextResultsSummary(result, language)}`
       status.classList.add('success')
       status.classList.remove('error')
     }
@@ -3283,6 +4333,34 @@ document.addEventListener('click', (event) => {
     return
   }
 
+  const adminCreateToggle = event.target.closest('[data-admin-create-toggle]')
+
+  if (adminCreateToggle) {
+    const panel = adminCreateToggle.closest('[data-admin-panel]')
+    const form = panel?.querySelector('[data-admin-create-form]')
+    const isHidden = form?.classList.toggle('is-hidden')
+
+    adminCreateToggle.textContent = isHidden
+      ? adminCreateToggle.dataset.showLabel
+      : adminCreateToggle.dataset.hideLabel
+    adminCreateToggle.setAttribute('aria-expanded', String(!isHidden))
+    return
+  }
+
+  const adminScoreToggle = event.target.closest('[data-admin-score-toggle]')
+
+  if (adminScoreToggle) {
+    const tool = adminScoreToggle.closest('[data-scores-tool]')
+    const form = tool?.querySelector('[data-admin-score-form]')
+    const isHidden = form?.classList.toggle('is-hidden')
+
+    adminScoreToggle.textContent = isHidden
+      ? adminScoreToggle.dataset.showLabel
+      : adminScoreToggle.dataset.hideLabel
+    adminScoreToggle.setAttribute('aria-expanded', String(!isHidden))
+    return
+  }
+
   const adminTextClose = event.target.closest('[data-admin-text-close]')
 
   if (adminTextClose) {
@@ -3298,6 +4376,24 @@ document.addEventListener('click', (event) => {
     const panel = adminTextModal.closest('[data-admin-panel]')
 
     setAdminTextModalOpen(panel, false)
+    return
+  }
+
+  const findGameTextClose = event.target.closest('[data-find-game-text-close]')
+
+  if (findGameTextClose) {
+    const tool = findGameTextClose.closest('[data-find-game-tool], [data-events-tool], [data-lesson-tool]')
+
+    setFindGameTextModalOpen(tool, false)
+    return
+  }
+
+  const findGameTextModal = event.target.closest('[data-find-game-text-modal]')
+
+  if (findGameTextModal && event.target === findGameTextModal) {
+    const tool = findGameTextModal.closest('[data-find-game-tool], [data-events-tool], [data-lesson-tool]')
+
+    setFindGameTextModalOpen(tool, false)
     return
   }
 
@@ -3320,25 +4416,75 @@ document.addEventListener('click', (event) => {
 
     const isClosing = expandedAdminMemberId === memberId
     expandedAdminMemberId = isClosing ? null : memberId
-    currentAdminDetailTab = 'points'
     renderAdminMembers(panel, currentAdminMembers, getLanguage())
     return
   }
 
-  const adminDetailTab = event.target.closest('[data-admin-detail-tab]')
+  const adminReportPath = event.target.closest('[data-admin-report-path]')
 
-  if (adminDetailTab) {
-    const panel = adminDetailTab.closest('[data-admin-panel]')
+  if (adminReportPath) {
+    const path = adminReportPath.dataset.adminReportPath || 'CUP'
+    const pointsTool = adminReportPath.closest('[data-admin-points-report]')
+    const roundsTool = adminReportPath.closest('[data-admin-rounds-report]')
 
-    currentAdminDetailTab = adminDetailTab.dataset.adminDetailTab || 'points'
-    renderAdminMembers(panel, currentAdminMembers, getLanguage())
+    if (pointsTool) {
+      currentAdminPointsPath = path
+      loadPoints(pointsTool, getLanguage())
+      return
+    }
+
+    if (roundsTool) {
+      currentAdminRoundsPath = path
+      loadScores(roundsTool, getLanguage())
+      return
+    }
+  }
+
+  const adminPointsReportToggle = event.target.closest('[data-admin-points-report-toggle]')
+
+  if (adminPointsReportToggle) {
+    const tool = adminPointsReportToggle.closest('[data-admin-points-report]')
+    const memberId = Number(adminPointsReportToggle.dataset.memberId || 0)
+
+    if (expandedAdminPointsMembers.has(memberId)) {
+      expandedAdminPointsMembers.delete(memberId)
+    } else {
+      expandedAdminPointsMembers.add(memberId)
+    }
+
+    loadPoints(tool, getLanguage())
     return
   }
 
-  const adminPointsAll = event.target.closest('[data-admin-points-all]')
+  const adminRoundsToggle = event.target.closest('[data-admin-rounds-toggle]')
 
-  if (adminPointsAll) {
-    openAdminPointHistoryWindow(Number(adminPointsAll.dataset.memberId || 0), getLanguage())
+  if (adminRoundsToggle) {
+    const tool = adminRoundsToggle.closest('[data-admin-rounds-report]')
+    const memberId = Number(adminRoundsToggle.dataset.memberId || 0)
+
+    if (expandedAdminRoundMembers.has(memberId)) {
+      expandedAdminRoundMembers.delete(memberId)
+    } else {
+      expandedAdminRoundMembers.add(memberId)
+    }
+
+    loadScores(tool, getLanguage())
+    return
+  }
+
+  const adminRoundsAllToggle = event.target.closest('[data-admin-rounds-all-toggle]')
+
+  if (adminRoundsAllToggle) {
+    const tool = adminRoundsAllToggle.closest('[data-admin-rounds-report]')
+    const memberId = Number(adminRoundsAllToggle.dataset.memberId || 0)
+
+    if (showAllAdminRoundMembers.has(memberId)) {
+      showAllAdminRoundMembers.delete(memberId)
+    } else {
+      showAllAdminRoundMembers.add(memberId)
+    }
+
+    loadScores(tool, getLanguage())
     return
   }
 
@@ -3351,6 +4497,13 @@ document.addEventListener('click', (event) => {
       showAccountForm(panel, accountTab.dataset.accountTab)
     }
 
+    return
+  }
+
+  const registerNewJuniorButton = event.target.closest('[data-register-new-junior]')
+
+  if (registerNewJuniorButton) {
+    resetJoinCreatedState(registerNewJuniorButton.closest('[data-account-form="join"]'), true)
     return
   }
 
@@ -3372,6 +4525,24 @@ document.addEventListener('click', (event) => {
     return
   }
 
+  const pointsListToggle = event.target.closest('[data-points-list-toggle]')
+
+  if (pointsListToggle) {
+    const pointsList = pointsListToggle.closest('[data-points-list]')
+    const language = getLanguage()
+    const pointsTool = siteContent.pageMap.get('points').pointsTool
+    const isExpanded = pointsList.classList.toggle('is-expanded')
+    const label = pointsListToggle.querySelector('span')
+
+    pointsListToggle.setAttribute('aria-expanded', String(isExpanded))
+
+    if (label) {
+      label.textContent = isExpanded ? pointsTool.showLatest[language] : pointsTool.showAll[language]
+    }
+
+    return
+  }
+
   const cashoutToggle = event.target.closest('[data-cashout-toggle]')
 
   if (cashoutToggle) {
@@ -3380,6 +4551,62 @@ document.addEventListener('click', (event) => {
 
     form?.classList.toggle('is-hidden')
     form?.querySelector('input[name="points"]')?.focus()
+    return
+  }
+
+  const adminPointsEntryToggle = event.target.closest('[data-admin-points-entry-toggle]')
+
+  if (adminPointsEntryToggle) {
+    const tool = adminPointsEntryToggle.closest('[data-points-tool]')
+    const form = tool?.querySelector('[data-admin-points-entry-form]')
+    const isHidden = form?.classList.toggle('is-hidden')
+
+    adminPointsEntryToggle.textContent = isHidden
+      ? adminPointsEntryToggle.dataset.showLabel
+      : adminPointsEntryToggle.dataset.hideLabel
+    adminPointsEntryToggle.setAttribute('aria-expanded', String(!isHidden))
+    return
+  }
+
+  const rankingTab = event.target.closest('[data-ranking-tab]')
+
+  if (rankingTab) {
+    const tool = rankingTab.closest('[data-ranking-tool]')
+    const tabId = rankingTab.dataset.rankingTab
+
+    tool?.querySelectorAll('[data-ranking-tab]').forEach((button) => {
+      const isActive = button.dataset.rankingTab === tabId
+
+      button.classList.toggle('active', isActive)
+      button.setAttribute('aria-selected', String(isActive))
+    })
+
+    tool?.querySelectorAll('[data-ranking-panel]').forEach((panel) => {
+      const isActive = panel.dataset.rankingPanel === tabId
+
+      panel.classList.toggle('active', isActive)
+      panel.hidden = !isActive
+    })
+
+    return
+  }
+
+  const rankingRoundToggle = event.target.closest('[data-ranking-round-toggle]')
+
+  if (rankingRoundToggle) {
+    const tool = rankingRoundToggle.closest('[data-ranking-tool]')
+    const memberId = Number(rankingRoundToggle.dataset.memberId || 0)
+
+    if (expandedRankingRoundMembers.has(memberId)) {
+      expandedRankingRoundMembers.delete(memberId)
+    } else {
+      expandedRankingRoundMembers.add(memberId)
+    }
+
+    if (tool && currentRankingResult) {
+      renderRankingState(tool, currentRankingResult, getLanguage())
+    }
+
     return
   }
 
@@ -3415,6 +4642,22 @@ document.addEventListener('click', (event) => {
   if (findGameActionButton) {
     event.preventDefault()
     handleFindGameAction(findGameActionButton)
+    return
+  }
+
+  const findGameEditButton = event.target.closest('[data-find-game-edit]')
+
+  if (findGameEditButton) {
+    event.preventDefault()
+    editFindGameFromList(findGameEditButton)
+    return
+  }
+
+  const findGameCancelEditButton = event.target.closest('[data-find-game-cancel-edit]')
+
+  if (findGameCancelEditButton) {
+    event.preventDefault()
+    resetFindGameForm(findGameCancelEditButton.closest('[data-find-game-form]'))
     return
   }
 
@@ -3466,6 +4709,20 @@ document.addEventListener('click', (event) => {
     return
   }
 
+  const eventAddPlayerToggle = event.target.closest('[data-event-add-player-toggle]')
+
+  if (eventAddPlayerToggle) {
+    const card = eventAddPlayerToggle.closest('li')
+    const form = card?.querySelector('[data-event-add-player-form]')
+    const isHidden = form?.classList.toggle('is-hidden')
+
+    eventAddPlayerToggle.textContent = isHidden
+      ? eventAddPlayerToggle.dataset.showLabel
+      : eventAddPlayerToggle.dataset.hideLabel
+    eventAddPlayerToggle.setAttribute('aria-expanded', String(!isHidden))
+    return
+  }
+
   const eventCancelEditButton = event.target.closest('[data-event-cancel-edit]')
 
   if (eventCancelEditButton) {
@@ -3494,6 +4751,25 @@ document.addEventListener('click', (event) => {
   }
 })
 
+document.addEventListener('change', (event) => {
+  const publicStatsChoice = event.target.closest('[data-account-public-stats]')
+
+  if (publicStatsChoice) {
+    const form = publicStatsChoice.closest('form')
+    const publicStatsValue = form?.querySelector('[data-account-public-stats-value]')
+
+    if (publicStatsValue) {
+      publicStatsValue.value = publicStatsChoice.value === '1' ? '1' : '0'
+    }
+  }
+
+  const scoreFormat = event.target.closest('[data-score-format]')
+
+  if (scoreFormat) {
+    updateScoreFormForFormat(scoreFormat.closest('[data-score-form]'), getLanguage())
+  }
+})
+
 document.addEventListener('submit', (event) => {
   const scoreForm = event.target.closest('[data-score-form]')
 
@@ -3508,6 +4784,14 @@ document.addEventListener('submit', (event) => {
   if (cashoutForm) {
     event.preventDefault()
     handleCashoutSubmit(cashoutForm)
+    return
+  }
+
+  const adminPointsEntryForm = event.target.closest('[data-admin-points-entry-form]')
+
+  if (adminPointsEntryForm) {
+    event.preventDefault()
+    handleAdminPointsEntrySubmit(adminPointsEntryForm)
     return
   }
 
@@ -3532,6 +4816,14 @@ document.addEventListener('submit', (event) => {
   if (eventForm) {
     event.preventDefault()
     handleEventSubmit(eventForm)
+    return
+  }
+
+  const eventAddPlayerForm = event.target.closest('[data-event-add-player-form]')
+
+  if (eventAddPlayerForm) {
+    event.preventDefault()
+    handleEventAddPlayerSubmit(eventAddPlayerForm)
     return
   }
 
@@ -3581,14 +4873,6 @@ document.addEventListener('submit', (event) => {
     return
   }
 
-  const adminAwardForm = event.target.closest('[data-admin-award-form]')
-
-  if (adminAwardForm) {
-    event.preventDefault()
-    handleAdminMemberSubmit(adminAwardForm)
-    return
-  }
-
   const form = event.target.closest('[data-account-form]')
 
   if (!form) {
@@ -3617,12 +4901,20 @@ window.addEventListener('appinstalled', () => {
 })
 
 if ('serviceWorker' in navigator) {
+  const isLocalDev = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
+
+  if (isLocalDev) {
+    navigator.serviceWorker.getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .catch(() => null)
+  } else {
   const registerServiceWorker = () => navigator.serviceWorker.register('/sw.js').catch(() => null)
 
   if (document.readyState === 'complete') {
     registerServiceWorker()
   } else {
     window.addEventListener('load', registerServiceWorker)
+  }
   }
 }
 

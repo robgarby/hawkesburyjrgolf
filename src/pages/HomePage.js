@@ -34,13 +34,14 @@ export const homePage = {
   "ctaRoute": "our-program",
   "notice": {
     "type": "facebook",
+    "url": "https://www.facebook.com/hawkesburyjrgolf/",
     "title": {
       "en": "Follow us on Facebook",
       "fr": "Suivez-nous sur Facebook"
     },
     "text": {
-      "en": "Coming soon",
-      "fr": "Bientot"
+      "en": "Hawkesbury Jr Golf",
+      "fr": "Hawkesbury Jr Golf"
     }
   },
   "sections": [
@@ -60,8 +61,8 @@ export const homePage = {
         "fr": "Deux volets de programme"
       },
       "text": {
-        "en": "Cup Members are Hawkesbury Golf and Curling Club members. CUP and Community members use the same My Account area to request free volunteer-coach lessons, join sponsored or open events, and connect with juniors who are looking for a game.",
-        "fr": "Les membres Cup sont membres du Hawkesbury Golf and Curling Club. Les membres CUP et communautaires utilisent le même espace Mon compte pour demander des leçons gratuites avec des entraîneurs bénévoles, joindre des événements commandités ou ouverts et trouver des juniors qui cherchent une partie."
+        "en": "Members are Hawkesbury Golf and Curling Club members. Member and Community players use the same My Account area to request free volunteer-coach lessons, join sponsored or open events, and connect with juniors who are looking for a game.",
+        "fr": "Les membres sont membres du Hawkesbury Golf and Curling Club. Les membres et les joueurs communautaires utilisent le même espace Mon compte pour demander des leçons gratuites avec des entraîneurs bénévoles, joindre des événements commandités ou ouverts et trouver des juniors qui cherchent une partie."
       }
     },
     {

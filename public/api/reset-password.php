@@ -72,7 +72,9 @@ HTML;
 
 try {
     $pdo = get_database();
-    ensure_members_table($pdo);
+    run_schema_setup('Reset password service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $token = (string) ($_GET['token'] ?? '');

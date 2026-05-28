@@ -40,7 +40,9 @@ require_once __DIR__ . '/mail.php';
 
 try {
     $pdo = get_database();
-    ensure_members_table($pdo);
+    run_schema_setup('Resend verification service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
 
     $parentEmail = trim((string) ($_POST['parent_email'] ?? ''));
 
@@ -96,7 +98,7 @@ try {
     $firstName = trim((string) ($member['first_name'] ?? ''));
     $greeting = $firstName === '' ? 'Hi' : "Hi {$firstName}";
     $subject = 'Verify your Hawkesbury Junior Golf account';
-    $message = "{$greeting},\n\nHere is a new parent email verification link for your Hawkesbury Junior Golf account:\n{$verificationUrl}\n\nImportant: because the Hawkesbury Junior Golf website is new, this email will probably be in your spam or junk folder. Please check spam, junk, and trash if it is not in your inbox. If you are still having problems, email info@hawkesburyjrgolf.ca.\n\nThank you,\nHawkesbury Junior Golf";
+    $message = "{$greeting},\n\nHere is a new parent email verification link for your Hawkesbury Junior Golf account:\n{$verificationUrl}\n\nAfter you click the verification link, it will send you back to the Log in page.\n\nImportant: because the Hawkesbury Junior Golf website is new, this email will probably be in your spam or junk folder. Please check spam, junk, and trash if it is not in your inbox. If you are still having problems, email info@hawkesburyjrgolf.ca.\n\nThank you,\nHawkesbury Junior Golf";
 
     send_smtp_mail($parentEmail, $subject, $message);
 

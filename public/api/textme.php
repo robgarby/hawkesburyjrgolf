@@ -1,8 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const TEXTME_TEST_MODE = true;
-const TEXTME_TEST_ALLOWED_NUMBER = '6138803625';
+const TEXTME_MONITOR_NUMBER = '6138803625';
 
 function send_textme_json(int $status, array $payload): void
 {
@@ -29,7 +28,7 @@ function send_textme_headers(): void
         header('Vary: Origin');
     }
 
-    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
     header('Content-Type: application/json; charset=utf-8');
 }
@@ -58,11 +57,38 @@ function get_textme_admin_member_id(PDO $pdo): int
     $statement->execute(['id' => $memberId]);
     $member = $statement->fetch();
 
-    if (!$member || $member['membership_type'] !== 'ADMIN' || !(bool) $member['is_active']) {
-        send_textme_json(403, ['ok' => false, 'message' => 'Only admins can send text messages.']);
+    if (!$member || !is_text_admin_type((string) $member['membership_type']) || !(bool) $member['is_active']) {
+        send_textme_json(403, ['ok' => false, 'message' => 'Only admins and super admins can send text messages.']);
     }
 
     return $memberId;
+}
+
+function get_textme_members(PDO $pdo): array
+{
+    $statement = $pdo->query(
+        'SELECT id, is_active, first_name, last_name, username, parent_name, parent_text, player_text
+         FROM members
+         WHERE is_active = 1
+         ORDER BY first_name ASC, last_name ASC, username ASC, id ASC'
+    );
+
+    return array_map(
+        static function (array $member): array {
+            $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+
+            return [
+                'id' => (int) $member['id'],
+                'isActive' => (bool) $member['is_active'],
+                'name' => $name !== '' ? $name : (string) ($member['username'] ?? ''),
+                'username' => $member['username'],
+                'parentName' => $member['parent_name'],
+                'parentText' => $member['parent_text'],
+                'playerText' => $member['player_text'],
+            ];
+        },
+        $statement->fetchAll()
+    );
 }
 
 function get_twilio_config(): array
@@ -141,9 +167,29 @@ function personalize_text_message(string $message, array $recipient): string
     );
 }
 
-function normalize_text_number_for_test(string $number): string
+function normalize_text_number(string $number): string
 {
     return preg_replace('/\D+/', '', $number) ?? '';
+}
+
+function add_text_monitor_recipient(array $recipients): array
+{
+    $monitorDigits = normalize_text_number(TEXTME_MONITOR_NUMBER);
+
+    foreach ($recipients as $recipient) {
+        $normalized = normalize_text_recipient($recipient);
+
+        if (normalize_text_number($normalized['to']) === $monitorDigits) {
+            return $recipients;
+        }
+    }
+
+    $recipients[] = [
+        'to' => TEXTME_MONITOR_NUMBER,
+        'name' => 'Rob Monitor',
+    ];
+
+    return $recipients;
 }
 
 function send_text_message(string $to, string $message): string
@@ -170,6 +216,7 @@ function send_text_message(string $to, string $message): string
 
 function send_text_messages(array $recipients, string $message): array
 {
+    $recipients = add_text_monitor_recipient($recipients);
     $results = [];
 
     foreach ($recipients as $recipient) {
@@ -186,31 +233,15 @@ function send_text_messages(array $recipients, string $message): array
         }
 
         $personalizedMessage = personalize_text_message($message, $normalized);
-        $isAllowedTestNumber = normalize_text_number_for_test($normalized['to']) === TEXTME_TEST_ALLOWED_NUMBER
-            || normalize_text_number_for_test($normalized['to']) === '1' . TEXTME_TEST_ALLOWED_NUMBER;
-
-        if (TEXTME_TEST_MODE && !$isAllowedTestNumber) {
-            $results[] = [
-                'ok' => true,
-                'testing' => true,
-                'skipped' => true,
-                'to' => $normalized['to'],
-                'name' => $normalized['name'],
-                'message' => "Testing mode: no text sent to {$normalized['to']}. Message preview: " . $personalizedMessage,
-            ];
-            continue;
-        }
 
         try {
             $results[] = [
                 'ok' => true,
-                'testing' => TEXTME_TEST_MODE,
+                'testing' => false,
                 'to' => $normalized['to'],
                 'name' => $normalized['name'],
                 'sid' => send_text_message($normalized['to'], $personalizedMessage),
-                'message' => TEXTME_TEST_MODE
-                    ? "Testing mode: real text sent only because {$normalized['to']} is the approved test number."
-                    : 'Text sent.',
+                'message' => 'Text sent.',
             ];
         } catch (Throwable $error) {
             $results[] = [
@@ -239,14 +270,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if (!function_exists('is_text_admin_type')) {
+    function is_text_admin_type(string $type): bool
+    {
+        return in_array(strtoupper(trim($type)), ['SUPER_ADMIN', 'ADMIN'], true);
+    }
+}
+
+if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'], true)) {
     send_textme_json(405, ['ok' => false, 'message' => 'Method not allowed.']);
 }
 
 try {
     $pdo = get_database();
-    ensure_members_table($pdo);
+    run_schema_setup('Text service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
     get_textme_admin_member_id($pdo);
+
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        send_textme_json(200, [
+            'ok' => true,
+            'members' => get_textme_members($pdo),
+        ]);
+    }
 
     $input = json_decode((string) file_get_contents('php://input'), true);
 

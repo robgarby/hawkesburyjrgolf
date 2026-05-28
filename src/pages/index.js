@@ -5,7 +5,7 @@ import { contactPage } from './ContactPage.js'
 import { ourProgramPage } from './OurProgramPage.js'
 import { sponsorsPage } from './SponsorsPage.js'
 import { theCupPage } from './TheCupPage.js'
-import { myAccountPage } from './MyAccountPage.js'
+import { adminPanelPage, myAccountPage } from './MyAccountPage.js'
 import {
   bookALessonPage,
   eventsPage,
@@ -24,6 +24,7 @@ export const pages = [
   contactPage,
   loginPage,
   myAccountPage,
+  adminPanelPage,
   scoresPage,
   pointsPage,
   rankingPage,

@@ -13,8 +13,8 @@ export const lessonsPage = {
     "fr": "Leçons, camp d’enseignement et demandes de leçons gratuites avec des entraîneurs bénévoles."
   },
   "intro": {
-    "en": "Boys and girls ages 9-17 can learn through group instruction and free volunteer-coach lessons made available in the same My Account area used by both CUP and Community members. Lessons with Hawkesbury Golf and Curling Club professionals are booked through the club and are not free unless they are listed in the Lessons area of My Account.",
-    "fr": "Les filles et garçons de 9 à 17 ans peuvent apprendre grâce aux leçons de groupe et aux leçons gratuites avec des entraîneurs bénévoles offertes dans le même espace Mon compte utilisé par les membres CUP et communautaires. Les leçons avec les professionnels du Hawkesbury Golf and Curling Club se réservent auprès du club et ne sont pas gratuites, sauf si elles sont affichées dans la section Leçons de Mon compte."
+    "en": "Boys and girls ages 9-17 can learn through group instruction and free volunteer-coach lessons made available in the same My Account area used by both Member and Community players. Lessons with Hawkesbury Golf and Curling Club professionals are booked through the club and are not free unless they are listed in the Lessons area of My Account.",
+    "fr": "Les filles et garçons de 9 à 17 ans peuvent apprendre grâce aux leçons de groupe et aux leçons gratuites avec des entraîneurs bénévoles offertes dans le même espace Mon compte utilisé par les membres et les joueurs communautaires. Les leçons avec les professionnels du Hawkesbury Golf and Curling Club se réservent auprès du club et ne sont pas gratuites, sauf si elles sont affichées dans la section Leçons de Mon compte."
   },
   "image": "/images/putting-green.jpeg",
   "cta": {
@@ -78,8 +78,8 @@ export const lessonsPage = {
         "fr": "Leçons gratuites avec entraîneurs bénévoles"
       },
       "text": {
-        "en": "Volunteer coaches are willing to give free lessons to juniors. These free lessons are available in the same My Account area for both CUP and Community members, where juniors can see available times, request single or group lessons, and view booked lessons once a teacher or admin accepts.",
-        "fr": "Des entraîneurs bénévoles sont prêts à offrir des leçons gratuites aux juniors. Ces leçons gratuites sont offertes dans le même espace Mon compte pour les membres CUP et communautaires, où les juniors peuvent voir les heures disponibles, demander des leçons individuelles ou de groupe et consulter les leçons réservées lorsqu’un enseignant ou admin accepte."
+        "en": "Volunteer coaches are willing to give free lessons to juniors. These free lessons are available in the same My Account area for both Member and Community players, where juniors can see available times, request single or group lessons, and view booked lessons once a teacher or admin accepts.",
+        "fr": "Des entraîneurs bénévoles sont prêts à offrir des leçons gratuites aux juniors. Ces leçons gratuites sont offertes dans le même espace Mon compte pour les membres et les joueurs communautaires, où les juniors peuvent voir les heures disponibles, demander des leçons individuelles ou de groupe et consulter les leçons réservées lorsqu’un enseignant ou admin accepte."
       },
       "bullets": {
         "en": [

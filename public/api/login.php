@@ -40,7 +40,9 @@ require_once __DIR__ . '/auth.php';
 
 try {
     $pdo = get_database();
-    ensure_members_table($pdo);
+    run_schema_setup('Login service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
 
     $username = normalize_username((string) ($_POST['username'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');

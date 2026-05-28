@@ -66,8 +66,8 @@ export const loginPage = {
       "fr": "Créer votre compte"
     },
     "notice": {
-      "en": "Join as a Hawkesbury Golf and Curling Club Cup member or as a Community Golf member. Both paths can use the member tools.",
-      "fr": "Adhérez comme membre Cup du Hawkesbury Golf and Curling Club ou comme membre du volet Golf communautaire. Les deux parcours peuvent utiliser les outils membres."
+      "en": "Join as a Hawkesbury Golf and Curling Club Member or as a Community Golf member. Both paths can use the member tools.",
+      "fr": "Adhérez comme membre du Hawkesbury Golf and Curling Club ou comme membre du volet Golf communautaire. Les deux parcours peuvent utiliser les outils membres."
     },
     "firstNameLabel": {
       "en": "Junior first name",
@@ -87,8 +87,8 @@ export const loginPage = {
     },
     "membershipOptions": {
       "cup": {
-        "en": "HGCC Member / The Cup",
-        "fr": "Membre HGCC / The Cup"
+        "en": "HGCC Member",
+        "fr": "Membre HGCC"
       },
       "community": {
         "en": "Community Golf",
@@ -106,6 +106,14 @@ export const loginPage = {
     "button": {
       "en": "Join and create account",
       "fr": "Adhérer et créer le compte"
+    },
+    "createdButton": {
+      "en": "Account created",
+      "fr": "Compte créé"
+    },
+    "registerNewJuniorButton": {
+      "en": "Register a new junior",
+      "fr": "Inscrire un autre junior"
     },
     "helper": {
       "en": "Passwords must be at least 8 characters. After joining, check spam or junk for the verification email because the website is new.",

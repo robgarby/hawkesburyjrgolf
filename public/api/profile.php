@@ -58,7 +58,9 @@ try {
             }
 
             $pdo = get_database();
-            ensure_members_table($pdo);
+            run_schema_setup('Profile service', static function () use ($pdo): void {
+                ensure_members_table($pdo);
+            });
 
             $statement = $pdo->prepare(
                 'SELECT id, username, first_name, last_name, membership_type, password_hash, email_verified_at
@@ -79,7 +81,9 @@ try {
             }
         } else {
             $pdo = get_database();
-            ensure_members_table($pdo);
+            run_schema_setup('Profile service', static function () use ($pdo): void {
+                ensure_members_table($pdo);
+            });
 
             $tokenHash = hash('sha256', $profileToken);
             $statement = $pdo->prepare(
@@ -135,7 +139,9 @@ try {
     if (!isset($pdo)) {
         $pdo = get_database();
     }
-    ensure_members_table($pdo);
+    run_schema_setup('Profile service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
 
     $statement = $pdo->prepare(
         'UPDATE members

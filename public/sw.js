@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hawkesbury-junior-golf-v1'
+const CACHE_NAME = 'hawkesbury-junior-golf-v2'
 const APP_SHELL = [
   '/',
   '/members',
@@ -8,7 +8,14 @@ const APP_SHELL = [
   '/pwa-icon.svg',
 ]
 
+const isLocalDev = ['localhost', '127.0.0.1', '::1'].includes(self.location.hostname)
+
 self.addEventListener('install', (event) => {
+  if (isLocalDev) {
+    event.waitUntil(self.skipWaiting())
+    return
+  }
+
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(APP_SHELL))
@@ -17,6 +24,15 @@ self.addEventListener('install', (event) => {
 })
 
 self.addEventListener('activate', (event) => {
+  if (isLocalDev) {
+    event.waitUntil(
+      caches.keys()
+        .then((cacheNames) => Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName))))
+        .then(() => self.clients.claim()),
+    )
+    return
+  }
+
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => Promise.all(
@@ -29,6 +45,10 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
+  if (isLocalDev) {
+    return
+  }
+
   const request = event.request
   const requestUrl = new URL(request.url)
 

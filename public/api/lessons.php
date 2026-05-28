@@ -28,6 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/textme.php';
+
+if (!function_exists('is_lesson_staff_type')) {
+    function is_lesson_staff_type(string $type): bool
+    {
+        return in_array(strtoupper(trim($type)), ['SUPER_ADMIN', 'TEACHER', 'COACH'], true);
+    }
+}
+
+function is_lesson_admin_type(string $type): bool
+{
+    return in_array(strtoupper(trim($type)), ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'COACH'], true);
+}
 
 function send_json(int $status, array $payload): void
 {
@@ -91,6 +104,21 @@ function get_member_age(PDO $pdo, int $memberId): ?int
     return $age === null ? null : (int) $age;
 }
 
+function get_member_display_name(PDO $pdo, int $memberId): string
+{
+    $statement = $pdo->prepare(
+        'SELECT first_name, last_name, username
+         FROM members
+         WHERE id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $memberId]);
+    $member = $statement->fetch() ?: [];
+    $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+
+    return $name !== '' ? $name : (string) ($member['username'] ?? 'HJG');
+}
+
 function get_slot_students(PDO $pdo, int $slotId): array
 {
     $statement = $pdo->prepare(
@@ -119,7 +147,9 @@ function get_lessons(PDO $pdo, int $memberId): array
     $today = (new DateTimeImmutable('today'))->format('Y-m-d');
     $memberType = get_member_type($pdo, $memberId);
     $memberAge = get_member_age($pdo, $memberId);
-    $canTeach = in_array($memberType, ['ADMIN', 'TEACHER'], true);
+    $canManageLessons = is_lesson_admin_type($memberType);
+    $canRequestLesson = in_array($memberType, ['CUP', 'COMMUNITY'], true);
+    $canManageAll = is_super_admin_type($memberType);
     $slotsStatement = $pdo->query(
         'SELECT slots.*, members.first_name, members.last_name, members.username, members.membership_type
          FROM member_lesson_slots slots
@@ -160,11 +190,13 @@ function get_lessons(PDO $pdo, int $memberId): array
             'isJoined' => in_array($memberId, array_column($students, 'memberId'), true),
         ];
 
-        if ($mappedSlot['providerMemberId'] === $memberId || $mappedSlot['isJoined']) {
+        if (($canManageLessons && $studentCount > 0) || $mappedSlot['providerMemberId'] === $memberId || $mappedSlot['isJoined']) {
             $booked[] = $mappedSlot;
         }
 
         if (
+            $canRequestLesson
+            &&
             $mappedSlot['spotsRemaining'] > 0
             && !$mappedSlot['isJoined']
             && $mappedSlot['providerMemberId'] !== $memberId
@@ -218,7 +250,7 @@ function get_lessons(PDO $pdo, int $memberId): array
             'acceptedByMembershipType' => $request['accepted_by_member_id'] === null ? '' : $request['accepter_membership_type'],
         ];
 
-        if (!$canTeach && (int) $request['requester_member_id'] !== $memberId) {
+        if (!$canManageLessons && (int) $request['requester_member_id'] !== $memberId) {
             continue;
         }
 
@@ -228,17 +260,23 @@ function get_lessons(PDO $pdo, int $memberId): array
     return ['slots' => $slots, 'booked' => $booked, 'requests' => $requests];
 }
 
-function send_lessons_response(PDO $pdo, int $memberId, string $message = ''): void
+function send_lessons_response(PDO $pdo, int $memberId, string $message = '', ?array $textResults = null): void
 {
     $lessons = get_lessons($pdo, $memberId);
 
-    send_json(200, [
+    $payload = [
         'ok' => true,
         'message' => $message,
         'slots' => $lessons['slots'],
         'booked' => $lessons['booked'],
         'requests' => $lessons['requests'],
-    ]);
+    ];
+
+    if ($textResults !== null) {
+        $payload['textResults'] = $textResults;
+    }
+
+    send_json(200, $payload);
 }
 
 function read_lesson_type(): string
@@ -281,6 +319,118 @@ function age_allows_member(?int $minAge, ?int $maxAge, ?int $playerAge): bool
     return $maxAge === null || $playerAge <= $maxAge;
 }
 
+function mask_text_number(?string $number): string
+{
+    $digits = preg_replace('/\D+/', '', (string) $number) ?? '';
+
+    return strlen($digits) < 4 ? '' : '***-***-' . substr($digits, -4);
+}
+
+function build_lesson_text_preview(
+    PDO $pdo,
+    int $providerMemberId,
+    string $teacherName,
+    string $lessonPath,
+    ?int $minAge,
+    ?int $maxAge,
+    string $lessonDate,
+    string $lessonTime,
+    string $lessonType,
+    string $location,
+    string $notes,
+    int $maxStudents
+): array {
+    if ($maxStudents < 1) {
+        return ['message' => '', 'recipients' => []];
+    }
+
+    $message = sprintf(
+        "HJG Notice: A new lesson time has been added by %s.\n\nDate: %s\nTime: %s\nType: %s\nLocation: %s\nSpots open: %d\nNotes: %s\n\nYou can Add or Join this lesson in the HJG Website or App.",
+        $teacherName,
+        $lessonDate,
+        $lessonTime,
+        $lessonType,
+        $location,
+        $maxStudents,
+        $notes !== '' ? $notes : 'No notes added.'
+    );
+    $statement = $pdo->query(
+        "SELECT id, first_name, last_name, username, membership_type, player_age,
+                parent_text, player_text, notify_lessons_player_text, notify_lessons_parent_text
+         FROM members
+         WHERE is_active = 1
+           AND membership_type IN ('CUP', 'COMMUNITY')
+           AND (notify_lessons_player_text = 1 OR notify_lessons_parent_text = 1)
+         ORDER BY first_name ASC, last_name ASC, username ASC, id ASC"
+    );
+    $recipients = [];
+
+    foreach ($statement->fetchAll() as $member) {
+        $memberId = (int) $member['id'];
+
+        if ($memberId === $providerMemberId) {
+            continue;
+        }
+
+        if (
+            !path_allows_member($lessonPath, (string) ($member['membership_type'] ?? ''))
+            || !age_allows_member($minAge, $maxAge, isset($member['player_age']) ? (int) $member['player_age'] : null)
+        ) {
+            continue;
+        }
+
+        $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+        $name = $name !== '' ? $name : (string) ($member['username'] ?? 'Member');
+
+        if ((bool) $member['notify_lessons_player_text'] && trim((string) ($member['player_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'to' => $member['player_text'],
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'player',
+                'phone' => mask_text_number($member['player_text']),
+                'message' => $message,
+            ];
+        }
+
+        if ((bool) $member['notify_lessons_parent_text'] && trim((string) ($member['parent_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'to' => $member['parent_text'],
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'parent',
+                'phone' => mask_text_number($member['parent_text']),
+                'message' => $message,
+            ];
+        }
+    }
+
+    return ['contextLabel' => 'lesson', 'message' => $message, 'recipients' => $recipients];
+}
+
+function build_lesson_request_text_notice(
+    string $requesterName,
+    string $preferredDate,
+    string $preferredTime,
+    string $lessonType,
+    string $notes
+): array {
+    $message = sprintf(
+        "HJG Notice: A junior has requested a lesson.\n\nJunior: %s\nPreferred date: %s\nPreferred time: %s\nType: %s\nNotes: %s\n\nPlease review the lesson request in the HJG Website or App.",
+        $requesterName,
+        $preferredDate,
+        $preferredTime,
+        $lessonType,
+        $notes
+    );
+
+    return [
+        'message' => $message,
+        // Future recipient list: opted-in Teachers/Instructors. The shared text sender adds the monitor number.
+        'recipients' => [],
+    ];
+}
+
 function read_age_range(): array
 {
     $minAgeRaw = trim((string) ($_POST['min_age'] ?? ''));
@@ -304,10 +454,12 @@ try {
     $memberId = (int) $member['sub'];
     $pdo = get_database();
 
-    ensure_members_table($pdo);
-    ensure_member_lessons_table($pdo);
+    run_schema_setup('Lessons service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+        ensure_member_lessons_table($pdo);
+    });
     $memberType = get_member_type($pdo, $memberId);
-    $canTeach = in_array($memberType, ['ADMIN', 'TEACHER'], true);
+    $canManageLessons = is_lesson_admin_type($memberType);
     $canRequestLesson = in_array($memberType, ['CUP', 'COMMUNITY'], true);
     $canJoinLesson = in_array($memberType, ['CUP', 'COMMUNITY'], true);
 
@@ -342,7 +494,7 @@ try {
 
         if ($action === 'join_slot') {
             if (!$canJoinLesson) {
-                send_json(403, ['ok' => false, 'message' => 'Only CUP and Community members can join lessons.']);
+                send_json(403, ['ok' => false, 'message' => 'Only Member and Community players can join lessons.']);
             }
 
             if (!path_allows_member((string) ($slot['lesson_path'] ?? 'EVERYONE'), $memberType)) {
@@ -376,8 +528,8 @@ try {
     }
 
     if ($action === 'delete_slot') {
-        if (!$canTeach) {
-            send_json(403, ['ok' => false, 'message' => 'Only admins and teachers can remove lesson times.']);
+        if (!$canManageLessons) {
+            send_json(403, ['ok' => false, 'message' => 'Only teachers, coaches, admins, and super admins can remove lesson times.']);
         }
 
         $slotId = filter_var($_POST['slot_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -395,7 +547,7 @@ try {
         $slotStatement->execute(['id' => (int) $slotId]);
         $slot = $slotStatement->fetch();
 
-        if (!$slot || (int) $slot['provider_member_id'] !== $memberId) {
+        if (!$slot || (!is_super_admin_type($memberType) && (int) $slot['provider_member_id'] !== $memberId)) {
             send_json(404, ['ok' => false, 'message' => 'Lesson time not found.']);
         }
 
@@ -410,15 +562,24 @@ try {
             send_json(422, ['ok' => false, 'message' => 'This lesson already has a student booked.']);
         }
 
-        $delete = $pdo->prepare('DELETE FROM member_lesson_slots WHERE id = :id AND provider_member_id = :member_id');
-        $delete->execute(['id' => (int) $slotId, 'member_id' => $memberId]);
+        $deleteSql = is_super_admin_type($memberType)
+            ? 'DELETE FROM member_lesson_slots WHERE id = :id'
+            : 'DELETE FROM member_lesson_slots WHERE id = :id AND provider_member_id = :member_id';
+        $delete = $pdo->prepare($deleteSql);
+        $deleteParams = ['id' => (int) $slotId];
+
+        if (!is_super_admin_type($memberType)) {
+            $deleteParams['member_id'] = $memberId;
+        }
+
+        $delete->execute($deleteParams);
 
         send_lessons_response($pdo, $memberId, 'Lesson time removed.');
     }
 
     if ($action === 'accept_request') {
-        if (!$canTeach) {
-            send_json(403, ['ok' => false, 'message' => 'Only admins and teachers can accept lesson requests.']);
+        if (!$canManageLessons) {
+            send_json(403, ['ok' => false, 'message' => 'Only teachers, coaches, admins, and super admins can accept lesson requests.']);
         }
 
         $requestId = filter_var($_POST['request_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -489,7 +650,7 @@ try {
 
     if ($action === 'delete_request') {
         if (!$canRequestLesson) {
-            send_json(403, ['ok' => false, 'message' => 'Only CUP and Community members can remove lesson requests.']);
+            send_json(403, ['ok' => false, 'message' => 'Only Member and Community players can remove lesson requests.']);
         }
 
         $requestId = filter_var($_POST['request_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -514,11 +675,12 @@ try {
     }
 
     if ($action === 'add_slot') {
-        if (!$canTeach) {
-            send_json(403, ['ok' => false, 'message' => 'Only admins and teachers can make lesson times available.']);
+        if (!$canManageLessons) {
+            send_json(403, ['ok' => false, 'message' => 'Only teachers, coaches, admins, and super admins can make lesson times available.']);
         }
 
         $lessonDate = trim((string) ($_POST['lesson_date'] ?? ''));
+        $shouldNotifyOthers = isset($_POST['notify_others']);
         $lessonTime = trim((string) ($_POST['lesson_time'] ?? ''));
         $lessonType = read_lesson_type();
         $maxStudents = filter_var($_POST['max_students'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 12]]);
@@ -558,18 +720,38 @@ try {
             'notes' => $notes,
         ]);
 
-        send_lessons_response($pdo, $memberId, 'Lesson time added.');
+        $textResults = null;
+
+        if ($shouldNotifyOthers) {
+            $textNotice = build_lesson_text_preview(
+                $pdo,
+                $memberId,
+                get_member_display_name($pdo, $memberId),
+                $lessonPath,
+                $minAge,
+                $maxAge,
+                $lessonDate,
+                $lessonTime,
+                $lessonType,
+                $location,
+                $notes,
+                (int) $maxStudents
+            );
+            $textResults = send_text_messages($textNotice['recipients'], $textNotice['message']);
+        }
+
+        send_lessons_response($pdo, $memberId, 'Lesson time added.', $textResults);
     }
 
     if ($action === 'request_lesson') {
         if (!$canRequestLesson) {
-            send_json(403, ['ok' => false, 'message' => 'Only CUP and Community members can request lessons.']);
+            send_json(403, ['ok' => false, 'message' => 'Only Member and Community players can request lessons.']);
         }
 
         $preferredDate = trim((string) ($_POST['preferred_date'] ?? ''));
         $preferredTime = trim((string) ($_POST['preferred_time'] ?? ''));
         $lessonType = read_lesson_type();
-        $maxStudents = filter_var($_POST['max_students'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 12]]);
+        $maxStudents = 1;
         $notes = trim((string) ($_POST['notes'] ?? ''));
         $date = DateTimeImmutable::createFromFormat('!Y-m-d', $preferredDate);
         $dateErrors = DateTimeImmutable::getLastErrors();
@@ -578,8 +760,8 @@ try {
             && $date->format('Y-m-d') === $preferredDate;
         $isValidTime = (bool) preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $preferredTime);
 
-        if (!$isValidDate || !$isValidTime || $maxStudents === false || $notes === '') {
-            send_json(422, ['ok' => false, 'message' => 'Please enter a valid preferred date, time, lesson type, group size, and notes.']);
+        if (!$isValidDate || !$isValidTime || $notes === '') {
+            send_json(422, ['ok' => false, 'message' => 'Please enter a valid preferred date, time, lesson type, and notes.']);
         }
 
         $insert = $pdo->prepare(
@@ -596,7 +778,16 @@ try {
             'notes' => $notes,
         ]);
 
-        send_lessons_response($pdo, $memberId, 'Lesson requested.');
+        $textNotice = build_lesson_request_text_notice(
+            get_member_display_name($pdo, $memberId),
+            $preferredDate,
+            $preferredTime,
+            $lessonType,
+            $notes
+        );
+        $textResults = send_text_messages($textNotice['recipients'], $textNotice['message']);
+
+        send_lessons_response($pdo, $memberId, 'Lesson requested.', $textResults);
     }
 
     send_json(422, ['ok' => false, 'message' => 'Please choose a valid lesson action.']);

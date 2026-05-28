@@ -40,8 +40,10 @@ require_once __DIR__ . '/mail.php';
 
 try {
     $pdo = get_database();
-    ensure_members_table($pdo);
-    ensure_member_points_table($pdo);
+    run_schema_setup('Register service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+        ensure_member_points_table($pdo);
+    });
 
     $firstName = trim((string) ($_POST['first_name'] ?? ''));
     $lastName = trim((string) ($_POST['last_name'] ?? ''));
@@ -68,9 +70,7 @@ try {
         exit;
     }
 
-    if (!in_array($membershipType, ['CUP', 'COMMUNITY'], true)) {
-        $membershipType = 'COMMUNITY';
-    }
+    $membershipType = in_array($membershipType, ['CUP', 'COMMUNITY'], true) ? $membershipType : 'COMMUNITY';
 
     if (!is_valid_username($username)) {
         http_response_code(422);
@@ -129,13 +129,13 @@ try {
 
     $verificationUrl = 'https://www.hawkesburyjrgolf.ca/api/verify-email.php?token=' . urlencode($verificationToken);
     $subject = 'Verify your Hawkesbury Junior Golf account';
-    $message = "Hi {$firstName},\n\nPlease verify your parent email before logging in:\n{$verificationUrl}\n\nImportant: because the Hawkesbury Junior Golf website is new, this email will probably be in your spam or junk folder. Please check spam, junk, and trash if it is not in your inbox.\n\nThank you,\nHawkesbury Junior Golf";
+    $message = "Hi {$firstName},\n\nPlease verify your parent email before logging in:\n{$verificationUrl}\n\nAfter you click the verification link, it will send you back to the Log in page.\n\nImportant: because the Hawkesbury Junior Golf website is new, this email will probably be in your spam or junk folder. Please check spam, junk, and trash if it is not in your inbox.\n\nThank you,\nHawkesbury Junior Golf";
     send_smtp_mail($parentEmail, $subject, $message);
 
     http_response_code(201);
     echo json_encode([
         'ok' => true,
-        'message' => 'Your account has been created. Please check the parent email to verify the account before logging in. Because the website is new, the email will probably be in spam or junk if it is not in the inbox.',
+        'message' => 'YOUR ACCOUNT WAS CREATED. Next step: verify the account before logging in. Check the parent email for the verification link, and please check spam, junk, and trash if it is not in the inbox. The verification link will send you back to the Log in page.',
     ]);
 } catch (PDOException $error) {
     if ($error->getCode() === '23000') {

@@ -42,7 +42,9 @@ $successMessage = 'If that parent email is connected to an account, a password r
 
 try {
     $pdo = get_database();
-    ensure_members_table($pdo);
+    run_schema_setup('Forgot password service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
 
     $parentEmail = trim((string) ($_POST['parent_email'] ?? ''));
 

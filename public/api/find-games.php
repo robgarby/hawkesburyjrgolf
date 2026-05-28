@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/textme.php';
 
 function send_json(int $status, array $payload): void
 {
@@ -108,6 +109,21 @@ function get_member_details(PDO $pdo, int $memberId): array
     ];
 }
 
+function get_member_display_name(PDO $pdo, int $memberId): string
+{
+    $statement = $pdo->prepare(
+        'SELECT first_name, last_name, username
+         FROM members
+         WHERE id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $memberId]);
+    $member = $statement->fetch() ?: [];
+    $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+
+    return $name !== '' ? $name : (string) ($member['username'] ?? 'HJG');
+}
+
 function read_path(string $fieldName): string
 {
     $path = strtoupper(trim((string) ($_POST[$fieldName] ?? 'EVERYONE')));
@@ -122,6 +138,21 @@ function path_allows_member(string $path, string $memberType): bool
     }
 
     return $memberType === $path;
+}
+
+function member_can_post_find_game_path(string $path, string $memberType): bool
+{
+    if (is_super_admin_type($memberType)) {
+        return in_array($path, ['CUP', 'COMMUNITY', 'EVERYONE'], true);
+    }
+
+    return path_allows_member($path, $memberType);
+}
+
+function member_can_manage_find_game(array $game, int $memberId, string $memberType): bool
+{
+    return (int) ($game['created_by_member_id'] ?? 0) === $memberId
+        || is_super_admin_type($memberType);
 }
 
 function age_allows_member(?int $minAge, ?int $maxAge, ?int $playerAge): bool
@@ -141,12 +172,117 @@ function age_allows_member(?int $minAge, ?int $maxAge, ?int $playerAge): bool
     return $maxAge === null || $playerAge <= $maxAge;
 }
 
+function mask_text_number(?string $number): string
+{
+    $digits = preg_replace('/\D+/', '', (string) $number) ?? '';
+
+    if (strlen($digits) < 4) {
+        return '';
+    }
+
+    return '***-***-' . substr($digits, -4);
+}
+
+function build_find_game_text_preview(
+    PDO $pdo,
+    int $createdByMemberId,
+    string $posterName,
+    string $gamePath,
+    ?int $minAge,
+    ?int $maxAge,
+    string $gameDate,
+    string $gameTime,
+    int $gameHoles,
+    string $location,
+    string $roundDetails,
+    int $spotsOpen
+): array {
+    if ($spotsOpen < 1) {
+        return [
+            'dryRun' => true,
+            'message' => '',
+            'recipients' => [],
+        ];
+    }
+
+    $message = sprintf(
+        "HJG Notice: A new round has been added by %s.\n\nDate: %s\nTime: %s\nHoles: %d\nLocation: %s\nSpots open: %d\nDetails: %s\n\nYou can Add or Join this round in the HJG Website or App.",
+        $posterName,
+        $gameDate,
+        $gameTime,
+        $gameHoles,
+        $location,
+        $spotsOpen,
+        $roundDetails
+    );
+
+    $statement = $pdo->query(
+        "SELECT id, first_name, last_name, username, membership_type, player_age,
+                parent_text, player_text, notify_games_player_text, notify_games_parent_text
+         FROM members
+         WHERE is_active = 1
+           AND membership_type IN ('CUP', 'COMMUNITY')
+           AND (notify_games_player_text = 1 OR notify_games_parent_text = 1)
+         ORDER BY first_name ASC, last_name ASC, username ASC, id ASC"
+    );
+
+    $recipients = [];
+
+    foreach ($statement->fetchAll() as $member) {
+        $memberId = (int) $member['id'];
+
+        if ($memberId === $createdByMemberId) {
+            continue;
+        }
+
+        $memberType = (string) ($member['membership_type'] ?? '');
+        $playerAge = isset($member['player_age']) ? (int) $member['player_age'] : null;
+
+        if (!path_allows_member($gamePath, $memberType) || !age_allows_member($minAge, $maxAge, $playerAge)) {
+            continue;
+        }
+
+        $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+        $name = $name !== '' ? $name : (string) ($member['username'] ?? 'Member');
+
+        if ((bool) $member['notify_games_player_text'] && trim((string) ($member['player_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'player',
+                'to' => $member['player_text'],
+                'phone' => mask_text_number($member['player_text']),
+                'message' => $message,
+            ];
+        }
+
+        if ((bool) $member['notify_games_parent_text'] && trim((string) ($member['parent_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'parent',
+                'to' => $member['parent_text'],
+                'phone' => mask_text_number($member['parent_text']),
+                'message' => $message,
+            ];
+        }
+    }
+
+    return [
+        'dryRun' => true,
+        'contextLabel' => 'round',
+        'message' => $message,
+        'recipients' => $recipients,
+    ];
+}
+
 function get_find_games(PDO $pdo, int $memberId): array
 {
     $memberDetails = get_member_details($pdo, $memberId);
     $playerAge = $memberDetails['playerAge'];
+    $memberType = $memberDetails['membershipType'];
     $statement = $pdo->query(
-        'SELECT id, created_by_member_id, game_date, game_time, spots_open, game_path, min_age, max_age, round_details, location, created_at
+        'SELECT id, created_by_member_id, game_date, game_time, game_holes, spots_open, game_path, min_age, max_age, round_details, location, created_at
          FROM member_find_games
          ORDER BY game_date ASC, game_time ASC, id ASC'
     );
@@ -170,6 +306,7 @@ function get_find_games(PDO $pdo, int $memberId): array
             'createdByMemberId' => (int) $game['created_by_member_id'],
             'gameDate' => $game['game_date'],
             'gameTime' => substr((string) $game['game_time'], 0, 5),
+            'gameHoles' => (int) ($game['game_holes'] ?? 9),
             'spotsOpen' => $spotsOpen,
             'spotsRemaining' => $spotsRemaining,
             'gamePath' => $game['game_path'] ?? 'EVERYONE',
@@ -181,6 +318,7 @@ function get_find_games(PDO $pdo, int $memberId): array
             'players' => $players,
             'playerCount' => $playerCount,
             'isJoined' => in_array($memberId, array_column($players, 'memberId'), true),
+            'canManage' => member_can_manage_find_game($game, $memberId, $memberType),
             'createdAt' => $game['created_at'],
         ];
     }
@@ -188,13 +326,19 @@ function get_find_games(PDO $pdo, int $memberId): array
     return $games;
 }
 
-function send_games_response(PDO $pdo, int $memberId, string $message = ''): void
+function send_games_response(PDO $pdo, int $memberId, string $message = '', ?array $textResults = null): void
 {
-    send_json(200, [
+    $payload = [
         'ok' => true,
         'message' => $message,
         'games' => get_find_games($pdo, $memberId),
-    ]);
+    ];
+
+    if ($textResults !== null) {
+        $payload['textResults'] = $textResults;
+    }
+
+    send_json(200, $payload);
 }
 
 try {
@@ -202,8 +346,10 @@ try {
     $memberId = (int) $member['sub'];
     $pdo = get_database();
 
-    ensure_members_table($pdo);
-    ensure_member_find_games_table($pdo);
+    run_schema_setup('Find games service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+        ensure_member_find_games_table($pdo);
+    });
     $memberDetails = get_member_details($pdo, $memberId);
     $memberType = $memberDetails['membershipType'];
     $playerAge = $memberDetails['playerAge'];
@@ -360,6 +506,206 @@ try {
         send_games_response($pdo, $memberId, 'You have left the game.');
     }
 
+    if ($action === 'delete_game') {
+        $gameId = filter_var($_POST['game_id'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+
+        if ($gameId === false) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please choose a valid game.',
+            ]);
+        }
+
+        $gameStatement = $pdo->prepare(
+            'SELECT id, created_by_member_id, game_date
+             FROM member_find_games
+             WHERE id = :id
+             LIMIT 1'
+        );
+        $gameStatement->execute(['id' => (int) $gameId]);
+        $game = $gameStatement->fetch();
+
+        if (!$game) {
+            send_json(404, [
+                'ok' => false,
+                'message' => 'Game not found.',
+            ]);
+        }
+
+        if (!member_can_manage_find_game($game, $memberId, $memberType)) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'You can only remove rounds you posted.',
+            ]);
+        }
+
+        $today = (new DateTimeImmutable('today'))->format('Y-m-d');
+
+        if ($game['game_date'] < $today) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Past games cannot be changed.',
+            ]);
+        }
+
+        $deleteGame = $pdo->prepare(
+            'DELETE FROM member_find_games
+             WHERE id = :id'
+        );
+        $deleteGame->execute(['id' => (int) $gameId]);
+
+        send_games_response($pdo, $memberId, 'Game removed.');
+    }
+
+    if ($action === 'update_game') {
+        $gameId = filter_var($_POST['game_id'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+
+        if ($gameId === false) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please choose a valid game.',
+            ]);
+        }
+
+        $gameStatement = $pdo->prepare(
+            'SELECT id, created_by_member_id, game_date
+             FROM member_find_games
+             WHERE id = :id
+             LIMIT 1'
+        );
+        $gameStatement->execute(['id' => (int) $gameId]);
+        $game = $gameStatement->fetch();
+
+        if (!$game) {
+            send_json(404, [
+                'ok' => false,
+                'message' => 'Game not found.',
+            ]);
+        }
+
+        if (!member_can_manage_find_game($game, $memberId, $memberType)) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'You can only edit rounds you posted.',
+            ]);
+        }
+
+        $today = (new DateTimeImmutable('today'))->format('Y-m-d');
+
+        if ($game['game_date'] < $today) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Past games cannot be changed.',
+            ]);
+        }
+
+        $gameDate = trim((string) ($_POST['game_date'] ?? ''));
+        $gameTime = trim((string) ($_POST['game_time'] ?? ''));
+        $gameHoles = filter_var($_POST['game_holes'] ?? 9, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 9, 'max_range' => 18],
+        ]);
+        $spotsOpen = filter_var($_POST['spots_open'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1, 'max_range' => 12],
+        ]);
+        $gamePath = read_path('game_path');
+        $minAgeRaw = trim((string) ($_POST['min_age'] ?? ''));
+        $maxAgeRaw = trim((string) ($_POST['max_age'] ?? ''));
+        $minAge = $minAgeRaw === '' ? null : filter_var($minAgeRaw, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1, 'max_range' => 99],
+        ]);
+        $maxAge = $maxAgeRaw === '' ? null : filter_var($maxAgeRaw, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1, 'max_range' => 99],
+        ]);
+        $roundDetails = trim((string) ($_POST['round_details'] ?? ''));
+        $location = trim((string) ($_POST['location'] ?? 'Hawkesbury'));
+
+        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $gameDate);
+        $dateErrors = DateTimeImmutable::getLastErrors();
+        $isValidDate = $date instanceof DateTimeImmutable
+            && ($dateErrors === false || ($dateErrors['warning_count'] === 0 && $dateErrors['error_count'] === 0))
+            && $date->format('Y-m-d') === $gameDate;
+        $isValidTime = (bool) preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $gameTime);
+
+        if (!$isValidDate || !$isValidTime || !in_array($gameHoles, [9, 18], true) || $spotsOpen === false || $roundDetails === '') {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please enter a valid date, time, holes, open spots, and round details.',
+            ]);
+        }
+
+        if ($gameDate < $today) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Past games cannot be changed.',
+            ]);
+        }
+
+        if ($minAge === false || $maxAge === false || ($minAge !== null && $maxAge !== null && $minAge > $maxAge)) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please enter a valid age range.',
+            ]);
+        }
+
+        if ($location === '') {
+            $location = 'Hawkesbury';
+        }
+
+        if (!member_can_post_find_game_path($gamePath, $memberType)) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'You can only post games for your own membership path or both paths.',
+            ]);
+        }
+
+        $countStatement = $pdo->prepare(
+            'SELECT COUNT(*) AS player_count
+             FROM member_find_game_players
+             WHERE find_game_id = :game_id'
+        );
+        $countStatement->execute(['game_id' => (int) $gameId]);
+        $playerCount = (int) ($countStatement->fetch()['player_count'] ?? 0);
+
+        if ($playerCount > 0 && $playerCount - 1 > (int) $spotsOpen) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Open spots cannot be lower than the players already added.',
+            ]);
+        }
+
+        $update = $pdo->prepare(
+            'UPDATE member_find_games
+             SET game_date = :game_date,
+                 game_time = :game_time,
+                 game_holes = :game_holes,
+                 spots_open = :spots_open,
+                 game_path = :game_path,
+                 min_age = :min_age,
+                 max_age = :max_age,
+                 round_details = :round_details,
+                 location = :location
+             WHERE id = :id'
+        );
+        $update->execute([
+            'game_date' => $gameDate,
+            'game_time' => $gameTime,
+            'game_holes' => (int) $gameHoles,
+            'spots_open' => (int) $spotsOpen,
+            'game_path' => $gamePath,
+            'min_age' => $minAge,
+            'max_age' => $maxAge,
+            'round_details' => $roundDetails,
+            'location' => $location,
+            'id' => (int) $gameId,
+        ]);
+
+        send_games_response($pdo, $memberId, 'Game updated.');
+    }
+
     if ($action !== 'post_game') {
         send_json(422, [
             'ok' => false,
@@ -367,8 +713,12 @@ try {
         ]);
     }
 
+    $shouldNotifyOthers = isset($_POST['notify_others']);
     $gameDate = trim((string) ($_POST['game_date'] ?? ''));
     $gameTime = trim((string) ($_POST['game_time'] ?? ''));
+    $gameHoles = filter_var($_POST['game_holes'] ?? 9, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 9, 'max_range' => 18],
+    ]);
     $spotsOpen = filter_var($_POST['spots_open'] ?? null, FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1, 'max_range' => 12],
     ]);
@@ -391,10 +741,10 @@ try {
         && $date->format('Y-m-d') === $gameDate;
     $isValidTime = (bool) preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $gameTime);
 
-    if (!$isValidDate || !$isValidTime || $spotsOpen === false || $roundDetails === '') {
+    if (!$isValidDate || !$isValidTime || !in_array($gameHoles, [9, 18], true) || $spotsOpen === false || $roundDetails === '') {
         send_json(422, [
             'ok' => false,
-            'message' => 'Please enter a valid date, time, open spots, and round details.',
+            'message' => 'Please enter a valid date, time, holes, open spots, and round details.',
         ]);
     }
 
@@ -409,7 +759,7 @@ try {
         $location = 'Hawkesbury';
     }
 
-    if (!path_allows_member($gamePath, $memberType)) {
+    if (!member_can_post_find_game_path($gamePath, $memberType)) {
         send_json(403, [
             'ok' => false,
             'message' => 'You can only post games for your own membership path or both paths.',
@@ -420,14 +770,15 @@ try {
 
     $insert = $pdo->prepare(
         'INSERT INTO member_find_games
-            (created_by_member_id, game_date, game_time, spots_open, game_path, min_age, max_age, round_details, location)
+            (created_by_member_id, game_date, game_time, game_holes, spots_open, game_path, min_age, max_age, round_details, location)
          VALUES
-            (:created_by_member_id, :game_date, :game_time, :spots_open, :game_path, :min_age, :max_age, :round_details, :location)'
+            (:created_by_member_id, :game_date, :game_time, :game_holes, :spots_open, :game_path, :min_age, :max_age, :round_details, :location)'
     );
     $insert->execute([
         'created_by_member_id' => $memberId,
         'game_date' => $gameDate,
         'game_time' => $gameTime,
+        'game_holes' => (int) $gameHoles,
         'spots_open' => (int) $spotsOpen,
         'game_path' => $gamePath,
         'min_age' => $minAge,
@@ -448,7 +799,27 @@ try {
 
     $pdo->commit();
 
-    send_games_response($pdo, $memberId, 'Game posted.');
+    $textResults = null;
+
+    if ($shouldNotifyOthers) {
+        $textNotice = build_find_game_text_preview(
+            $pdo,
+            $memberId,
+            get_member_display_name($pdo, $memberId),
+            $gamePath,
+            $minAge,
+            $maxAge,
+            $gameDate,
+            $gameTime,
+            (int) $gameHoles,
+            $location,
+            $roundDetails,
+            (int) $spotsOpen
+        );
+        $textResults = send_text_messages($textNotice['recipients'], $textNotice['message']);
+    }
+
+    send_games_response($pdo, $memberId, 'Game posted.', $textResults);
 } catch (Throwable $error) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();

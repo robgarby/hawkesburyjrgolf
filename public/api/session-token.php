@@ -53,7 +53,9 @@ try {
     }
 
     $pdo = get_database();
-    ensure_members_table($pdo);
+    run_schema_setup('Session token service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+    });
 
     $statement = $pdo->prepare(
         'SELECT id, is_active, username, first_name, last_name, membership_type

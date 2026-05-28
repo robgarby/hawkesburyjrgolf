@@ -68,20 +68,16 @@ export const scoresPage = {
     },
     "formatOptions": {
       "practice": {
-        "en": "Practice",
-        "fr": "Pratique"
-      },
-      "1-2-3": {
-        "en": "1-2-3",
-        "fr": "1-2-3"
+        "en": "Practice Round",
+        "fr": "Ronde de pratique"
       },
       "match-play": {
         "en": "Match Play",
         "fr": "Match Play"
       },
       "score": {
-        "en": "Score",
-        "fr": "Score"
+        "en": "Regular Round",
+        "fr": "Ronde régulière"
       },
       "stableford": {
         "en": "Stableford",
@@ -92,9 +88,41 @@ export const scoresPage = {
       "en": "Score",
       "fr": "Score"
     },
+    "regularScoreLabel": {
+      "en": "Regular round score",
+      "fr": "Score de ronde régulière"
+    },
+    "matchScoreLabel": {
+      "en": "Match play result",
+      "fr": "Résultat match play"
+    },
+    "stablefordScoreLabel": {
+      "en": "Stableford score",
+      "fr": "Score Stableford"
+    },
     "button": {
       "en": "Save round",
       "fr": "Enregistrer la ronde"
+    },
+    "adminShowScoreForm": {
+      "en": "Enter Score",
+      "fr": "Entrer un score"
+    },
+    "adminHideScoreForm": {
+      "en": "Hide Score",
+      "fr": "Masquer le score"
+    },
+    "adminJuniorLabel": {
+      "en": "Junior",
+      "fr": "Junior"
+    },
+    "adminJuniorLoading": {
+      "en": "Loading active juniors...",
+      "fr": "Chargement des juniors actifs..."
+    },
+    "adminNoJuniors": {
+      "en": "No active juniors available.",
+      "fr": "Aucun junior actif disponible."
     },
     "empty": {
       "en": "No rounds entered yet.",
@@ -115,6 +143,34 @@ export const scoresPage = {
     "saveMessage": {
       "en": "Saving round...",
       "fr": "Enregistrement de la ronde..."
+    },
+    "adminPathFilterLabel": {
+      "en": "Round report path",
+      "fr": "Parcours du rapport des rondes"
+    },
+    "adminTitle": {
+      "en": "Junior Rounds",
+      "fr": "Rondes des juniors"
+    },
+    "cupButton": {
+      "en": "Member",
+      "fr": "Membre"
+    },
+    "communityButton": {
+      "en": "Community",
+      "fr": "Communauté"
+    },
+    "adminEmpty": {
+      "en": "No juniors found for this group.",
+      "fr": "Aucun junior trouvé pour ce groupe."
+    },
+    "expandRounds": {
+      "en": "View rounds",
+      "fr": "Voir les rondes"
+    },
+    "collapseRounds": {
+      "en": "Hide rounds",
+      "fr": "Masquer les rondes"
     }
   },
 }
@@ -159,6 +215,14 @@ export const pointsPage = {
       "en": "No points yet.",
       "fr": "Aucun point pour le moment."
     },
+    "showAll": {
+      "en": "View all point history",
+      "fr": "Voir tout l’historique"
+    },
+    "showLatest": {
+      "en": "Show latest 5",
+      "fr": "Afficher les 5 derniers"
+    },
     "loading": {
       "en": "Loading points...",
       "fr": "Chargement des points..."
@@ -166,6 +230,70 @@ export const pointsPage = {
     "saving": {
       "en": "Saving cash out...",
       "fr": "Enregistrement de la demande..."
+    },
+    "adminSaving": {
+      "en": "Saving points...",
+      "fr": "Enregistrement des points..."
+    },
+    "adminShowPointsForm": {
+      "en": "Enter Points",
+      "fr": "Entrer des points"
+    },
+    "adminHidePointsForm": {
+      "en": "Hide Points",
+      "fr": "Masquer les points"
+    },
+    "adminFormTitle": {
+      "en": "Enter Points",
+      "fr": "Entrer des points"
+    },
+    "adminJuniorLabel": {
+      "en": "Junior",
+      "fr": "Junior"
+    },
+    "adminJuniorLoading": {
+      "en": "Loading active juniors...",
+      "fr": "Chargement des juniors actifs..."
+    },
+    "adminNoJuniors": {
+      "en": "No active juniors available.",
+      "fr": "Aucun junior actif disponible."
+    },
+    "adminPointsLabel": {
+      "en": "Points",
+      "fr": "Points"
+    },
+    "adminDescriptionLabel": {
+      "en": "Reason",
+      "fr": "Raison"
+    },
+    "adminDateLabel": {
+      "en": "Date",
+      "fr": "Date"
+    },
+    "adminSavePoints": {
+      "en": "Save points",
+      "fr": "Enregistrer les points"
+    },
+    "adminPathFilterLabel": {
+      "en": "Points leaderboard path",
+      "fr": "Parcours du classement des points"
+    },
+    "adminTitle": {
+      "en": "Junior Points",
+      "fr": "Points des juniors"
+    },
+    "cupButton": {
+      "en": "Member",
+      "fr": "Membre"
+    },
+    "communityButton": {
+      "en": "Community",
+      "fr": "Communauté"
+    },
+    "adminEmpty": {
+      "en": "No juniors found for this group.",
+      "fr": "Aucun junior trouvé pour ce groupe."
     }
   },
 }
@@ -182,8 +310,90 @@ export const rankingPage = {
     "fr": "Classement"
   },
   "intro": {
-    "en": "Player rankings will activate once Ranking Point Rounds are created and ranking points are distributed. Rankings are for CUP members only when they participate in eligible Ranking Point Rounds.",
-    "fr": "Le classement des joueurs sera activé lorsque les rondes de points de classement seront créées et que les points de classement seront distribués. Le classement est réservé aux membres CUP qui participent aux rondes admissibles de points de classement."
+    "en": "Player rankings will activate once Ranking Point Rounds are created and ranking points are distributed. Rankings are for Member players only when they participate in eligible Ranking Point Rounds.",
+    "fr": "Le classement des joueurs sera activé lorsque les rondes de points de classement seront créées et que les points de classement seront distribués. Le classement est réservé aux membres qui participent aux rondes admissibles de points de classement."
+  },
+  "rankingTool": {
+    "tabsLabel": {
+      "en": "Ranking views",
+      "fr": "Vues du classement"
+    },
+    "pointsTab": {
+      "en": "Points",
+      "fr": "Points"
+    },
+    "roundsTab": {
+      "en": "Rounds",
+      "fr": "Rondes"
+    },
+    "scoresTab": {
+      "en": "Scores",
+      "fr": "Scores"
+    },
+    "travelTeamTab": {
+      "en": "Travel Team Ranking",
+      "fr": "Classement équipe de voyage"
+    },
+    "pointsTitle": {
+      "en": "Points Ranking",
+      "fr": "Classement par points"
+    },
+    "roundsTitle": {
+      "en": "Most Rounds",
+      "fr": "Plus de rondes"
+    },
+    "scoresTitle": {
+      "en": "Scores Ranking",
+      "fr": "Classement par scores"
+    },
+    "travelTeamTitle": {
+      "en": "Travel Team Ranking",
+      "fr": "Classement équipe de voyage"
+    },
+    "empty": {
+      "en": "No Member rankings are visible yet.",
+      "fr": "Aucun classement membre n’est visible pour le moment."
+    },
+    "loading": {
+      "en": "Loading rankings...",
+      "fr": "Chargement du classement..."
+    },
+    "loadError": {
+      "en": "Unable to load rankings right now.",
+      "fr": "Impossible de charger le classement pour le moment."
+    },
+    "cupOnly": {
+      "en": "Member only - only players who choose Display Scores are shown.",
+      "fr": "Membre seulement - seuls les joueurs qui choisissent Afficher les scores sont affichés."
+    },
+    "pointsLabel": {
+      "en": "points",
+      "fr": "points"
+    },
+    "roundsLabel": {
+      "en": "rounds played",
+      "fr": "rondes jouées"
+    },
+    "lowestScoreLabel": {
+      "en": "Lowest score",
+      "fr": "Meilleur score"
+    },
+    "noScore": {
+      "en": "No score yet",
+      "fr": "Aucun score"
+    },
+    "travelTeamPending": {
+      "en": "Travel Team Ranking will display once we start tryouts and rounds for ranking.",
+      "fr": "Le classement de l’équipe de voyage sera affiché lorsque les essais et les rondes de classement commenceront."
+    },
+    "recentRegularRounds": {
+      "en": "Last 5 regular score rounds",
+      "fr": "Les 5 dernières rondes régulières"
+    },
+    "noRegularRounds": {
+      "en": "No regular score rounds yet.",
+      "fr": "Aucune ronde régulière pour le moment."
+    }
   },
 }
 
@@ -237,16 +447,16 @@ export const eventsPage = {
     },
     "pathOptions": {
       "cup": {
-        "en": "CUP",
-        "fr": "CUP"
+        "en": "Member",
+        "fr": "Membre"
       },
       "community": {
         "en": "Community",
         "fr": "Communauté"
       },
       "everyone": {
-        "en": "Both (Cup and Community)",
-        "fr": "Les deux (CUP et communauté)"
+        "en": "Both (Member and Community)",
+        "fr": "Les deux (membre et communauté)"
       }
     },
     "communityCostLabel": {
@@ -289,6 +499,10 @@ export const eventsPage = {
       "en": "Junior Name, Parent Email, Notes",
       "fr": "Nom du junior, courriel du parent, notes"
     },
+    "notifyOthersLabel": {
+      "en": "Text Others that you have added this Event?",
+      "fr": "Texter les autres que vous avez ajouté cet événement?"
+    },
     "saveButton": {
       "en": "Save event",
       "fr": "Enregistrer l’événement"
@@ -316,6 +530,30 @@ export const eventsPage = {
     "showAdminButton": {
       "en": "Add Event",
       "fr": "Ajouter un événement"
+    },
+    "addPlayerButton": {
+      "en": "Add Player to Event",
+      "fr": "Ajouter un joueur à l’événement"
+    },
+    "hideAddPlayerButton": {
+      "en": "Hide Add Player",
+      "fr": "Masquer l’ajout de joueur"
+    },
+    "addPlayerLabel": {
+      "en": "Player",
+      "fr": "Joueur"
+    },
+    "addPlayerLoading": {
+      "en": "Loading active juniors...",
+      "fr": "Chargement des juniors actifs..."
+    },
+    "addPlayerEmpty": {
+      "en": "No active juniors available.",
+      "fr": "Aucun junior actif disponible."
+    },
+    "addPlayerSave": {
+      "en": "Save",
+      "fr": "Enregistrer"
     },
     "upcomingTitle": {
       "en": "Upcoming events",
@@ -400,6 +638,10 @@ export const findAGamePage = {
       "en": "Post a Round",
       "fr": "Publier une ronde"
     },
+    "editTitle": {
+      "en": "Edit Round",
+      "fr": "Modifier la ronde"
+    },
     "dateLabel": {
       "en": "Date",
       "fr": "Date"
@@ -412,22 +654,26 @@ export const findAGamePage = {
       "en": "Open spots",
       "fr": "Places disponibles"
     },
+    "holesLabel": {
+      "en": "Holes",
+      "fr": "Trous"
+    },
     "pathLabel": {
       "en": "Path",
       "fr": "Parcours"
     },
     "pathOptions": {
       "cup": {
-        "en": "CUP",
-        "fr": "CUP"
+        "en": "Member",
+        "fr": "Membre"
       },
       "community": {
         "en": "Community",
         "fr": "Communauté"
       },
       "everyone": {
-        "en": "Both (Cup and Community)",
-        "fr": "Les deux (CUP et communauté)"
+        "en": "Both (Member and Community)",
+        "fr": "Les deux (membre et communauté)"
       }
     },
     "minAgeLabel": {
@@ -454,6 +700,10 @@ export const findAGamePage = {
       "en": "Example: 9 holes, front nine, walking",
       "fr": "Exemple : 9 trous, premier neuf, à pied"
     },
+    "notifyOthersLabel": {
+      "en": "Text Others that you have added this Round?",
+      "fr": "Texter les autres que vous avez ajouté cette ronde?"
+    },
     "locationLabel": {
       "en": "Location",
       "fr": "Lieu"
@@ -461,6 +711,14 @@ export const findAGamePage = {
     "saveButton": {
       "en": "Post round",
       "fr": "Publier la ronde"
+    },
+    "updateButton": {
+      "en": "Update round",
+      "fr": "Mettre la ronde à jour"
+    },
+    "cancelEditButton": {
+      "en": "Cancel edit",
+      "fr": "Annuler la modification"
     },
     "gamesTitle": {
       "en": "Posted rounds",
@@ -493,8 +751,8 @@ export const bookALessonPage = {
     "fr": "Réserver une leçon"
   },
   "intro": {
-    "en": "Juniors can join available free volunteer-coach lesson times or request single and group lessons in the same My Account area used by CUP and Community members. To book a lesson with Hawkesbury Golf and Curling Club professionals, contact the club directly; professional lessons are not free unless they are listed here in the Lessons area.",
-    "fr": "Les juniors peuvent joindre les heures de leçon gratuites avec des entraîneurs bénévoles ou demander des leçons individuelles et de groupe dans le même espace Mon compte utilisé par les membres CUP et communautaires. Pour réserver une leçon avec les professionnels du Hawkesbury Golf and Curling Club, communiquez directement avec le club; les leçons professionnelles ne sont pas gratuites, sauf si elles sont affichées ici dans la section Leçons."
+    "en": "Juniors can join available free volunteer-coach lesson times or request single and group lessons in the same My Account area used by Member and Community players. To book a lesson with Hawkesbury Golf and Curling Club professionals, contact the club directly; professional lessons are not free unless they are listed here in the Lessons area.",
+    "fr": "Les juniors peuvent joindre les heures de leçon gratuites avec des entraîneurs bénévoles ou demander des leçons individuelles et de groupe dans le même espace Mon compte utilisé par les membres et les joueurs communautaires. Pour réserver une leçon avec les professionnels du Hawkesbury Golf and Curling Club, communiquez directement avec le club; les leçons professionnelles ne sont pas gratuites, sauf si elles sont affichées ici dans la section Leçons."
   },
   "lessonTool": {
     "availableButton": {
@@ -547,16 +805,16 @@ export const bookALessonPage = {
     },
     "pathOptions": {
       "cup": {
-        "en": "CUP",
-        "fr": "CUP"
+        "en": "Member",
+        "fr": "Membre"
       },
       "community": {
         "en": "Community",
         "fr": "Communauté"
       },
       "everyone": {
-        "en": "Both (Cup and Community)",
-        "fr": "Les deux (CUP et communauté)"
+        "en": "Both (Member and Community)",
+        "fr": "Les deux (membre et communauté)"
       }
     },
     "minAgeLabel": {
@@ -582,6 +840,10 @@ export const bookALessonPage = {
     "notesLabel": {
       "en": "Notes",
       "fr": "Notes"
+    },
+    "notifyOthersLabel": {
+      "en": "Text Others that you have added this Lesson?",
+      "fr": "Texter les autres que vous avez ajouté cette leçon?"
     },
     "availableSave": {
       "en": "Save lesson time",

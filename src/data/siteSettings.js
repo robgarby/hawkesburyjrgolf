@@ -2,7 +2,7 @@ export const shared = {
   "en": {
     "siteTitle": "Hawkesbury Junior Golf",
     "titleSuffix": "Junior Golf in Prescott-Russell",
-    "defaultDescription": "Junior golf programs, lessons, rounds, video coaching, and the Hawkesbury Jr. Cup for families in Hawkesbury, Ontario and Prescott-Russell.",
+    "defaultDescription": "Junior golf programs, lessons, rounds, video coaching, and team opportunities for families in Hawkesbury, Ontario and Prescott-Russell.",
     "brandHome": "Hawkesbury Junior Golf home",
     "navLabel": "Primary navigation",
     "quickLabel": "highlights",
@@ -23,7 +23,7 @@ export const shared = {
   "fr": {
     "siteTitle": "Hawkesbury Junior Golf",
     "titleSuffix": "Golf junior à Prescott-Russell",
-    "defaultDescription": "Programmes de golf junior, leçons, rondes, entraînement vidéo et Coupe junior de Hawkesbury pour les familles de Hawkesbury, Ontario et Prescott-Russell.",
+    "defaultDescription": "Programmes de golf junior, leçons, rondes, entraînement vidéo et occasions d’équipe pour les familles de Hawkesbury, Ontario et Prescott-Russell.",
     "brandHome": "Accueil de Hawkesbury Junior Golf",
     "navLabel": "Navigation principale",
     "quickLabel": "points forts",

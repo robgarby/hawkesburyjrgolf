@@ -1,20 +1,20 @@
 export const theCupPage = {
   "id": "the-cup",
   "title": {
-    "en": "The Cup",
-    "fr": "La Coupe"
+    "en": "Member Golf",
+    "fr": "Golf membre"
   },
   "eyebrow": {
     "en": "Annual challenge event",
     "fr": "Défi annuel"
   },
   "heading": {
-    "en": "An invitation challenge where neighbouring clubs compete for The Cup.",
-    "fr": "Un défi sur invitation où les clubs voisins compétitionnent pour La Coupe."
+    "en": "Member Golf for Hawkesbury Golf and Curling Club juniors.",
+    "fr": "Golf membre pour les juniors du Hawkesbury Golf and Curling Club."
   },
   "intro": {
-    "en": "Each year, neighbouring clubs can apply to challenge Hawkesbury in a sponsored one-day junior match event. Cup Members can build toward team opportunities through participation, rounds, points, and program events.",
-    "fr": "Chaque année, les clubs voisins peuvent faire une demande pour défier Hawkesbury lors d’un événement junior commandité d’une journée. Les membres Cup peuvent progresser vers les occasions d’équipe grâce à la participation, aux rondes, aux points et aux événements du programme."
+    "en": "Member players can build toward team opportunities through participation, rounds, points, and program events, including annual junior match opportunities.",
+    "fr": "Les joueurs membres peuvent progresser vers les occasions d’équipe grâce à la participation, aux rondes, aux points et aux événements du programme, incluant les occasions annuelles de matchs juniors."
   },
   "image": "/images/junior-cup-winner.jpeg",
   "cta": {
@@ -23,12 +23,12 @@ export const theCupPage = {
   },
   "seo": {
     "en": {
-      "title": "Hawkesbury Jr. Cup",
-      "description": "The Hawkesbury Jr. Cup is a sponsored invitation junior golf event where participants play free, receive a free award banquet meal, and compete for The Cup."
+      "title": "Member Golf | Hawkesbury Junior Golf",
+      "description": "Member Golf gives Hawkesbury Golf and Curling Club juniors a program path for rounds, points, events, coaching, and team opportunities."
     },
     "fr": {
-      "title": "Coupe junior de Hawkesbury",
-      "description": "La Coupe junior de Hawkesbury est un événement junior commandité sur invitation où les participants jouent gratuitement, reçoivent un repas gratuit et compétitionnent pour La Coupe."
+      "title": "Golf membre | Hawkesbury Junior Golf",
+      "description": "Golf membre offre aux juniors du Hawkesbury Golf and Curling Club un parcours de programme pour les rondes, points, événements, entraînement et occasions d’équipe."
     }
   },
   "ctaRoute": "login",
@@ -39,8 +39,8 @@ export const theCupPage = {
         "fr": "Défi entre clubs"
       },
       "text": {
-        "en": "The Hawkesbury Jr. Cup is an invitation event where neighbouring clubs apply to challenge Hawkesbury for The Cup.",
-        "fr": "La Coupe junior de Hawkesbury est un événement sur invitation où les clubs voisins font une demande pour défier Hawkesbury pour La Coupe."
+        "en": "Member players can work toward invitation match opportunities where neighbouring clubs apply to challenge Hawkesbury.",
+        "fr": "Les joueurs membres peuvent progresser vers des occasions de matchs sur invitation où les clubs voisins font une demande pour défier Hawkesbury."
       },
       "bullets": {
         "en": [
@@ -85,25 +85,25 @@ export const theCupPage = {
         "fr": "Prix et célébration"
       },
       "text": {
-        "en": "The Cup is a sponsored event. Participants play free and gather afterward for an award banquet with a free meal.",
-        "fr": "La Coupe est un événement commandité. Les participants jouent gratuitement et se rassemblent ensuite pour un banquet de remise des prix avec un repas gratuit."
+        "en": "Sponsored invitation events may allow participants to play free and gather afterward for an award banquet with a free meal.",
+        "fr": "Les événements sur invitation commandités peuvent permettre aux participants de jouer gratuitement et de se rassembler ensuite pour un banquet de remise des prix avec un repas gratuit."
       },
       "bullets": {
         "en": [
           "Sponsored event for participating junior golfers",
-          "All Cup participants play free",
+          "All selected participants play free",
           "Award ceremony after play",
           "Free meal for participants at the award banquet",
           "Medals awarded to the winning team",
-          "Winning club and team member names added to The Cup"
+          "Winning club and team member names recognized"
         ],
         "fr": [
           "Événement commandité pour les golfeurs juniors participants",
-          "Tous les participants de La Coupe jouent gratuitement",
+          "Tous les participants sélectionnés jouent gratuitement",
           "Cérémonie de remise des prix après le jeu",
           "Repas gratuit pour les participants au banquet de remise des prix",
           "Médailles remises à l’équipe gagnante",
-          "Nom du club gagnant et des membres de l’équipe ajouté à La Coupe"
+          "Nom du club gagnant et des membres de l’équipe reconnus"
         ]
       }
     }

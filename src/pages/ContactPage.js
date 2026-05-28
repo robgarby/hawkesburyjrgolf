@@ -24,11 +24,11 @@ export const contactPage = {
   "seo": {
     "en": {
       "title": "Contact Hawkesbury Junior Golf",
-      "description": "Contact details for The Cup Jr. Golf program and Hawkesbury Golf and Curling Club, with guidance on where to direct each request."
+      "description": "Contact details for the Hawkesbury Junior Golf program and Hawkesbury Golf and Curling Club, with guidance on where to direct each request."
     },
     "fr": {
       "title": "Contacter Hawkesbury Junior Golf",
-      "description": "Coordonnées pour le programme The Cup Jr. Golf et le Hawkesbury Golf and Curling Club, avec indications pour bien diriger chaque demande."
+      "description": "Coordonnées pour le programme Hawkesbury Junior Golf et le Hawkesbury Golf and Curling Club, avec indications pour bien diriger chaque demande."
     }
   },
   "ctaRoute": "login",
@@ -36,12 +36,12 @@ export const contactPage = {
   "sections": [
     {
       "title": {
-        "en": "The Cup Jr. Golf program",
-        "fr": "Programme de golf junior The Cup Jr."
+        "en": "Hawkesbury Junior Golf program",
+        "fr": "Programme Hawkesbury Junior Golf"
       },
       "text": {
-        "en": "For registration, My Account access, free volunteer-coach lesson requests, event details, posted games, scores, points, and notification settings, contact the team for The Cup Jr. Golf program.",
-        "fr": "Pour l'inscription, l’accès à Mon compte, les demandes de leçons gratuites avec des entraîneurs bénévoles, les détails d’événements, les parties publiées, les scores, les points et les paramètres d’avis, communiquez avec l’équipe du programme The Cup Jr. Golf."
+        "en": "For registration, My Account access, free volunteer-coach lesson requests, event details, posted games, scores, points, and notification settings, contact the Hawkesbury Junior Golf team.",
+        "fr": "Pour l'inscription, l’accès à Mon compte, les demandes de leçons gratuites avec des entraîneurs bénévoles, les détails d’événements, les parties publiées, les scores, les points et les paramètres d’avis, communiquez avec l’équipe Hawkesbury Junior Golf."
       },
       "bullets": {
         "en": [
@@ -61,8 +61,8 @@ export const contactPage = {
         {
           "url": "mailto:info@hawkesburyjrgolf.ca",
           "label": {
-            "en": "Email The Cup team",
-            "fr": "Courriel a l'equipe La Coupe"
+            "en": "Email the program team",
+            "fr": "Courriel a l'equipe du programme"
           }
         },
         {

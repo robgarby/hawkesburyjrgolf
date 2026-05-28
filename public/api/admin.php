@@ -29,6 +29,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 
+if (!function_exists('is_super_admin_type')) {
+    function is_super_admin_type(string $type): bool
+    {
+        return strtoupper(trim($type)) === 'SUPER_ADMIN';
+    }
+}
+
+if (!function_exists('is_member_admin_type')) {
+    function is_member_admin_type(string $type): bool
+    {
+        return in_array(strtoupper(trim($type)), ['SUPER_ADMIN', 'ADMIN'], true);
+    }
+}
+
 function send_admin_json(int $status, array $payload): void
 {
     http_response_code($status);
@@ -60,11 +74,24 @@ function get_admin_member_id(PDO $pdo): int
     $statement->execute(['id' => $memberId]);
     $member = $statement->fetch();
 
-    if (!$member || $member['membership_type'] !== 'ADMIN' || !(bool) $member['is_active']) {
-        send_admin_json(403, ['ok' => false, 'message' => 'Only admins can use this panel.']);
+    if (!$member || !is_member_admin_type((string) $member['membership_type']) || !(bool) $member['is_active']) {
+        send_admin_json(403, ['ok' => false, 'message' => 'Only admins and super admins can use this panel.']);
     }
 
     return $memberId;
+}
+
+function get_admin_member_type(PDO $pdo, int $memberId): string
+{
+    $statement = $pdo->prepare(
+        'SELECT membership_type
+         FROM members
+         WHERE id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $memberId]);
+
+    return (string) ($statement->fetch()['membership_type'] ?? '');
 }
 
 function get_admin_members(PDO $pdo): array
@@ -72,7 +99,7 @@ function get_admin_members(PDO $pdo): array
     $statement = $pdo->query(
         'SELECT members.id, members.is_active, members.first_name, members.last_name, members.username, members.parent_email,
                 members.parent_name, members.parent_text, members.parent_email_notify, members.parent_text_notify,
-                members.player_age, members.player_text, members.player_text_notify,
+                members.player_age, members.player_text, members.player_text_notify, members.show_public_stats,
                 members.notify_lessons_parent_email, members.notify_lessons_player_text, members.notify_lessons_parent_text,
                 members.notify_events_parent_email, members.notify_events_player_text, members.notify_events_parent_text,
                 members.notify_games_parent_email, members.notify_games_player_text, members.notify_games_parent_text,
@@ -82,7 +109,7 @@ function get_admin_members(PDO $pdo): array
          LEFT JOIN member_points ON member_points.member_id = members.id
          GROUP BY members.id, members.is_active, members.first_name, members.last_name, members.username, members.parent_email,
                   members.parent_name, members.parent_text, members.parent_email_notify, members.parent_text_notify,
-                  members.player_age, members.player_text, members.player_text_notify,
+                  members.player_age, members.player_text, members.player_text_notify, members.show_public_stats,
                   members.notify_lessons_parent_email, members.notify_lessons_player_text, members.notify_lessons_parent_text,
                   members.notify_events_parent_email, members.notify_events_player_text, members.notify_events_parent_text,
                   members.notify_games_parent_email, members.notify_games_player_text, members.notify_games_parent_text,
@@ -93,6 +120,8 @@ function get_admin_members(PDO $pdo): array
         static fn (array $member): array => [
             'id' => (int) $member['id'],
             'isActive' => (bool) $member['is_active'],
+            'firstName' => $member['first_name'],
+            'lastName' => $member['last_name'],
             'name' => trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? ''))) ?: (string) $member['username'],
             'username' => $member['username'],
             'parentEmail' => $member['parent_email'],
@@ -103,6 +132,7 @@ function get_admin_members(PDO $pdo): array
             'playerAge' => $member['player_age'] ? (int) $member['player_age'] : null,
             'playerText' => $member['player_text'],
             'playerTextNotify' => (bool) $member['player_text_notify'],
+            'showPublicStats' => (bool) $member['show_public_stats'],
             'notifyLessonsParentEmail' => (bool) $member['notify_lessons_parent_email'],
             'notifyLessonsPlayerText' => (bool) $member['notify_lessons_player_text'],
             'notifyLessonsParentText' => (bool) $member['notify_lessons_parent_text'],
@@ -340,13 +370,17 @@ function send_admin_members_response(PDO $pdo, string $message = ''): void
 
 try {
     $pdo = get_database();
-    ensure_members_table($pdo);
-    ensure_member_rounds_table($pdo);
-    ensure_member_points_table($pdo);
-    ensure_member_point_cashouts_table($pdo);
-    ensure_member_events_table($pdo);
-    ensure_member_lessons_table($pdo);
+    run_schema_setup('Admin service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+        ensure_member_rounds_table($pdo);
+        ensure_member_points_table($pdo);
+        ensure_member_point_cashouts_table($pdo);
+        ensure_member_events_table($pdo);
+        ensure_member_lessons_table($pdo);
+    });
     $adminMemberId = get_admin_member_id($pdo);
+    $adminMemberType = get_admin_member_type($pdo, $adminMemberId);
+    $isSuperAdmin = is_super_admin_type($adminMemberType);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         send_admin_members_response($pdo);
@@ -358,7 +392,72 @@ try {
 
     $action = (string) ($_POST['action'] ?? 'update_member');
 
+    if ($action === 'create_member') {
+        if (!$isSuperAdmin) {
+            send_admin_json(403, ['ok' => false, 'message' => 'Only super admins can create accounts.']);
+        }
+
+        $firstName = trim((string) ($_POST['first_name'] ?? ''));
+        $lastName = trim((string) ($_POST['last_name'] ?? ''));
+        $parentEmail = trim((string) ($_POST['parent_email'] ?? ''));
+        $username = normalize_username((string) ($_POST['username'] ?? ''));
+        $password = (string) ($_POST['password'] ?? '');
+        $membershipType = normalize_membership_type((string) ($_POST['membership_type'] ?? 'COMMUNITY'));
+        $playerAgeRaw = trim((string) ($_POST['player_age'] ?? ''));
+        $playerAge = $playerAgeRaw === ''
+            ? null
+            : filter_var($playerAgeRaw, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 18]]);
+
+        if ($firstName === '' || $lastName === '' || $username === '' || $password === '' || $playerAge === false) {
+            send_admin_json(422, ['ok' => false, 'message' => 'Please enter a valid name, username, password, role/path, and age.']);
+        }
+
+        if (in_array($membershipType, ['CUP', 'COMMUNITY'], true) && $playerAge === null) {
+            send_admin_json(422, ['ok' => false, 'message' => 'Please enter an age for junior members.']);
+        }
+
+        if ($parentEmail !== '' && !filter_var($parentEmail, FILTER_VALIDATE_EMAIL)) {
+            send_admin_json(422, ['ok' => false, 'message' => 'Please enter a valid parent email address.']);
+        }
+
+        if (!is_valid_username($username)) {
+            send_admin_json(422, ['ok' => false, 'message' => 'Usernames must be 3 to 40 characters and may use letters, numbers, dots, underscores, and hyphens.']);
+        }
+
+        if (strlen($password) < 8) {
+            send_admin_json(422, ['ok' => false, 'message' => 'Passwords must be at least 8 characters.']);
+        }
+
+        $insert = $pdo->prepare(
+            'INSERT INTO members
+                (membership_type, first_name, last_name, username, password_hash, parent_email, player_age, email_verified_at)
+             VALUES
+                (:membership_type, :first_name, :last_name, :username, :password_hash, :parent_email, :player_age, NOW())'
+        );
+        $insert->execute([
+            'membership_type' => $membershipType,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'username' => $username,
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            'parent_email' => $parentEmail === '' ? null : $parentEmail,
+            'player_age' => $playerAge,
+        ]);
+
+        $newMemberId = (int) $pdo->lastInsertId();
+
+        if (in_array($membershipType, ['CUP', 'COMMUNITY'], true)) {
+            add_welcome_points_for_member($pdo, $newMemberId);
+        }
+
+        send_admin_members_response($pdo, 'Member account created.');
+    }
+
     if ($action === 'approve_cashout') {
+        if (!$isSuperAdmin) {
+            send_admin_json(403, ['ok' => false, 'message' => 'Only super admins can approve cash out requests.']);
+        }
+
         $cashoutId = filter_var($_POST['cashout_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
         if ($cashoutId === false) {
@@ -423,57 +522,14 @@ try {
     }
 
     if (in_array($action, ['update_points', 'add_points', 'remove_points'], true)) {
-        $memberId = filter_var($_POST['member_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-        $points = $action === 'update_points'
-            ? filter_var($_POST['points'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => -999, 'max_range' => 999]])
-            : filter_var($_POST['points'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 999]]);
-        $description = trim((string) ($_POST['description'] ?? ''));
-
-        if ($memberId === false || $points === false || (int) $points === 0 || $description === '') {
-            send_admin_json(422, ['ok' => false, 'message' => 'Please enter a member, non-zero point amount, and reason.']);
-        }
-
-        if ($action === 'remove_points') {
-            $points = -1 * (int) $points;
-        }
-
-        if (strlen($description) > 160) {
-            $description = substr($description, 0, 160);
-        }
-
-        $memberCheck = $pdo->prepare('SELECT id FROM members WHERE id = :id LIMIT 1');
-        $memberCheck->execute(['id' => (int) $memberId]);
-
-        if (!$memberCheck->fetch()) {
-            send_admin_json(404, ['ok' => false, 'message' => 'Member not found.']);
-        }
-
-        if ((int) $points < 0) {
-            $balanceStatement = $pdo->prepare(
-                'SELECT COALESCE(SUM(points), 0) AS points_balance
-                 FROM member_points
-                 WHERE member_id = :member_id'
-            );
-            $balanceStatement->execute(['member_id' => (int) $memberId]);
-
-            if ((int) ($balanceStatement->fetch()['points_balance'] ?? 0) < abs((int) $points)) {
-                send_admin_json(422, ['ok' => false, 'message' => 'This member does not have enough points to remove.']);
-            }
-        }
-
-        add_member_point(
-            $pdo,
-            (int) $memberId,
-            'COACH_AWARD',
-            (new DateTimeImmutable('now'))->format('Y-m-d'),
-            $description,
-            (int) $points
-        );
-
-        send_admin_members_response($pdo, 'Points updated.');
+        send_admin_json(403, ['ok' => false, 'message' => 'Points are managed from the Points section.']);
     }
 
     if ($action === 'set_inactive_member' || $action === 'delete_member') {
+        if (!$isSuperAdmin) {
+            send_admin_json(403, ['ok' => false, 'message' => 'Only super admins can set members inactive.']);
+        }
+
         $memberId = filter_var($_POST['member_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
         if ($memberId === false) {
@@ -495,6 +551,10 @@ try {
     }
 
     if ($action === 'activate_member') {
+        if (!$isSuperAdmin) {
+            send_admin_json(403, ['ok' => false, 'message' => 'Only super admins can reactivate members.']);
+        }
+
         $memberId = filter_var($_POST['member_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
         if ($memberId === false) {
@@ -512,18 +572,13 @@ try {
     }
 
     $memberId = filter_var($_POST['member_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-    $membershipType = strtoupper(trim((string) ($_POST['membership_type'] ?? 'COMMUNITY')));
 
     if ($memberId === false) {
         send_admin_json(422, ['ok' => false, 'message' => 'Please choose a valid member.']);
     }
 
-    if (!in_array($membershipType, ['CUP', 'COMMUNITY', 'ADMIN', 'TEACHER'], true)) {
-        send_admin_json(422, ['ok' => false, 'message' => 'Please choose a valid path.']);
-    }
-
     $memberStatement = $pdo->prepare(
-        'SELECT is_active, email_verified_at, email_verification_token_hash, player_age
+        'SELECT is_active, email_verified_at, email_verification_token_hash, player_age, membership_type
          FROM members
          WHERE id = :id
          LIMIT 1'
@@ -535,15 +590,28 @@ try {
         send_admin_json(404, ['ok' => false, 'message' => 'Member not found.']);
     }
 
-    $emailVerified = array_key_exists('email_verified_present', $_POST) || array_key_exists('email_verified', $_POST)
+    $membershipType = $isSuperAdmin
+        ? strtoupper(trim((string) ($_POST['membership_type'] ?? $existingMember['membership_type'] ?? 'COMMUNITY')))
+        : (string) ($existingMember['membership_type'] ?? 'COMMUNITY');
+
+    if (!in_array($membershipType, ['CUP', 'COMMUNITY', 'SUPER_ADMIN', 'ADMIN', 'TEACHER', 'COACH'], true)) {
+        send_admin_json(422, ['ok' => false, 'message' => 'Please choose a valid path.']);
+    }
+
+    $emailVerified = $isSuperAdmin && (array_key_exists('email_verified_present', $_POST) || array_key_exists('email_verified', $_POST))
         ? (array_key_exists('email_verified', $_POST) ? 1 : 0)
         : ($existingMember['email_verified_at'] === null ? 0 : 1);
-    $isActive = array_key_exists('is_active', $_POST)
+    $isActive = $isSuperAdmin && array_key_exists('is_active', $_POST)
         ? filter_var($_POST['is_active'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 1]])
         : (int) $existingMember['is_active'];
-    $playerAge = array_key_exists('player_age', $_POST)
-        ? filter_var($_POST['player_age'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 18]])
-        : ($existingMember['player_age'] === null ? null : (int) $existingMember['player_age']);
+    $playerAge = $existingMember['player_age'] === null ? null : (int) $existingMember['player_age'];
+
+    if (array_key_exists('player_age', $_POST)) {
+        $playerAgeRaw = trim((string) $_POST['player_age']);
+        $playerAge = $playerAgeRaw === ''
+            ? null
+            : filter_var($playerAgeRaw, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 18]]);
+    }
 
     if ($playerAge === false) {
         send_admin_json(422, ['ok' => false, 'message' => 'Please enter a valid player age.']);
@@ -557,23 +625,80 @@ try {
         send_admin_json(422, ['ok' => false, 'message' => 'You cannot make your own admin account inactive.']);
     }
 
+    if ((int) $memberId === $adminMemberId && !is_super_admin_type($membershipType)) {
+        send_admin_json(422, ['ok' => false, 'message' => 'You cannot remove your own super admin role from this panel.']);
+    }
+
+    $firstName = trim((string) ($_POST['first_name'] ?? ''));
+    $lastName = trim((string) ($_POST['last_name'] ?? ''));
+    $parentEmail = trim((string) ($_POST['parent_email'] ?? ''));
+    $parentName = trim((string) ($_POST['parent_name'] ?? ''));
+    $parentText = trim((string) ($_POST['parent_text'] ?? ''));
+    $playerText = trim((string) ($_POST['player_text'] ?? ''));
+    $showPublicStats = isset($_POST['show_public_stats']) && (string) $_POST['show_public_stats'] !== '0' ? 1 : 0;
+
+    if ($parentEmail !== '' && !filter_var($parentEmail, FILTER_VALIDATE_EMAIL)) {
+        send_admin_json(422, ['ok' => false, 'message' => 'Please enter a valid parent email address.']);
+    }
+
+    $notificationFields = [
+        'notify_lessons_parent_email',
+        'notify_lessons_player_text',
+        'notify_lessons_parent_text',
+        'notify_events_parent_email',
+        'notify_events_player_text',
+        'notify_events_parent_text',
+        'notify_games_parent_email',
+        'notify_games_player_text',
+        'notify_games_parent_text',
+    ];
+    $notificationUpdates = [];
+
+    foreach ($notificationFields as $field) {
+        $notificationUpdates[$field] = $isSuperAdmin && array_key_exists($field, $_POST) ? 1 : 0;
+    }
+
+    $notificationsEditableSql = $isSuperAdmin ? '1' : '0';
     $statement = $pdo->prepare(
         'UPDATE members
-         SET membership_type = :membership_type,
+         SET first_name = :first_name,
+             last_name = :last_name,
+             parent_email = :parent_email,
+             parent_name = :parent_name,
+             parent_text = :parent_text,
+             player_text = :player_text,
+             show_public_stats = :show_public_stats,
+             membership_type = :membership_type,
              is_active = :is_active,
              player_age = :player_age,
              email_verified_at = CASE WHEN :email_verified_status = 1 THEN COALESCE(email_verified_at, NOW()) ELSE NULL END,
-             email_verification_token_hash = CASE WHEN :email_verified_token = 1 THEN NULL ELSE email_verification_token_hash END
+             email_verification_token_hash = CASE WHEN :email_verified_token = 1 THEN NULL ELSE email_verification_token_hash END,
+             notify_lessons_parent_email = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_lessons_parent_email ELSE notify_lessons_parent_email END,
+             notify_lessons_player_text = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_lessons_player_text ELSE notify_lessons_player_text END,
+             notify_lessons_parent_text = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_lessons_parent_text ELSE notify_lessons_parent_text END,
+             notify_events_parent_email = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_events_parent_email ELSE notify_events_parent_email END,
+             notify_events_player_text = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_events_player_text ELSE notify_events_player_text END,
+             notify_events_parent_text = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_events_parent_text ELSE notify_events_parent_text END,
+             notify_games_parent_email = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_games_parent_email ELSE notify_games_parent_email END,
+             notify_games_player_text = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_games_player_text ELSE notify_games_player_text END,
+             notify_games_parent_text = CASE WHEN ' . $notificationsEditableSql . ' = 1 THEN :notify_games_parent_text ELSE notify_games_parent_text END
          WHERE id = :id'
     );
-    $statement->execute([
+    $statement->execute(array_merge([
+        'first_name' => $firstName === '' ? null : $firstName,
+        'last_name' => $lastName === '' ? null : $lastName,
+        'parent_email' => $parentEmail === '' ? null : $parentEmail,
+        'parent_name' => $parentName === '' ? null : $parentName,
+        'parent_text' => $parentText === '' ? null : $parentText,
+        'player_text' => $playerText === '' ? null : $playerText,
+        'show_public_stats' => $showPublicStats,
         'membership_type' => $membershipType,
         'is_active' => $isActive,
         'player_age' => $playerAge,
         'email_verified_status' => $emailVerified,
         'email_verified_token' => $emailVerified,
         'id' => (int) $memberId,
-    ]);
+    ], $notificationUpdates));
 
     send_admin_members_response($pdo, 'Member updated.');
 } catch (Throwable $error) {

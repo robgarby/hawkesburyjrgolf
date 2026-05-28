@@ -17,9 +17,9 @@ function escapeAttribute(value) {
     .replaceAll('>', '&gt;')
 }
 
-function renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal = false }) {
+function renderHeader({ routes, page, language, copy, isLoggedIn, member, isMemberPortal = false }) {
   if (isMemberPortal) {
-    return ''
+    return renderMemberHeader(language, page, copy, member)
   }
 
   return `
@@ -69,11 +69,42 @@ function renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal
   `
 }
 
+function renderMemberHeader(language, page, copy, member) {
+  const logoutLabel = language === 'fr' ? 'Se déconnecter' : 'Log out'
+  const fullSiteLabel = language === 'fr' ? 'Quitter le portail junior' : 'Exit Junior Portal'
+  const activeRoute = page?.id || 'my-account'
+
+  return `
+    <header class="site-header member-site-header">
+      <a class="brand" href="#my-account" aria-label="${copy.brandHome}">
+        <img class="brand-mark" src="/pwa-icon-192.png?v=20260523-1320" alt="" width="48" height="48" />
+        <span>
+          <strong>Hawkesbury</strong>
+          <small>${language === 'fr' ? 'Espace membre' : 'Member Area'}</small>
+        </span>
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="header-actions">
+        <nav class="nav member-site-nav" aria-label="${language === 'fr' ? 'Navigation membre' : 'Member navigation'}">
+          ${renderMemberPortalNavLinks(language, activeRoute, member)}
+        </nav>
+        ${renderLanguageToggle(language, copy)}
+        <a class="account-app-link member-full-site-link" href="/" data-session-mode-link="site">${fullSiteLabel}</a>
+        <button class="account-logout member-header-logout" type="button" data-account-logout>${logoutLabel}</button>
+      </div>
+    </header>
+  `
+}
+
 function accountStreamLabel(membershipType = '') {
   const type = String(membershipType || '').toUpperCase()
 
   if (type === 'CUP') {
-    return 'Cup'
+    return 'Member'
   }
 
   if (type === 'COMMUNITY') {
@@ -84,11 +115,23 @@ function accountStreamLabel(membershipType = '') {
     return 'Admin'
   }
 
+  if (type === 'SUPER_ADMIN') {
+    return 'Super Admin'
+  }
+
   if (type === 'TEACHER') {
     return 'Teacher'
   }
 
+  if (type === 'COACH') {
+    return 'Coach'
+  }
+
   return type || 'Member'
+}
+
+function memberCanSeeAdminPanel(member) {
+  return ['SUPER_ADMIN', 'ADMIN'].includes(String(member?.membershipType || '').toUpperCase())
 }
 
 function renderAccountProfilePanel(language, member) {
@@ -104,6 +147,10 @@ function renderAccountProfilePanel(language, member) {
       lessonPosted: 'Notify on Lesson Posted',
       eventPosted: 'Notify when Event Posted',
       gamePosted: 'Notify when Round Posted',
+      publicStats: 'Scores, points, and rank visibility',
+      displayScores: 'Display Scores',
+      hideScores: 'Hide Scores',
+      publicStatsNote: 'If you are taking part in a competitive team, those points must always show.',
       save: 'Save Notifications',
       loading: 'Loading account details...',
       helper: 'Choose which contact methods receive alerts when lessons, events, or rounds are posted.',
@@ -119,6 +166,10 @@ function renderAccountProfilePanel(language, member) {
       lessonPosted: 'Aviser quand une leçon est publiée',
       eventPosted: 'Aviser quand un événement est publié',
       gamePosted: 'Aviser quand une ronde est publiée',
+      publicStats: 'Visibilité des scores, points et classement',
+      displayScores: 'Afficher les scores',
+      hideScores: 'Masquer les scores',
+      publicStatsNote: 'Si vous participez à une équipe compétitive, ces points doivent toujours être affichés.',
       save: 'Enregistrer',
       loading: 'Chargement du compte...',
       helper: 'Choisissez quelles méthodes de contact reçoivent les avis pour les leçons, événements ou rondes publiés.',
@@ -176,6 +227,21 @@ function renderAccountProfilePanel(language, member) {
           </div>
         `).join('')}
       </div>
+      <fieldset class="account-public-stats-toggle">
+        <legend>${copy.publicStats}</legend>
+        <div class="account-public-stats-options">
+          <label>
+            <input type="radio" name="show_public_stats_choice" value="1" data-account-public-stats data-public-stats-display checked />
+            <span>${copy.displayScores}</span>
+          </label>
+          <label>
+            <input type="radio" name="show_public_stats_choice" value="0" data-account-public-stats data-public-stats-hide />
+            <span>${copy.hideScores}</span>
+          </label>
+        </div>
+        <input type="hidden" name="show_public_stats" value="1" data-account-public-stats-value />
+        <p>${copy.publicStatsNote}</p>
+      </fieldset>
       <div class="account-profile-actions">
         <button type="submit">${copy.save}</button>
         <p class="score-status" data-account-profile-status aria-live="polite">${copy.loading}</p>
@@ -184,19 +250,34 @@ function renderAccountProfilePanel(language, member) {
   `
 }
 
-function renderAdminPanel(language) {
+function renderAdminPanel(language, isHidden = true, member = null) {
+  const memberType = String(member?.membershipType || '').toUpperCase()
+  const canManageMembers = memberCanSeeAdminPanel(member)
+  const canSuperAdmin = memberType === 'SUPER_ADMIN'
   const copy = {
     en: {
       title: 'Admin Panel',
-      helper: 'Update member paths, email status, and review point balances.',
+      helper: 'Update member profiles, contact details, roles, status, and notifications.',
       loading: 'Loading members...',
-      staff: 'Admin / Teacher',
-      cup: 'Cup',
+      staff: 'Staff',
+      cup: 'Member',
       community: 'Community',
       inactive: 'Inactive',
       sendText: 'Send Text',
+      createTitle: 'Create Account',
+      createHelper: 'Create a verified account for a junior, coach, teacher, or admin.',
+      showCreate: 'Create Account',
+      hideCreate: 'Hide Account Form',
+      firstName: 'First Name',
+      lastName: 'Last Name',
+      parentEmail: 'Parent Email',
+      username: 'Username',
+      password: 'Password',
+      age: 'Age',
+      path: 'Path',
+      createAccount: 'Create Account',
       textTitle: 'Send Text',
-      textHelper: 'Testing mode is on. Messages will be previewed only.',
+      textHelper: 'Live sending is on. Your monitoring number will also receive every send.',
       targetLabel: 'Send to',
       all: 'All',
       parents: 'Parents',
@@ -208,15 +289,27 @@ function renderAdminPanel(language) {
     },
     fr: {
       title: 'Panneau admin',
-      helper: 'Mettez à jour les parcours, le statut courriel et les points.',
+      helper: 'Mettez à jour les profils, coordonnées, rôles, statuts et avis.',
       loading: 'Chargement des membres...',
-      staff: 'Admin / Enseignant',
-      cup: 'Cup',
+      staff: 'Personnel',
+      cup: 'Membre',
       community: 'Communauté',
       inactive: 'Inactifs',
       sendText: 'Envoyer texto',
+      createTitle: 'Créer un compte',
+      createHelper: 'Créez un compte vérifié pour un junior, entraîneur, enseignant ou admin.',
+      showCreate: 'Créer un compte',
+      hideCreate: 'Masquer le formulaire',
+      firstName: 'Prénom',
+      lastName: 'Nom',
+      parentEmail: 'Courriel parent',
+      username: 'Nom utilisateur',
+      password: 'Mot de passe',
+      age: 'Âge',
+      path: 'Parcours',
+      createAccount: 'Créer le compte',
       textTitle: 'Envoyer texto',
-      textHelper: 'Le mode test est activé. Les messages seront seulement prévisualisés.',
+      textHelper: 'L’envoi réel est activé. Votre numéro de surveillance recevra aussi chaque envoi.',
       targetLabel: 'Envoyer à',
       all: 'Tous',
       parents: 'Parents',
@@ -229,14 +322,43 @@ function renderAdminPanel(language) {
   }[language]
 
   return `
-    <section class="account-admin-panel is-hidden" data-admin-panel>
+    <section class="account-admin-panel ${isHidden ? 'is-hidden' : ''}" data-admin-panel>
       <div class="account-profile-heading">
         <h2>${copy.title}</h2>
         <p>${copy.helper}</p>
       </div>
       <div class="admin-toolbar">
+        ${canSuperAdmin ? `<button type="button" data-admin-create-toggle data-show-label="${copy.showCreate}" data-hide-label="${copy.hideCreate}" aria-expanded="false">${copy.showCreate}</button>` : ''}
         <button type="button" data-admin-text-open>${copy.sendText}</button>
       </div>
+      ${canSuperAdmin ? `<form class="admin-create-form admin-manage-form is-hidden" data-admin-member-form data-admin-create-form>
+        <input type="hidden" name="action" value="create_member" />
+        <div class="admin-create-heading">
+          <span>
+            <h3>${copy.createTitle}</h3>
+            <p>${copy.createHelper}</p>
+          </span>
+        </div>
+        <div class="form-grid two-column">
+          <label><span>${copy.firstName}</span><input type="text" name="first_name" autocomplete="given-name" required /></label>
+          <label><span>${copy.lastName}</span><input type="text" name="last_name" autocomplete="family-name" required /></label>
+          <label><span>${copy.parentEmail}</span><input type="email" name="parent_email" autocomplete="email" /></label>
+          <label><span>${copy.username}</span><input type="text" name="username" autocomplete="username" required /></label>
+          <label><span>${copy.password}</span><input type="password" name="password" autocomplete="new-password" minlength="8" required /></label>
+          <label><span>${copy.age}</span><input type="number" name="player_age" min="1" max="18" inputmode="numeric" /></label>
+          <label>
+            <span>${copy.path}</span>
+            <select name="membership_type">
+              <option value="COMMUNITY">Community</option>
+              <option value="CUP">Member</option>
+              <option value="COACH">Coach</option>
+              <option value="TEACHER">Teacher</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit">${copy.createAccount}</button>
+      </form>` : ''}
       <div class="admin-text-modal is-hidden" data-admin-text-modal aria-hidden="true">
         <div class="admin-text-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-text-title">
           <form data-admin-text-form>
@@ -267,7 +389,7 @@ function renderAdminPanel(language) {
           </form>
         </div>
       </div>
-      <div class="admin-cashout-list" data-admin-cashouts></div>
+      ${canManageMembers ? `
       <div class="admin-filter-tabs" role="tablist" aria-label="${copy.title}">
         <button type="button" class="active" data-admin-filter="staff"><span>${copy.staff}</span><small data-admin-filter-count="staff">0</small></button>
         <button type="button" data-admin-filter="cup"><span>${copy.cup}</span><small data-admin-filter-count="cup">0</small></button>
@@ -276,7 +398,7 @@ function renderAdminPanel(language) {
       </div>
       <div class="admin-members-list" data-admin-members data-empty-label="${copy.loading}">
         <p>${copy.loading}</p>
-      </div>
+      </div>` : ''}
       <p class="score-status" data-admin-status aria-live="polite"></p>
     </section>
   `
@@ -284,14 +406,7 @@ function renderAdminPanel(language) {
 
 function renderAccountPage(page, language, member, copy, isMemberPortal = false) {
   const logoutLabel = language === 'fr' ? 'Se déconnecter' : 'Log out'
-  const appButtonLabel = isMemberPortal
-    ? (language === 'fr' ? 'Site complet' : 'Load Full Site')
-    : (language === 'fr' ? 'Ouvrir comme app' : 'Open as App')
-  const appButtonHref = isMemberPortal ? '/' : '/members'
-  const appButtonMode = isMemberPortal ? 'site' : 'app'
-  const isAdmin = member?.membershipType === 'ADMIN'
-  const adminLabel = language === 'fr' ? 'Panneau admin' : 'Admin Panel'
-
+  const loadAppLabel = language === 'fr' ? 'Charger comme application' : 'LOAD AS AN APP'
   return `
     <section class="account-page">
       <div class="account-rule"></div>
@@ -300,25 +415,38 @@ function renderAccountPage(page, language, member, copy, isMemberPortal = false)
           <p class="eyebrow">${page.eyebrow[language]}</p>
           <div class="account-title-row">
             <h1>${page.heading[language]}</h1>
-            <a class="account-app-link" href="${appButtonHref}" data-session-mode-link="${appButtonMode}">${appButtonLabel}</a>
+            <a class="account-app-link account-title-app-link" href="/members#my-account" data-session-mode-link="app">${loadAppLabel}</a>
           </div>
           <p>${page.intro[language]}</p>
         </div>
         <div class="account-top-actions">
-          ${isMemberPortal ? renderLanguageToggle(language, copy) : ''}
-          ${isAdmin ? `<button class="account-logout" type="button" data-admin-toggle aria-expanded="false">${adminLabel}</button>` : ''}
-          <button class="account-logout" type="button" data-account-logout>${logoutLabel}</button>
+          ${isMemberPortal ? '' : `<button class="account-logout" type="button" data-account-logout>${logoutLabel}</button>`}
         </div>
       </div>
-      <nav class="account-link-grid" aria-label="${page.title[language]}">
+      ${isMemberPortal ? '' : `<nav class="account-link-grid" aria-label="${page.title[language]}">
         ${isMemberPortal
           ? renderMemberPortalNavLinks(language, 'my-account')
           : page.accountLinks
             .map((link) => `<a href="#${link.route}">${link.label[language]}</a>`)
             .join('')}
-      </nav>
-      ${isAdmin ? renderAdminPanel(language) : ''}
+      </nav>`}
       ${renderAccountProfilePanel(language, member)}
+    </section>
+  `
+}
+
+function renderAdminPage(page, language, member) {
+  return `
+    <section class="account-page account-admin-page">
+      <div class="account-rule"></div>
+      <div class="account-heading-row">
+        <div>
+          <p class="eyebrow">${page.eyebrow[language]}</p>
+          <h1>${page.heading[language]}</h1>
+          <p>${page.intro[language]}</p>
+        </div>
+      </div>
+      ${renderAdminPanel(language, false, member)}
     </section>
   `
 }
@@ -334,7 +462,7 @@ function renderMemberPortalNav(language) {
   `
 }
 
-function renderMemberPortalNavLinks(language, activeRoute = 'my-account') {
+function renderMemberPortalNavLinks(language, activeRoute = 'my-account', member = null) {
   const links = [
     ['my-account', language === 'fr' ? 'Profil' : 'Profile'],
     ['scores', language === 'fr' ? 'Scores' : 'Scores'],
@@ -345,6 +473,10 @@ function renderMemberPortalNavLinks(language, activeRoute = 'my-account') {
     ['ranking', language === 'fr' ? 'Classement' : 'Ranking'],
   ]
 
+  if (memberCanSeeAdminPanel(member)) {
+    links.push(['admin-panel', language === 'fr' ? 'Panneau admin' : 'Admin Panel'])
+  }
+
   return links.map(([route, label]) => `<a href="#${route}" class="${route === activeRoute ? 'active' : ''}">${label}</a>`).join('')
 }
 
@@ -353,14 +485,62 @@ function renderAccountSubpage(page, language, member, isMemberPortal = false) {
 
   return `
     <section class="account-page account-subpage account-${page.id}-page">
-      ${isMemberPortal ? renderMemberPortalNav(language) : `<a class="account-back-link" href="#my-account">${backLabel}</a>`}
+      ${isMemberPortal ? '' : `<a class="account-back-link" href="#my-account">${backLabel}</a>`}
       <h1>${page.heading[language]}</h1>
       <p>${page.intro[language]}</p>
-      ${page.id === 'scores' ? renderScoresTool(page, language) : ''}
-      ${page.id === 'points' ? renderPointsTool(page, language) : ''}
+      ${page.id === 'scores' ? renderScoresTool(page, language, member) : ''}
+      ${page.id === 'points' ? renderPointsTool(page, language, member) : ''}
       ${page.id === 'events' ? renderEventsTool(page, language, member) : ''}
       ${page.id === 'find-a-game' ? renderFindGameTool(page, language, member) : ''}
       ${page.id === 'book-a-lesson' ? renderLessonTool(page, language, member) : ''}
+      ${page.id === 'ranking' ? renderRankingTool(page, language) : ''}
+    </section>
+  `
+}
+
+function renderRankingTool(page, language) {
+  const rankingTool = page.rankingTool
+  const tabs = [
+    ['points', rankingTool.pointsTab[language], rankingTool.pointsTitle[language]],
+    ['rounds', rankingTool.roundsTab[language], rankingTool.roundsTitle[language]],
+    ['scores', rankingTool.scoresTab[language], rankingTool.scoresTitle[language]],
+    ['travel-team', rankingTool.travelTeamTab[language], rankingTool.travelTeamTitle[language]],
+  ]
+
+  return `
+    <section class="ranking-tool" data-ranking-tool>
+      <div class="ranking-tabs" role="tablist" aria-label="${rankingTool.tabsLabel[language]}">
+        ${tabs.map(([id, label], index) => `
+          <button
+            type="button"
+            class="${index === 0 ? 'active' : ''}"
+            role="tab"
+            id="ranking-tab-${id}"
+            aria-selected="${index === 0 ? 'true' : 'false'}"
+            aria-controls="ranking-panel-${id}"
+            data-ranking-tab="${id}"
+          >${label}</button>
+        `).join('')}
+      </div>
+      ${tabs.map(([id, label, title], index) => `
+        <section
+          class="ranking-panel ${index === 0 ? 'active' : ''}"
+          role="tabpanel"
+          id="ranking-panel-${id}"
+          aria-labelledby="ranking-tab-${id}"
+          ${index === 0 ? '' : 'hidden'}
+          data-ranking-panel="${id}"
+        >
+          <div class="admin-report-heading">
+            <h2>${title}</h2>
+            <span>${label}</span>
+          </div>
+          <p class="ranking-note">${rankingTool.cupOnly[language]}</p>
+          <div class="ranking-list" data-ranking-list="${id}">
+            <p>${rankingTool.loading[language]}</p>
+          </div>
+        </section>
+      `).join('')}
     </section>
   `
 }
@@ -397,7 +577,7 @@ function renderLessonTypeSelect(lessonTool, language) {
 
 function renderPathSelect(name, label, pathOptions, language, member, includeAllPaths = false) {
   const memberType = String(member?.membershipType || '').toUpperCase()
-  const values = includeAllPaths || ['ADMIN', 'TEACHER'].includes(memberType)
+  const values = includeAllPaths || memberType === 'SUPER_ADMIN'
     ? ['EVERYONE', 'CUP', 'COMMUNITY']
     : ['EVERYONE', memberType].filter((value, index, list) => (
         ['EVERYONE', 'CUP', 'COMMUNITY'].includes(value) && list.indexOf(value) === index
@@ -415,7 +595,7 @@ function renderPathSelect(name, label, pathOptions, language, member, includeAll
 
 function renderLessonTool(page, language, member) {
   const lessonTool = page.lessonTool
-  const canTeach = ['ADMIN', 'TEACHER'].includes(member?.membershipType)
+  const canTeach = ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'COACH'].includes(member?.membershipType)
   const canRequestLesson = ['CUP', 'COMMUNITY'].includes(member?.membershipType)
 
   return `
@@ -444,6 +624,10 @@ function renderLessonTool(page, language, member) {
           <label><span>${lessonTool.locationLabel[language]}</span><input type="text" name="location" value="Hawkesbury" required /></label>
         </div>
         <label><span>${lessonTool.notesLabel[language]}</span><textarea name="notes" rows="3" maxlength="240"></textarea></label>
+        <label class="find-game-notify-toggle">
+          <input type="checkbox" name="notify_others" value="1" checked />
+          <span>${lessonTool.notifyOthersLabel[language]}</span>
+        </label>
         <div class="event-form-actions"><button type="submit">${lessonTool.availableSave[language]}</button></div>
       </form>` : ''}
       ${canRequestLesson ? `<form class="event-entry-form is-hidden" data-lesson-request-form>
@@ -453,7 +637,6 @@ function renderLessonTool(page, language, member) {
           ${renderLessonDateField('preferred_date', lessonTool.dateLabel[language])}
           <label><span>${lessonTool.timeLabel[language]}</span><input type="time" name="preferred_time" required /></label>
           ${renderLessonTypeSelect(lessonTool, language)}
-          <label><span>${lessonTool.maxLabel[language]}</span><input type="number" name="max_students" min="1" max="12" value="1" inputmode="numeric" required /></label>
         </div>
         <label><span>${lessonTool.notesLabel[language]}</span><textarea name="notes" rows="3" maxlength="240" required></textarea></label>
         <div class="event-form-actions"><button type="submit">${lessonTool.requestSave[language]}</button></div>
@@ -473,6 +656,11 @@ function renderLessonTool(page, language, member) {
         <div class="events-list" data-lesson-requests data-empty-label="${lessonTool.emptyRequests[language]}"></div>
       </section>
       <p class="score-status" data-lesson-status aria-live="polite">${lessonTool.loading[language]}</p>
+      <div class="find-game-text-modal is-hidden" data-find-game-text-modal aria-hidden="true">
+        <div class="find-game-text-dialog" role="dialog" aria-modal="true">
+          <div class="find-game-text-dialog-content" data-find-game-text-modal-content></div>
+        </div>
+      </div>
     </section>
   `
 }
@@ -486,8 +674,9 @@ function renderFindGameTool(page, language, member) {
         <button type="button" data-find-game-post-toggle data-show-label="${findGameTool.postButton[language]}" data-hide-label="${findGameTool.hidePostButton[language]}">${findGameTool.postButton[language]}</button>
       </div>
       <form class="event-entry-form find-game-form is-hidden" data-find-game-form>
-        <h2>${findGameTool.formTitle[language]}</h2>
+        <h2 data-find-game-form-title data-add-title="${findGameTool.formTitle[language]}" data-edit-title="${findGameTool.editTitle[language]}">${findGameTool.formTitle[language]}</h2>
         <input type="hidden" name="action" value="post_game" />
+        <input type="hidden" name="game_id" value="" />
         <div class="form-grid two-column">
           <div class="score-field">
             <span>${findGameTool.dateLabel[language]}</span>
@@ -505,6 +694,13 @@ function renderFindGameTool(page, language, member) {
           <label>
             <span>${findGameTool.timeLabel[language]}</span>
             <input type="time" name="game_time" required />
+          </label>
+          <label>
+            <span>${findGameTool.holesLabel[language]}</span>
+            <select name="game_holes" required>
+              <option value="9">9 holes</option>
+              <option value="18">18 holes</option>
+            </select>
           </label>
           <label>
             <span>${findGameTool.spotsLabel[language]}</span>
@@ -528,25 +724,38 @@ function renderFindGameTool(page, language, member) {
           <span>${findGameTool.roundLabel[language]}</span>
           <textarea name="round_details" rows="3" maxlength="200" placeholder="${findGameTool.roundPlaceholder[language]}" required></textarea>
         </label>
+        <label class="find-game-notify-toggle">
+          <input type="checkbox" name="notify_others" value="1" checked />
+          <span>${findGameTool.notifyOthersLabel[language]}</span>
+        </label>
         <div class="event-form-actions">
-          <button type="submit">${findGameTool.saveButton[language]}</button>
+          <button type="submit" data-find-game-submit data-save-label="${findGameTool.saveButton[language]}" data-update-label="${findGameTool.updateButton[language]}">${findGameTool.saveButton[language]}</button>
+          <button class="event-cancel-edit is-hidden" type="button" data-find-game-cancel-edit>${findGameTool.cancelEditButton[language]}</button>
         </div>
       </form>
       <section class="events-list-panel find-game-list-panel">
         <div class="events-list-heading">
           <h2>${findGameTool.gamesTitle[language]}</h2>
         </div>
+        <div class="find-game-text-preview" data-find-game-text-preview hidden></div>
         <div class="events-list" data-find-game-list data-empty-label="${findGameTool.empty[language]}"></div>
       </section>
       <p class="score-status" data-find-game-status aria-live="polite">${findGameTool.loading[language]}</p>
+      <div class="find-game-text-modal is-hidden" data-find-game-text-modal aria-hidden="true">
+        <div class="find-game-text-dialog" role="dialog" aria-modal="true">
+          <div class="find-game-text-dialog-content" data-find-game-text-modal-content></div>
+        </div>
+      </div>
     </section>
   `
 }
 
 function renderEventsTool(page, language, member) {
   const eventsTool = page.eventsTool
-  const canManageEvents = ['ADMIN', 'TEACHER'].includes(member?.membershipType)
-  const adminForm = canManageEvents
+  const memberType = String(member?.membershipType || '').toUpperCase()
+  const canAddEvents = ['SUPER_ADMIN', 'ADMIN'].includes(memberType)
+  const canSuperAdminEvents = memberType === 'SUPER_ADMIN'
+  const adminForm = canAddEvents
     ? `
       <form class="event-entry-form is-hidden" data-event-form data-event-admin-panel>
         <input type="hidden" name="action" value="add_event" />
@@ -623,6 +832,10 @@ function renderEventsTool(page, language, member) {
           <span>${eventsTool.attendeeCsvLabel[language]}</span>
           <textarea name="attendee_csv" rows="4" placeholder="${eventsTool.attendeeCsvPlaceholder[language]}"></textarea>
         </label>
+        <label class="find-game-notify-toggle" data-event-notify-field>
+          <input type="checkbox" name="notify_others" value="1" checked />
+          <span>${eventsTool.notifyOthersLabel[language]}</span>
+        </label>
         <div class="event-form-actions">
           <button type="submit" data-event-submit data-save-label="${eventsTool.saveButton[language]}" data-update-label="${eventsTool.updateButton[language]}">${eventsTool.saveButton[language]}</button>
           <button class="event-cancel-edit is-hidden" type="button" data-event-cancel-edit>${eventsTool.cancelEditButton[language]}</button>
@@ -638,7 +851,7 @@ function renderEventsTool(page, language, member) {
         <div class="events-list-heading">
           <h2>${eventsTool.upcomingTitle[language]}</h2>
           <div class="events-list-actions">
-            ${canManageEvents ? `<button type="button" data-event-admin-toggle data-show-label="${eventsTool.showAdminButton[language]}" data-hide-label="${eventsTool.hideAdminButton[language]}" aria-expanded="false">${eventsTool.showAdminButton[language]}</button>` : ''}
+            ${canAddEvents ? `<button type="button" data-event-admin-toggle data-show-label="${eventsTool.showAdminButton[language]}" data-hide-label="${eventsTool.hideAdminButton[language]}" aria-expanded="false" data-super-admin-events="${canSuperAdminEvents ? 'true' : 'false'}">${eventsTool.showAdminButton[language]}</button>` : ''}
             <button type="button" data-past-events-toggle>${eventsTool.pastButton[language]}</button>
           </div>
         </div>
@@ -646,12 +859,76 @@ function renderEventsTool(page, language, member) {
         <div class="events-list is-hidden" data-past-events data-empty-label="${eventsTool.emptyPast[language]}" data-title="${eventsTool.pastTitle[language]}"></div>
       </section>
       <p class="score-status" data-events-status aria-live="polite">${eventsTool.loading[language]}</p>
+      <div class="find-game-text-modal is-hidden" data-find-game-text-modal aria-hidden="true">
+        <div class="find-game-text-dialog" role="dialog" aria-modal="true">
+          <div class="find-game-text-dialog-content" data-find-game-text-modal-content></div>
+        </div>
+      </div>
     </section>
   `
 }
 
-function renderPointsTool(page, language) {
+function renderPointsTool(page, language, member) {
   const pointsTool = page.pointsTool
+  const isAdmin = ['SUPER_ADMIN', 'ADMIN'].includes(String(member?.membershipType || '').toUpperCase())
+
+  if (isAdmin) {
+    return `
+      <section class="points-tool admin-member-report-tool" data-points-tool data-admin-points-report>
+        <div class="admin-score-toolbar">
+          <button type="button" data-admin-points-entry-toggle data-show-label="${pointsTool.adminShowPointsForm[language]}" data-hide-label="${pointsTool.adminHidePointsForm[language]}" aria-expanded="false">
+            ${pointsTool.adminShowPointsForm[language]}
+          </button>
+        </div>
+        <form class="score-entry-form admin-score-entry-form is-hidden" data-admin-points-entry-form>
+          <h2>${pointsTool.adminFormTitle[language]}</h2>
+          <div class="form-grid two-column">
+            <label class="admin-score-junior-field">
+              <span>${pointsTool.adminJuniorLabel[language]}</span>
+              <select name="member_id" required data-admin-points-member>
+                <option value="">${pointsTool.adminJuniorLoading[language]}</option>
+              </select>
+            </label>
+            <label>
+              <span>${pointsTool.adminPointsLabel[language]}</span>
+              <input type="number" name="points" min="1" max="999" step="1" inputmode="numeric" required />
+            </label>
+            <label>
+              <span>${pointsTool.adminDescriptionLabel[language]}</span>
+              <input type="text" name="description" maxlength="160" required />
+            </label>
+            <div class="score-field">
+              <span>${pointsTool.adminDateLabel[language]}</span>
+              <div class="date-picker" data-date-picker>
+                <input type="hidden" name="point_date" required data-date-input data-point-date />
+                <button class="date-picker-button" type="button" data-date-picker-toggle aria-expanded="false">
+                  <span data-date-picker-label></span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M8 2v4M16 2v4M4 9h16M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
+                  </svg>
+                </button>
+                <div class="date-picker-popover" data-date-picker-popover></div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" name="action" value="award_points" />
+          <button type="submit">${pointsTool.adminSavePoints[language]}</button>
+        </form>
+        <div class="admin-report-toolbar" role="tablist" aria-label="${pointsTool.adminPathFilterLabel[language]}">
+          <button type="button" class="active" data-admin-report-path="CUP">${pointsTool.cupButton[language]}</button>
+          <button type="button" data-admin-report-path="COMMUNITY">${pointsTool.communityButton[language]}</button>
+        </div>
+        <div class="points-history-panel admin-report-panel">
+          <div class="admin-report-heading">
+            <h2>${pointsTool.adminTitle[language]}</h2>
+            <span data-admin-points-count></span>
+          </div>
+          <div class="points-history-list admin-leaderboard-list" data-admin-points-list data-empty-label="${pointsTool.adminEmpty[language]}"></div>
+        </div>
+        <p class="score-status" data-points-status aria-live="polite">${pointsTool.loading[language]}</p>
+      </section>
+    `
+  }
 
   return `
     <section class="points-tool" data-points-tool>
@@ -678,10 +955,77 @@ function renderPointsTool(page, language) {
   `
 }
 
-function renderScoresTool(page, language) {
+function renderScoreEntryFields(scoreTool, language, teeOptions, formatOptions) {
+  return `
+    <div class="score-field">
+      <span>${scoreTool.dateLabel[language]}</span>
+      <div class="date-picker" data-date-picker>
+        <input type="hidden" name="round_date" required data-date-input data-round-date />
+        <button class="date-picker-button" type="button" data-date-picker-toggle aria-expanded="false">
+          <span data-date-picker-label></span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M8 2v4M16 2v4M4 9h16M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
+          </svg>
+        </button>
+        <div class="date-picker-popover" data-date-picker-popover></div>
+      </div>
+    </div>
+    <label>
+      <span>${scoreTool.teeLabel[language]}</span>
+      <select name="tee" required data-score-tee>
+        ${teeOptions.map(([value, label]) => `<option value="${value}">${label[language]}</option>`).join('')}
+      </select>
+    </label>
+    <label>
+      <span>${scoreTool.formatLabel[language]}</span>
+      <select name="format" required data-score-format>
+        ${formatOptions.map(([value, label]) => `<option value="${value}">${label[language]}</option>`).join('')}
+      </select>
+    </label>
+    <label data-score-field>
+      <span data-score-label>${scoreTool.scoreLabel[language]}</span>
+      <input type="text" name="score" maxlength="40" data-score-input />
+    </label>
+  `
+}
+
+function renderScoresTool(page, language, member) {
   const scoreTool = page.scoreTool
   const teeOptions = Object.entries(scoreTool.teeOptions)
   const formatOptions = Object.entries(scoreTool.formatOptions)
+  const scoreEntryFields = renderScoreEntryFields(scoreTool, language, teeOptions, formatOptions)
+  const isAdmin = member?.membershipType === 'SUPER_ADMIN'
+
+  if (isAdmin) {
+    return `
+      <section class="scores-tool admin-member-report-tool" data-scores-tool data-admin-rounds-report>
+        <div class="admin-score-toolbar">
+          <button type="button" data-admin-score-toggle data-show-label="${scoreTool.adminShowScoreForm[language]}" data-hide-label="${scoreTool.adminHideScoreForm[language]}" aria-expanded="false">
+            ${scoreTool.adminShowScoreForm[language]}
+          </button>
+        </div>
+        <form class="score-entry-form admin-score-entry-form is-hidden" data-score-form data-admin-score-form>
+          <h2>${scoreTool.formTitle[language]}</h2>
+          <div class="form-grid two-column">
+            <label class="admin-score-junior-field">
+              <span>${scoreTool.adminJuniorLabel[language]}</span>
+              <select name="member_id" required data-admin-score-member>
+                <option value="">${scoreTool.adminJuniorLoading[language]}</option>
+              </select>
+            </label>
+            ${scoreEntryFields}
+          </div>
+          <button type="submit">${scoreTool.button[language]}</button>
+          <p class="score-status" data-score-status aria-live="polite">${scoreTool.loading[language]}</p>
+        </form>
+        <div class="admin-report-toolbar" role="tablist" aria-label="${scoreTool.adminPathFilterLabel[language]}">
+          <button type="button" class="active" data-admin-report-path="CUP">${scoreTool.cupButton[language]}</button>
+          <button type="button" data-admin-report-path="COMMUNITY">${scoreTool.communityButton[language]}</button>
+        </div>
+        <div class="admin-rounds-report-panel admin-report-panel" data-admin-rounds-list data-empty-label="${scoreTool.adminEmpty[language]}"></div>
+      </section>
+    `
+  }
 
   return `
     <section class="scores-tool" data-scores-tool>
@@ -694,35 +1038,7 @@ function renderScoresTool(page, language) {
         <form class="score-entry-form" data-score-form>
           <h2>${scoreTool.formTitle[language]}</h2>
           <div class="form-grid two-column">
-            <div class="score-field">
-              <span>${scoreTool.dateLabel[language]}</span>
-              <div class="date-picker" data-date-picker>
-                <input type="hidden" name="round_date" required data-date-input data-round-date />
-                <button class="date-picker-button" type="button" data-date-picker-toggle aria-expanded="false">
-                  <span data-date-picker-label></span>
-                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M8 2v4M16 2v4M4 9h16M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
-                  </svg>
-                </button>
-                <div class="date-picker-popover" data-date-picker-popover></div>
-              </div>
-            </div>
-            <label>
-              <span>${scoreTool.teeLabel[language]}</span>
-              <select name="tee" required>
-                ${teeOptions.map(([value, label]) => `<option value="${value}">${label[language]}</option>`).join('')}
-              </select>
-            </label>
-            <label>
-              <span>${scoreTool.formatLabel[language]}</span>
-              <select name="format" required>
-                ${formatOptions.map(([value, label]) => `<option value="${value}">${label[language]}</option>`).join('')}
-              </select>
-            </label>
-            <label>
-              <span>${scoreTool.scoreLabel[language]}</span>
-              <input type="text" name="score" maxlength="40" required />
-            </label>
+            ${scoreEntryFields}
           </div>
           <button type="submit">${scoreTool.button[language]}</button>
           <p class="score-status" data-score-status aria-live="polite">${scoreTool.loading[language]}</p>
@@ -782,15 +1098,27 @@ function renderNotice(page, language) {
     return ''
   }
 
+  const content = `
+    <div class="notice-icon">
+      ${page.notice.type === 'facebook' ? renderFacebookLogo() : ''}
+    </div>
+    <div>
+      <h2>${page.notice.title[language]}</h2>
+      <p>${page.notice.text[language]}</p>
+    </div>
+  `
+
+  if (page.notice.url) {
+    return `
+      <a class="home-notice" href="${page.notice.url}" target="_blank" rel="noopener noreferrer" aria-label="${page.notice.title[language]}">
+        ${content}
+      </a>
+    `
+  }
+
   return `
     <section class="home-notice" aria-label="${page.notice.title[language]}">
-      <div class="notice-icon">
-        ${page.notice.type === 'facebook' ? renderFacebookLogo() : ''}
-      </div>
-      <div>
-        <h2>${page.notice.title[language]}</h2>
-        <p>${page.notice.text[language]}</p>
-      </div>
+      ${content}
     </section>
   `
 }
@@ -862,6 +1190,40 @@ function renderContactBand(copy) {
   `
 }
 
+function renderFooter(language, isMemberPortal = false) {
+  if (isMemberPortal) {
+    return ''
+  }
+
+  const copy = {
+    en: {
+      privacyTitle: 'Privacy',
+      privacyText: 'Hawkesbury Junior Golf collects and uses personal information only to operate the program, manage member accounts, communicate with parents and players, organize lessons, events, games, scores, and points, and meet safety or administrative needs. We do not sell personal information. Questions or privacy requests can be sent to info@hawkesburyjrgolf.ca.',
+      disclaimerTitle: 'Disclaimer',
+      disclaimerText: 'Program details, schedules, events, points, and availability may change. Participation in golf and related activities involves inherent risks, and parents or guardians are responsible for deciding whether activities are appropriate for their junior golfer. Website information is provided for general program purposes and is not legal, medical, financial, or professional advice.',
+    },
+    fr: {
+      privacyTitle: 'Confidentialité',
+      privacyText: 'Hawkesbury Junior Golf recueille et utilise les renseignements personnels seulement pour gérer le programme, les comptes membres, les communications avec les parents et les joueurs, les leçons, événements, parties, scores et points, ainsi que les besoins de sécurité ou d’administration. Nous ne vendons pas les renseignements personnels. Les questions ou demandes de confidentialité peuvent être envoyées à info@hawkesburyjrgolf.ca.',
+      disclaimerTitle: 'Avis',
+      disclaimerText: 'Les détails du programme, les horaires, les événements, les points et les disponibilités peuvent changer. La participation au golf et aux activités connexes comporte des risques inhérents, et les parents ou tuteurs sont responsables de décider si les activités conviennent à leur jeune golfeur. Les renseignements du site sont fournis à des fins générales du programme et ne constituent pas des conseils juridiques, médicaux, financiers ou professionnels.',
+    },
+  }[language]
+
+  return `
+    <footer class="site-footer">
+      <details>
+        <summary>${copy.privacyTitle}</summary>
+        <p>${copy.privacyText}</p>
+      </details>
+      <details>
+        <summary>${copy.disclaimerTitle}</summary>
+        <p>${copy.disclaimerText}</p>
+      </details>
+    </footer>
+  `
+}
+
 function renderLoginPanel(page, language) {
   const loginForm = page.loginForm
   const signupForm = page.signupForm
@@ -884,41 +1246,44 @@ function renderLoginPanel(page, language) {
         <p class="eyebrow">${page.eyebrow[language]}</p>
         <h2>${signupForm.title[language]}</h2>
         <p class="login-notice">${signupForm.notice[language]}</p>
-        <div class="form-grid two-column">
+        <div class="join-entry-fields" data-join-fields>
+          <div class="form-grid two-column">
+            <label>
+              <span>${signupForm.firstNameLabel[language]}</span>
+              <input type="text" name="first_name" autocomplete="given-name" required />
+            </label>
+            <label>
+              <span>${signupForm.lastNameLabel[language]}</span>
+              <input type="text" name="last_name" autocomplete="family-name" required />
+            </label>
+          </div>
           <label>
-            <span>${signupForm.firstNameLabel[language]}</span>
-            <input type="text" name="first_name" autocomplete="given-name" required />
+            <span>${signupForm.parentEmailLabel[language]}</span>
+            <input type="email" name="parent_email" autocomplete="email" required />
           </label>
           <label>
-            <span>${signupForm.lastNameLabel[language]}</span>
-            <input type="text" name="last_name" autocomplete="family-name" required />
+            <span>${signupForm.membershipTypeLabel[language]}</span>
+            <span class="membership-toggle">
+              <input type="radio" id="membership-cup" name="membership_type" value="CUP" checked />
+              <label for="membership-cup">${signupForm.membershipOptions.cup[language]}</label>
+              <input type="radio" id="membership-community" name="membership_type" value="COMMUNITY" />
+              <label for="membership-community">${signupForm.membershipOptions.community[language]}</label>
+            </span>
           </label>
+          <div class="form-grid two-column">
+            <label>
+              <span>${signupForm.usernameLabel[language]}</span>
+              <input type="text" name="username" autocomplete="username" required />
+            </label>
+            <label>
+              <span>${signupForm.passwordLabel[language]}</span>
+              <input type="password" name="password" autocomplete="new-password" required />
+            </label>
+          </div>
         </div>
-        <label>
-          <span>${signupForm.parentEmailLabel[language]}</span>
-          <input type="email" name="parent_email" autocomplete="email" required />
-        </label>
-        <label>
-          <span>${signupForm.membershipTypeLabel[language]}</span>
-          <span class="membership-toggle">
-            <input type="radio" id="membership-cup" name="membership_type" value="CUP" checked />
-            <label for="membership-cup">${signupForm.membershipOptions.cup[language]}</label>
-            <input type="radio" id="membership-community" name="membership_type" value="COMMUNITY" />
-            <label for="membership-community">${signupForm.membershipOptions.community[language]}</label>
-          </span>
-        </label>
-        <div class="form-grid two-column">
-          <label>
-            <span>${signupForm.usernameLabel[language]}</span>
-            <input type="text" name="username" autocomplete="username" required />
-          </label>
-          <label>
-            <span>${signupForm.passwordLabel[language]}</span>
-            <input type="password" name="password" autocomplete="new-password" required />
-          </label>
-        </div>
-        <button type="submit">${signupForm.button[language]}</button>
+        <button type="submit" data-default-label="${signupForm.button[language]}" data-created-label="${signupForm.createdButton[language]}">${signupForm.button[language]}</button>
         <p class="login-status" data-account-status aria-live="polite"></p>
+        <button class="register-new-junior-button is-hidden" type="button" data-register-new-junior>${signupForm.registerNewJuniorButton[language]}</button>
         <p class="login-helper">${signupForm.helper[language]}</p>
       </form>
       <form class="login-card" data-account-form="login">
@@ -936,6 +1301,7 @@ function renderLoginPanel(page, language) {
         <button type="submit">${loginForm.button[language]}</button>
         <p class="login-status" data-account-status aria-live="polite"></p>
         <p class="login-helper">${loginForm.helper[language]}</p>
+        <p class="login-version">Version ${appVersion}</p>
       </form>
       <form class="login-card is-hidden" data-account-form="resend">
         <p class="eyebrow">${page.eyebrow[language]}</p>
@@ -990,7 +1356,6 @@ function renderLoginPanel(page, language) {
         <p class="login-status" data-account-status aria-live="polite"></p>
         <p class="login-helper">${profileForm.helper[language]}</p>
       </form>
-      <p class="login-version">Version ${appVersion}</p>
     </section>
   `
 }
@@ -1003,29 +1368,42 @@ export function renderPage({ routes, page, language, copy, isLoggedIn, member, i
         ${isMemberPortal ? '' : renderHero(page, language)}
         ${renderLoginPanel(page, language)}
       </main>
+      ${renderFooter(language, isMemberPortal)}
     `
   }
 
   if (page.template === 'account') {
     return `
-      ${renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal })}
+      ${renderHeader({ routes, page, language, copy, isLoggedIn, member, isMemberPortal })}
       <main>
         ${renderAccountPage(page, language, member, copy, isMemberPortal)}
       </main>
+      ${renderFooter(language, isMemberPortal)}
     `
   }
 
   if (page.template === 'accountSubpage') {
     return `
-      ${renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal })}
+      ${renderHeader({ routes, page, language, copy, isLoggedIn, member, isMemberPortal })}
       <main>
         ${renderAccountSubpage(page, language, member, isMemberPortal)}
       </main>
+      ${renderFooter(language, isMemberPortal)}
+    `
+  }
+
+  if (page.template === 'adminPanel') {
+    return `
+      ${renderHeader({ routes, page, language, copy, isLoggedIn, member, isMemberPortal })}
+      <main>
+        ${renderAdminPage(page, language, member)}
+      </main>
+      ${renderFooter(language, isMemberPortal)}
     `
   }
 
   return `
-    ${renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal })}
+    ${renderHeader({ routes, page, language, copy, isLoggedIn, member, isMemberPortal })}
     <main>
       ${renderHero(page, language)}
       ${renderQuickPanel(page, language, copy)}
@@ -1034,5 +1412,6 @@ export function renderPage({ routes, page, language, copy, isLoggedIn, member, i
       ${renderServiceArea(copy)}
       ${renderContactBand(copy)}
     </main>
+    ${renderFooter(language, isMemberPortal)}
   `
 }

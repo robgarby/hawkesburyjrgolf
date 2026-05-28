@@ -28,6 +28,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/textme.php';
+
+if (!function_exists('is_member_admin_type')) {
+    function is_member_admin_type(string $type): bool
+    {
+        return in_array(strtoupper(trim($type)), ['SUPER_ADMIN', 'ADMIN'], true);
+    }
+}
+
+if (!function_exists('is_super_admin_type')) {
+    function is_super_admin_type(string $type): bool
+    {
+        return strtoupper(trim($type)) === 'SUPER_ADMIN';
+    }
+}
 
 function send_json(int $status, array $payload): void
 {
@@ -94,6 +109,7 @@ function get_events(PDO $pdo, int $memberId): array
 {
     $memberDetails = get_member_details($pdo, $memberId);
     $playerAge = $memberDetails['playerAge'];
+    $memberType = $memberDetails['membershipType'];
     $statement = $pdo->query(
         'SELECT id, created_by_member_id, event_name, event_date, event_time, winner_points, participant_points, max_players, event_path, min_age, max_age, community_cost, location, description, winner, attendee_csv, created_at
          FROM member_events
@@ -133,6 +149,12 @@ function get_events(PDO $pdo, int $memberId): array
             'attendeeCount' => $attendeeCount,
             'spotsRemaining' => $maxPlayers > 0 ? max(0, $maxPlayers - $attendeeCount) : null,
             'isJoined' => in_array($memberId, array_column($attendees, 'memberId'), true),
+            'canManage' => member_can_manage_event($event, $memberId, $memberType),
+            'canEdit' => is_super_admin_type($memberType)
+                || (is_member_admin_type($memberType) && (int) $event['created_by_member_id'] === $memberId),
+            'canDelete' => is_super_admin_type($memberType)
+                || (is_member_admin_type($memberType) && (int) $event['created_by_member_id'] === $memberId),
+            'canAddPlayer' => is_super_admin_type($memberType),
             'createdAt' => $event['created_at'],
         ];
 
@@ -159,6 +181,75 @@ function get_member_details(PDO $pdo, int $memberId): array
     ];
 }
 
+function get_member_display_name(PDO $pdo, int $memberId): string
+{
+    $statement = $pdo->prepare(
+        'SELECT first_name, last_name, username
+         FROM members
+         WHERE id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $memberId]);
+    $member = $statement->fetch() ?: [];
+    $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+
+    return $name !== '' ? $name : (string) ($member['username'] ?? 'HJG');
+}
+
+function get_active_juniors(PDO $pdo): array
+{
+    $statement = $pdo->query(
+        "SELECT id, first_name, last_name, username, membership_type, player_age
+         FROM members
+         WHERE is_active = 1
+           AND membership_type IN ('CUP', 'COMMUNITY')
+         ORDER BY membership_type ASC, first_name ASC, last_name ASC, username ASC"
+    );
+    $juniors = [
+        'CUP' => [],
+        'COMMUNITY' => [],
+    ];
+
+    foreach ($statement->fetchAll() as $row) {
+        $path = (string) $row['membership_type'];
+        $name = trim((string) (($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? '')));
+
+        $juniors[$path][] = [
+            'id' => (int) $row['id'],
+            'name' => $name !== '' ? $name : (string) ($row['username'] ?? 'Junior'),
+            'username' => $row['username'],
+            'membershipType' => $path,
+            'playerAge' => isset($row['player_age']) ? (int) $row['player_age'] : null,
+        ];
+    }
+
+    return $juniors;
+}
+
+function get_active_junior(PDO $pdo, int $memberId): ?array
+{
+    $statement = $pdo->prepare(
+        "SELECT id, membership_type, player_age
+         FROM members
+         WHERE id = :id
+           AND is_active = 1
+           AND membership_type IN ('CUP', 'COMMUNITY')
+         LIMIT 1"
+    );
+    $statement->execute(['id' => $memberId]);
+    $junior = $statement->fetch();
+
+    if (!$junior) {
+        return null;
+    }
+
+    return [
+        'id' => (int) $junior['id'],
+        'membershipType' => (string) $junior['membership_type'],
+        'playerAge' => isset($junior['player_age']) ? (int) $junior['player_age'] : null,
+    ];
+}
+
 function path_allows_member(string $path, string $memberType): bool
 {
     if ($path === 'EVERYONE') {
@@ -166,6 +257,12 @@ function path_allows_member(string $path, string $memberType): bool
     }
 
     return $memberType === $path;
+}
+
+function member_can_manage_event(array $event, int $memberId, string $memberType): bool
+{
+    return is_super_admin_type($memberType)
+        || (is_member_admin_type($memberType) && (int) ($event['created_by_member_id'] ?? 0) === $memberId);
 }
 
 function age_allows_member(?int $minAge, ?int $maxAge, ?int $playerAge): bool
@@ -183,6 +280,96 @@ function age_allows_member(?int $minAge, ?int $maxAge, ?int $playerAge): bool
     }
 
     return $maxAge === null || $playerAge <= $maxAge;
+}
+
+function mask_text_number(?string $number): string
+{
+    $digits = preg_replace('/\D+/', '', (string) $number) ?? '';
+
+    return strlen($digits) < 4 ? '' : '***-***-' . substr($digits, -4);
+}
+
+function build_event_text_preview(
+    PDO $pdo,
+    int $createdByMemberId,
+    string $posterName,
+    string $eventName,
+    string $eventPath,
+    ?int $minAge,
+    ?int $maxAge,
+    string $eventDate,
+    string $eventTime,
+    string $location,
+    string $description,
+    int $maxPlayers
+): array {
+    if ($maxPlayers < 1) {
+        return ['dryRun' => true, 'message' => '', 'recipients' => []];
+    }
+
+    $message = sprintf(
+        "HJG Notice: A new event has been added by %s.\n\nEvent: %s\nDate: %s\nTime: %s\nLocation: %s\nSpots open: %d\nDetails: %s\n\nYou can Add or Join this event in the HJG Website or App.",
+        $posterName,
+        $eventName,
+        $eventDate,
+        $eventTime,
+        $location,
+        $maxPlayers,
+        $description
+    );
+
+    $statement = $pdo->query(
+        "SELECT id, first_name, last_name, username, membership_type, player_age,
+                parent_text, player_text, notify_events_player_text, notify_events_parent_text
+         FROM members
+         WHERE is_active = 1
+           AND membership_type IN ('CUP', 'COMMUNITY')
+           AND (notify_events_player_text = 1 OR notify_events_parent_text = 1)
+         ORDER BY first_name ASC, last_name ASC, username ASC, id ASC"
+    );
+    $recipients = [];
+
+    foreach ($statement->fetchAll() as $member) {
+        $memberId = (int) $member['id'];
+
+        if ($memberId === $createdByMemberId) {
+            continue;
+        }
+
+        if (
+            !path_allows_member($eventPath, (string) ($member['membership_type'] ?? ''))
+            || !age_allows_member($minAge, $maxAge, isset($member['player_age']) ? (int) $member['player_age'] : null)
+        ) {
+            continue;
+        }
+
+        $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+        $name = $name !== '' ? $name : (string) ($member['username'] ?? 'Member');
+
+        if ((bool) $member['notify_events_player_text'] && trim((string) ($member['player_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'player',
+                'to' => $member['player_text'],
+                'phone' => mask_text_number($member['player_text']),
+                'message' => $message,
+            ];
+        }
+
+        if ((bool) $member['notify_events_parent_text'] && trim((string) ($member['parent_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'parent',
+                'to' => $member['parent_text'],
+                'phone' => mask_text_number($member['parent_text']),
+                'message' => $message,
+            ];
+        }
+    }
+
+    return ['dryRun' => true, 'contextLabel' => 'event', 'message' => $message, 'recipients' => $recipients];
 }
 
 function read_age_range(): array
@@ -206,16 +393,27 @@ function read_age_range(): array
     return [$minAge, $maxAge];
 }
 
-function send_events_response(PDO $pdo, int $memberId, string $message = ''): void
+function send_events_response(PDO $pdo, int $memberId, string $message = '', ?array $textResults = null): void
 {
     $events = get_events($pdo, $memberId);
+    $memberDetails = get_member_details($pdo, $memberId);
 
-    send_json(200, [
+    $payload = [
         'ok' => true,
         'message' => $message,
         'upcoming' => $events['upcoming'],
         'past' => array_reverse($events['past']),
-    ]);
+    ];
+
+    if (is_super_admin_type($memberDetails['membershipType'])) {
+        $payload['activeJuniors'] = get_active_juniors($pdo);
+    }
+
+    if ($textResults !== null) {
+        $payload['textResults'] = $textResults;
+    }
+
+    send_json(200, $payload);
 }
 
 try {
@@ -223,8 +421,10 @@ try {
     $memberId = (int) $member['sub'];
     $pdo = get_database();
 
-    ensure_members_table($pdo);
-    ensure_member_events_table($pdo);
+    run_schema_setup('Events service', static function () use ($pdo): void {
+        ensure_members_table($pdo);
+        ensure_member_events_table($pdo);
+    });
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         send_events_response($pdo, $memberId);
@@ -376,6 +576,103 @@ try {
         send_events_response($pdo, $memberId, 'You have been removed from the event.');
     }
 
+    if ($action === 'add_attendee') {
+        $memberDetails = get_member_details($pdo, $memberId);
+
+        if (!is_super_admin_type($memberDetails['membershipType'])) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'Only super admins can add players to events.',
+            ]);
+        }
+
+        $eventId = filter_var($_POST['event_id'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        $targetMemberId = filter_var($_POST['member_id'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+
+        if ($eventId === false || $targetMemberId === false) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please choose a valid event and player.',
+            ]);
+        }
+
+        $eventStatement = $pdo->prepare(
+            'SELECT id, event_date, max_players, event_path, min_age, max_age
+             FROM member_events
+             WHERE id = :id
+             LIMIT 1'
+        );
+        $eventStatement->execute(['id' => (int) $eventId]);
+        $event = $eventStatement->fetch();
+
+        if (!$event) {
+            send_json(404, [
+                'ok' => false,
+                'message' => 'Event not found.',
+            ]);
+        }
+
+        $today = (new DateTimeImmutable('today'))->format('Y-m-d');
+
+        if ($event['event_date'] < $today) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Past events cannot be changed.',
+            ]);
+        }
+
+        $junior = get_active_junior($pdo, (int) $targetMemberId);
+
+        if (!$junior) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please choose an active junior.',
+            ]);
+        }
+
+        $eventPath = (string) ($event['event_path'] ?? 'EVERYONE');
+        $minAge = $event['min_age'] === null ? null : (int) $event['min_age'];
+        $maxAge = $event['max_age'] === null ? null : (int) $event['max_age'];
+
+        if (!path_allows_member($eventPath, $junior['membershipType']) || !age_allows_member($minAge, $maxAge, $junior['playerAge'])) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'This player does not match the event path or age range.',
+            ]);
+        }
+
+        $countStatement = $pdo->prepare(
+            'SELECT COUNT(*) AS attendee_count
+             FROM member_event_attendees
+             WHERE event_id = :event_id'
+        );
+        $countStatement->execute(['event_id' => (int) $eventId]);
+        $attendeeCount = (int) ($countStatement->fetch()['attendee_count'] ?? 0);
+        $maxPlayers = (int) $event['max_players'];
+
+        if ($maxPlayers > 0 && $attendeeCount >= $maxPlayers) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'This event is full.',
+            ]);
+        }
+
+        $insertAttendee = $pdo->prepare(
+            'INSERT IGNORE INTO member_event_attendees (event_id, member_id)
+             VALUES (:event_id, :member_id)'
+        );
+        $insertAttendee->execute([
+            'event_id' => (int) $eventId,
+            'member_id' => $junior['id'],
+        ]);
+
+        send_events_response($pdo, $memberId, 'Player added to event.');
+    }
+
     if (!in_array($action, ['add_event', 'update_event', 'delete_event'], true)) {
         send_json(422, [
             'ok' => false,
@@ -391,11 +688,12 @@ try {
     );
     $memberStatement->execute(['id' => $memberId]);
     $memberRow = $memberStatement->fetch();
+    $managerType = (string) ($memberRow['membership_type'] ?? '');
 
-    if (!in_array(($memberRow['membership_type'] ?? ''), ['ADMIN', 'TEACHER'], true)) {
+    if ($action === 'add_event' && !is_member_admin_type($managerType)) {
         send_json(403, [
             'ok' => false,
-            'message' => 'Only admins and teachers can manage events.',
+            'message' => 'Only admins can add events.',
         ]);
     }
 
@@ -414,17 +712,29 @@ try {
         }
 
         $existingEvent = $pdo->prepare(
-            'SELECT id
+            'SELECT id, created_by_member_id
              FROM member_events
              WHERE id = :id
              LIMIT 1'
         );
         $existingEvent->execute(['id' => (int) $eventId]);
+        $existingEventRow = $existingEvent->fetch();
 
-        if (!$existingEvent->fetch()) {
+        if (!$existingEventRow) {
             send_json(404, [
                 'ok' => false,
                 'message' => 'Event not found.',
+            ]);
+        }
+
+        if (
+            in_array($action, ['update_event', 'delete_event'], true)
+            && !is_super_admin_type($managerType)
+            && (!is_member_admin_type($managerType) || (int) $existingEventRow['created_by_member_id'] !== $memberId)
+        ) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'Admins can only edit or remove events they created.',
             ]);
         }
     }
@@ -440,6 +750,7 @@ try {
     }
 
     $eventName = trim((string) ($_POST['event_name'] ?? ''));
+    $shouldNotifyOthers = $action === 'add_event' && isset($_POST['notify_others']);
     $eventDate = trim((string) ($_POST['event_date'] ?? ''));
     $eventTime = trim((string) ($_POST['event_time'] ?? ''));
     $winnerPoints = filter_var($_POST['winner_points'] ?? null, FILTER_VALIDATE_INT, [
@@ -560,7 +871,27 @@ try {
         'attendee_csv' => $attendeeCsv,
     ]);
 
-    send_events_response($pdo, $memberId, 'Event saved.');
+    $textResults = null;
+
+    if ($shouldNotifyOthers) {
+        $textNotice = build_event_text_preview(
+            $pdo,
+            $memberId,
+            get_member_display_name($pdo, $memberId),
+            $eventName,
+            $eventPath,
+            $minAge,
+            $maxAge,
+            $eventDate,
+            $eventTime,
+            $location,
+            $description,
+            (int) $maxPlayers
+        );
+        $textResults = send_text_messages($textNotice['recipients'], $textNotice['message']);
+    }
+
+    send_events_response($pdo, $memberId, 'Event saved.', $textResults);
 } catch (Throwable $error) {
     error_log('Events service error: ' . $error->getMessage());
 

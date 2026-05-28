@@ -44,7 +44,9 @@ try {
     }
 
     $pdo = get_database();
-    ensure_received_texts_table($pdo);
+    run_schema_setup('Receive text service', static function () use ($pdo): void {
+        ensure_received_texts_table($pdo);
+    });
 
     $statement = $pdo->prepare(
         'INSERT INTO receivedTexts

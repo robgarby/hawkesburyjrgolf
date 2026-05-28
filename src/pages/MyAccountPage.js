@@ -73,3 +73,36 @@ export const myAccountPage = {
     }
   ]
 }
+
+export const adminPanelPage = {
+  "id": "admin-panel",
+  "title": {
+    "en": "Admin Panel",
+    "fr": "Panneau admin"
+  },
+  "eyebrow": {
+    "en": "Super admin",
+    "fr": "Super admin"
+  },
+  "heading": {
+    "en": "Admin Panel",
+    "fr": "Panneau admin"
+  },
+  "intro": {
+    "en": "Manage accounts, roles, points, rounds, events, lessons, cash outs, and messages.",
+    "fr": "Gérez les comptes, rôles, points, rondes, événements, leçons, demandes de points et messages."
+  },
+  "template": "adminPanel",
+  "hideFromNav": true,
+  "accountArea": true,
+  "seo": {
+    "en": {
+      "title": "Admin Panel | Hawkesbury Junior Golf",
+      "description": "Super admin tools for Hawkesbury Junior Golf."
+    },
+    "fr": {
+      "title": "Panneau admin | Hawkesbury Junior Golf",
+      "description": "Outils super admin pour Hawkesbury Junior Golf."
+    }
+  }
+}

@@ -13,22 +13,22 @@ export const ourProgramPage = {
     "fr": "Deux parcours pour les jeunes golfeurs de Hawkesbury."
   },
   "intro": {
-    "en": "Cup Members and Community Members share one My Account area for lessons, events, scores, points, and finding a game. Cup Members are part of the club pathway, while Community Members can still request free volunteer-coach lessons in My Account and join sponsored or open events.",
-    "fr": "Les membres Cup et les membres communautaires utilisent le même espace Mon compte pour les leçons, les événements, les scores, les points et la recherche de parties. Les membres Cup font partie du parcours du club, tandis que les membres communautaires peuvent aussi demander des leçons gratuites avec des entraîneurs bénévoles dans Mon compte et joindre des événements commandités ou ouverts."
+    "en": "Member and Community players share one My Account area for lessons, events, scores, points, and finding a game. Members are part of the club pathway, while Community players can still request free volunteer-coach lessons in My Account and join sponsored or open events.",
+    "fr": "Les membres et les joueurs communautaires utilisent le même espace Mon compte pour les leçons, les événements, les scores, les points et la recherche de parties. Les membres font partie du parcours du club, tandis que les joueurs communautaires peuvent aussi demander des leçons gratuites avec des entraîneurs bénévoles dans Mon compte et joindre des événements commandités ou ouverts."
   },
   "image": "/images/junior-golfer-girl.jpeg",
   "cta": {
-    "en": "Learn about The Cup",
-    "fr": "Découvrir La Coupe"
+    "en": "Learn about Member Golf",
+    "fr": "Découvrir le golf membre"
   },
   "seo": {
     "en": {
       "title": "Junior Golf Program in Hawkesbury",
-      "description": "Hawkesbury Junior Golf has two paths: The Cup for Members of Hawkesbury Golf and Curling Club and Community Golf for families who create a free Hawkesbury Jr. Golf account."
+      "description": "Hawkesbury Junior Golf has two paths: Member Golf for Members of Hawkesbury Golf and Curling Club and Community Golf for families who create a free Hawkesbury Jr. Golf account."
     },
     "fr": {
       "title": "Programme de golf junior à Hawkesbury",
-      "description": "Hawkesbury Junior Golf propose deux parcours: La Coupe pour les membres du Hawkesbury Golf and Curling Club et Golf communautaire pour les membres communautaires du volet gratuit Hawkesbury Jr. Golf."
+      "description": "Hawkesbury Junior Golf propose deux parcours: Golf membre pour les membres du Hawkesbury Golf and Curling Club et Golf communautaire pour les membres communautaires du volet gratuit Hawkesbury Jr. Golf."
     }
   },
   "ctaRoute": "the-cup",
@@ -36,12 +36,12 @@ export const ourProgramPage = {
   "sections": [
     {
       "title": {
-        "en": "The Cup",
-        "fr": "La Coupe"
+        "en": "Member Golf",
+        "fr": "Golf membre"
       },
       "text": {
-        "en": "The Cup program gives junior Members of Hawkesbury Golf and Curling Club a full season of matches, coaching, prizes, event opportunities, and points.",
-        "fr": "Le programme de La Coupe offre aux membres juniors du Hawkesbury Golf and Curling Club une saison complète de matchs, d'encadrement, de prix, d'occasions d'événements et de points."
+        "en": "Member Golf gives junior Members of Hawkesbury Golf and Curling Club a full season of matches, coaching, prizes, event opportunities, and points.",
+        "fr": "Le golf membre offre aux membres juniors du Hawkesbury Golf and Curling Club une saison complète de matchs, d'encadrement, de prix, d'occasions d'événements et de points."
       },
       "bullets": {
         "en": [
@@ -50,7 +50,7 @@ export const ourProgramPage = {
           "Additional golf any time juniors choose to play with their membership",
           "Use My Account to find other juniors to play with when organized events are not planned",
           "Post scores and round details in My Account so rounds can be tracked through the season",
-          "Earn Ranking Points for participation in inter-club matches toward representing Hawkesbury in the annual Hawkesbury Jr. Cup",
+          "Earn Ranking Points for participation in inter-club matches toward representing Hawkesbury in annual junior team opportunities",
           "Earn points that juniors can use to purchase golf-related items at the Hawkesbury Golf Course Pro Shop, like golf balls, gloves, shoes, clubs, and more",
           "Lessons included throughout the program",
           "Swing video analysis and a video account for reviewing progress",
@@ -63,7 +63,7 @@ export const ourProgramPage = {
           "Golf additionnel selon le choix des juniors grâce à leur adhésion",
           "Utiliser Mon compte pour trouver d’autres juniors avec qui jouer lorsqu’aucun événement organisé n’est prévu",
           "Inscrire les scores et les détails des rondes dans Mon compte afin de suivre les rondes durant la saison",
-          "Accumulation de points de classement pour la participation aux matchs interclubs afin de représenter Hawkesbury à la Coupe junior annuelle de Hawkesbury",
+          "Accumulation de points de classement pour la participation aux matchs interclubs afin de représenter Hawkesbury lors d’occasions annuelles d’équipe junior",
           "Accumulation de points que les juniors peuvent utiliser pour acheter des articles de golf à la boutique du pro du Hawkesbury Golf Course, comme des balles, gants, souliers, bâtons et plus",
           "Leçons incluses tout au long du programme",
           "Analyse vidéo de l’élan et compte vidéo pour revoir les progrès",
