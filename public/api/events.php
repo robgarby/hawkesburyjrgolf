@@ -30,6 +30,8 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/textme.php';
 
+const EVENT_MESSAGE_TEXTS_ENABLED = true;
+
 if (!function_exists('is_member_admin_type')) {
     function is_member_admin_type(string $type): bool
     {
@@ -49,6 +51,56 @@ function send_json(int $status, array $payload): void
     http_response_code($status);
     echo json_encode($payload);
     exit;
+}
+
+function generate_live_score_code(PDO $pdo): string
+{
+    $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    $statement = $pdo->prepare(
+        'SELECT id
+         FROM member_event_attendees
+         WHERE live_score_code = :code
+         LIMIT 1'
+    );
+
+    for ($attempt = 0; $attempt < 40; $attempt++) {
+        $code = '';
+
+        for ($index = 0; $index < 4; $index++) {
+            $code .= $alphabet[random_int(0, strlen($alphabet) - 1)];
+        }
+
+        $statement->execute(['code' => $code]);
+
+        if (!$statement->fetch()) {
+            return $code;
+        }
+    }
+
+    throw new RuntimeException('Unable to generate a live scoring code.');
+}
+
+function ensure_live_score_codes(PDO $pdo, int $eventId): void
+{
+    $statement = $pdo->prepare(
+        "SELECT id
+         FROM member_event_attendees
+         WHERE event_id = :event_id
+           AND (live_score_code = '' OR live_score_code IS NULL)"
+    );
+    $statement->execute(['event_id' => $eventId]);
+    $update = $pdo->prepare(
+        'UPDATE member_event_attendees
+         SET live_score_code = :code
+         WHERE id = :id'
+    );
+
+    foreach ($statement->fetchAll() as $row) {
+        $update->execute([
+            'code' => generate_live_score_code($pdo),
+            'id' => (int) $row['id'],
+        ]);
+    }
 }
 
 function get_member_payload(): array
@@ -81,9 +133,12 @@ function get_member_payload(): array
 function get_event_attendees(PDO $pdo, int $eventId): array
 {
     $statement = $pdo->prepare(
-        'SELECT attendees.member_id, attendees.created_at, members.first_name, members.last_name, members.username, members.membership_type
+        'SELECT attendees.member_id, attendees.team_name, attendees.tee_time, attendees.scoring_for_member_id, attendees.scoring_for_team_name, attendees.scoring_for_group, attendees.live_score_code, attendees.created_at,
+                members.first_name, members.last_name, members.username, members.membership_type,
+                scoring_members.first_name AS scoring_first_name, scoring_members.last_name AS scoring_last_name, scoring_members.username AS scoring_username
          FROM member_event_attendees attendees
          INNER JOIN members ON members.id = attendees.member_id
+         LEFT JOIN members scoring_members ON scoring_members.id = attendees.scoring_for_member_id
          WHERE attendees.event_id = :event_id
          ORDER BY attendees.created_at ASC, attendees.id ASC'
     );
@@ -92,13 +147,64 @@ function get_event_attendees(PDO $pdo, int $eventId): array
     return array_map(
         static function (array $attendee): array {
             $name = trim((string) ($attendee['first_name'] . ' ' . $attendee['last_name']));
+            $scoringName = trim((string) (($attendee['scoring_first_name'] ?? '') . ' ' . ($attendee['scoring_last_name'] ?? '')));
 
             return [
                 'memberId' => (int) $attendee['member_id'],
                 'name' => $name !== '' ? $name : $attendee['username'],
                 'username' => $attendee['username'],
                 'membershipType' => $attendee['membership_type'],
+                'teamName' => $attendee['team_name'] ?? '',
+                'teeTime' => $attendee['tee_time'] === null ? '' : substr((string) $attendee['tee_time'], 0, 5),
+                'scoringForMemberId' => $attendee['scoring_for_member_id'] === null ? 0 : (int) $attendee['scoring_for_member_id'],
+                'scoringForTeamName' => $attendee['scoring_for_team_name'] ?? '',
+                'scoringForGroup' => (bool) $attendee['scoring_for_group'],
+                'liveScoreCode' => $attendee['live_score_code'] ?? '',
+                'scoringForName' => (bool) $attendee['scoring_for_group']
+                    ? 'Whole Group'
+                    : (trim((string) ($attendee['scoring_for_team_name'] ?? '')) !== ''
+                    ? (string) $attendee['scoring_for_team_name']
+                    : ($scoringName !== '' ? $scoringName : (string) ($attendee['scoring_username'] ?? ''))),
                 'joinedAt' => $attendee['created_at'],
+            ];
+        },
+        $statement->fetchAll()
+    );
+}
+
+function get_event_standings(PDO $pdo, int $eventId): array
+{
+    $statement = $pdo->prepare(
+        "SELECT rounds.id, rounds.member_id, rounds.score, rounds.hole_scores, rounds.tee, rounds.created_at,
+                attendees.team_name, attendees.tee_time,
+                members.first_name, members.last_name, members.username, members.membership_type
+         FROM member_rounds rounds
+         INNER JOIN members ON members.id = rounds.member_id
+         LEFT JOIN member_event_attendees attendees
+            ON attendees.event_id = rounds.source_event_id
+           AND attendees.member_id = rounds.member_id
+         WHERE rounds.source_event_id = :event_id
+           AND rounds.format = 'score'
+           AND rounds.score REGEXP '^[0-9]+$'
+         ORDER BY CAST(rounds.score AS UNSIGNED) ASC, rounds.created_at ASC"
+    );
+    $statement->execute(['event_id' => $eventId]);
+
+    return array_map(
+        static function (array $row): array {
+            $name = trim((string) (($row['first_name'] ?? '') . ' ' . ($row['last_name'] ?? '')));
+
+            return [
+                'roundId' => (int) $row['id'],
+                'memberId' => (int) $row['member_id'],
+                'name' => $name !== '' ? $name : (string) ($row['username'] ?? 'Junior'),
+                'membershipType' => $row['membership_type'],
+                'teamName' => $row['team_name'] ?? '',
+                'teeTime' => $row['tee_time'] === null ? '' : substr((string) $row['tee_time'], 0, 5),
+                'tee' => $row['tee'],
+                'score' => (int) $row['score'],
+                'holeScores' => json_decode((string) ($row['hole_scores'] ?? '[]'), true) ?: [],
+                'createdAt' => $row['created_at'],
             ];
         },
         $statement->fetchAll()
@@ -111,7 +217,7 @@ function get_events(PDO $pdo, int $memberId): array
     $playerAge = $memberDetails['playerAge'];
     $memberType = $memberDetails['membershipType'];
     $statement = $pdo->query(
-        'SELECT id, created_by_member_id, event_name, event_date, event_time, winner_points, participant_points, max_players, event_path, min_age, max_age, community_cost, location, description, winner, attendee_csv, created_at
+        'SELECT id, created_by_member_id, event_name, event_date, event_time, winner_points, participant_points, max_players, event_path, min_age, max_age, community_cost, event_format, teams_published, location, description, winner, attendee_csv, created_at
          FROM member_events
          ORDER BY event_date ASC, event_time ASC, id ASC'
     );
@@ -141,11 +247,14 @@ function get_events(PDO $pdo, int $memberId): array
             'maxAge' => $maxAge,
             'isAgeEligible' => age_allows_member($minAge, $maxAge, $playerAge),
             'communityCost' => (float) $event['community_cost'],
+            'eventFormat' => $event['event_format'] ?? 'TEAM',
+            'teamsPublished' => (bool) $event['teams_published'],
             'location' => $event['location'],
             'description' => $event['description'] ?? '',
             'winner' => $event['winner'],
             'attendeeCsv' => $event['attendee_csv'],
             'attendees' => $attendees,
+            'standings' => get_event_standings($pdo, (int) $event['id']),
             'attendeeCount' => $attendeeCount,
             'spotsRemaining' => $maxPlayers > 0 ? max(0, $maxPlayers - $attendeeCount) : null,
             'isJoined' => in_array($memberId, array_column($attendees, 'memberId'), true),
@@ -369,7 +478,52 @@ function build_event_text_preview(
         }
     }
 
-    return ['dryRun' => true, 'contextLabel' => 'event', 'message' => $message, 'recipients' => $recipients];
+    return ['dryRun' => true, 'contextLabel' => 'event', 'message' => append_text_reply_to($message), 'recipients' => $recipients];
+}
+
+function build_event_attendee_message_recipients(PDO $pdo, int $eventId, string $message): array
+{
+    $statement = $pdo->prepare(
+        "SELECT members.id, members.first_name, members.last_name, members.username,
+                members.parent_text, members.player_text
+         FROM member_event_attendees attendees
+         INNER JOIN members ON members.id = attendees.member_id
+         WHERE attendees.event_id = :event_id
+           AND members.is_active = 1
+         ORDER BY attendees.created_at ASC, attendees.id ASC"
+    );
+    $statement->execute(['event_id' => $eventId]);
+    $recipients = [];
+
+    foreach ($statement->fetchAll() as $member) {
+        $memberId = (int) $member['id'];
+        $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+        $name = $name !== '' ? $name : (string) ($member['username'] ?? 'Member');
+
+        if (trim((string) ($member['player_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'player',
+                'to' => $member['player_text'],
+                'phone' => mask_text_number($member['player_text']),
+                'message' => $message,
+            ];
+        }
+
+        if (trim((string) ($member['parent_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'parent',
+                'to' => $member['parent_text'],
+                'phone' => mask_text_number($member['parent_text']),
+                'message' => $message,
+            ];
+        }
+    }
+
+    return $recipients;
 }
 
 function read_age_range(): array
@@ -391,6 +545,38 @@ function read_age_range(): array
     }
 
     return [$minAge, $maxAge];
+}
+
+function read_event_hole_scores(): array
+{
+    $rawHoleScores = trim((string) ($_POST['hole_scores'] ?? ''));
+    $holeScores = json_decode($rawHoleScores, true);
+
+    if (!is_array($holeScores) || !in_array(count($holeScores), [9, 18], true)) {
+        send_json(422, [
+            'ok' => false,
+            'message' => 'Please enter either 9 or 18 hole scores.',
+        ]);
+    }
+
+    $scores = [];
+
+    foreach ($holeScores as $score) {
+        $value = filter_var($score, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 0, 'max_range' => 30],
+        ]);
+
+        if ($value === false) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please enter valid hole scores.',
+            ]);
+        }
+
+        $scores[] = (int) $value;
+    }
+
+    return $scores;
 }
 
 function send_events_response(PDO $pdo, int $memberId, string $message = '', ?array $textResults = null): void
@@ -424,6 +610,7 @@ try {
     run_schema_setup('Events service', static function () use ($pdo): void {
         ensure_members_table($pdo);
         ensure_member_events_table($pdo);
+        ensure_member_rounds_table($pdo);
     });
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -671,6 +858,311 @@ try {
         ]);
 
         send_events_response($pdo, $memberId, 'Player added to event.');
+    }
+
+    if ($action === 'save_event_teams') {
+        $memberDetails = get_member_details($pdo, $memberId);
+        $managerType = $memberDetails['membershipType'];
+        $eventId = filter_var($_POST['event_id'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+
+        if ($eventId === false) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please choose a valid event.',
+            ]);
+        }
+
+        $eventStatement = $pdo->prepare(
+            'SELECT id, created_by_member_id
+             FROM member_events
+             WHERE id = :id
+             LIMIT 1'
+        );
+        $eventStatement->execute(['id' => (int) $eventId]);
+        $event = $eventStatement->fetch();
+
+        if (!$event) {
+            send_json(404, [
+                'ok' => false,
+                'message' => 'Event not found.',
+            ]);
+        }
+
+        if (!member_can_manage_event($event, $memberId, $managerType)) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'Only event admins can manage teams.',
+            ]);
+        }
+
+        $rawAssignments = (string) ($_POST['assignments'] ?? '[]');
+        $assignments = json_decode($rawAssignments, true);
+
+        if (!is_array($assignments)) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please send valid team assignments.',
+            ]);
+        }
+
+        $eventFormat = strtoupper(trim((string) ($_POST['event_format'] ?? 'TEAM')));
+
+        if (!in_array($eventFormat, ['TEAM', 'INDIVIDUAL'], true)) {
+            $eventFormat = 'TEAM';
+        }
+
+        $update = $pdo->prepare(
+            'UPDATE member_event_attendees
+             SET team_name = :team_name,
+                 tee_time = :tee_time,
+                 scoring_for_member_id = :scoring_for_member_id,
+                 scoring_for_team_name = :scoring_for_team_name,
+                 scoring_for_group = :scoring_for_group
+             WHERE event_id = :event_id
+             AND member_id = :member_id'
+        );
+        $teamTeeTimes = [];
+        $hasNamedTeams = false;
+
+        foreach ($assignments as $assignment) {
+            if (!is_array($assignment)) {
+                continue;
+            }
+
+            $teamName = trim((string) ($assignment['teamName'] ?? ''));
+            if ($eventFormat === 'INDIVIDUAL') {
+                $teamName = '';
+            }
+            $teeTime = trim((string) ($assignment['teeTime'] ?? ''));
+
+            if ($teamName === '') {
+                continue;
+            }
+
+            $hasNamedTeams = true;
+
+            if ($teeTime !== '' && !preg_match('/^\d{2}:\d{2}$/', $teeTime)) {
+                send_json(422, [
+                    'ok' => false,
+                    'message' => 'Please enter valid tee times.',
+                ]);
+            }
+
+            $teamTeeTimes[$teamName] = $teeTime;
+        }
+
+        foreach ($assignments as $assignment) {
+            if (!is_array($assignment)) {
+                continue;
+            }
+
+            $targetMemberId = filter_var($assignment['memberId'] ?? null, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 1],
+            ]);
+
+            if ($targetMemberId === false) {
+                continue;
+            }
+
+            $teamName = trim((string) ($assignment['teamName'] ?? ''));
+            if ($eventFormat === 'INDIVIDUAL') {
+                $teamName = '';
+            }
+            $teamName = substr($teamName, 0, 120);
+            $teeTime = $teamName === ''
+                ? trim((string) ($assignment['teeTime'] ?? ''))
+                : (string) ($teamTeeTimes[$teamName] ?? '');
+
+            if ($teeTime !== '' && !preg_match('/^\d{2}:\d{2}$/', $teeTime)) {
+                send_json(422, [
+                    'ok' => false,
+                    'message' => 'Please enter valid tee times.',
+                ]);
+            }
+
+            $update->execute([
+                'team_name' => $teamName,
+                'tee_time' => $teeTime === '' ? null : $teeTime,
+                'scoring_for_member_id' => null,
+                'scoring_for_team_name' => '',
+                'scoring_for_group' => 0,
+                'event_id' => (int) $eventId,
+                'member_id' => (int) $targetMemberId,
+            ]);
+        }
+
+        $published = (string) ($_POST['teams_published'] ?? '0') === '1' ? 1 : 0;
+
+        if ($published) {
+            $hasPublishedStart = false;
+
+            foreach ($assignments as $assignment) {
+                if (!is_array($assignment)) {
+                    continue;
+                }
+
+                $teamName = trim((string) ($assignment['teamName'] ?? ''));
+                if ($eventFormat === 'INDIVIDUAL') {
+                    $teamName = '';
+                }
+                $teeTime = $teamName === ''
+                    ? trim((string) ($assignment['teeTime'] ?? ''))
+                    : (string) ($teamTeeTimes[$teamName] ?? '');
+
+                if ($teeTime === '') {
+                    send_json(422, [
+                        'ok' => false,
+                        'message' => $hasNamedTeams
+                            ? 'Please add a tee time for every team before publishing.'
+                            : 'Please add a starting time for every player before publishing.',
+                    ]);
+                }
+
+                $hasPublishedStart = true;
+            }
+
+            if (!$hasPublishedStart) {
+                $published = 0;
+            }
+        }
+
+        ensure_live_score_codes($pdo, (int) $eventId);
+
+        $publish = $pdo->prepare(
+            'UPDATE member_events
+             SET teams_published = :teams_published,
+                 event_format = :event_format
+             WHERE id = :id'
+        );
+        $publish->execute([
+            'teams_published' => $published,
+            'event_format' => $eventFormat,
+            'id' => (int) $eventId,
+        ]);
+
+        send_events_response($pdo, $memberId, $published ? 'Teams published.' : 'Teams saved.');
+    }
+
+    if ($action === 'send_event_message') {
+        $memberDetails = get_member_details($pdo, $memberId);
+        $managerType = $memberDetails['membershipType'];
+        $eventId = filter_var($_POST['event_id'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        $note = trim((string) ($_POST['message'] ?? ''));
+
+        if ($eventId === false) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please choose a valid event.',
+            ]);
+        }
+
+        if ($note === '') {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please enter a message to send.',
+            ]);
+        }
+
+        if (strlen($note) > 1000) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please keep event messages under 1000 characters.',
+            ]);
+        }
+
+        $eventStatement = $pdo->prepare(
+            'SELECT id, created_by_member_id, event_name
+             FROM member_events
+             WHERE id = :id
+             LIMIT 1'
+        );
+        $eventStatement->execute(['id' => (int) $eventId]);
+        $event = $eventStatement->fetch();
+
+        if (!$event) {
+            send_json(404, [
+                'ok' => false,
+                'message' => 'Event not found.',
+            ]);
+        }
+
+        if (!is_member_admin_type($managerType)) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'Only event admins can message event attendees.',
+            ]);
+        }
+
+        $messageBody = sprintf(
+            "HJG Event Message for %s:\n\n%s",
+            (string) $event['event_name'],
+            $note
+        );
+        $recipients = build_event_attendee_message_recipients($pdo, (int) $eventId, $messageBody);
+
+        if (count($recipients) < 1) {
+            send_events_response($pdo, $memberId, 'No event text recipients found.');
+        }
+
+        if (!EVENT_MESSAGE_TEXTS_ENABLED) {
+            send_events_response($pdo, $memberId, 'Preview only. No event message texts were sent.', [
+                'dryRun' => true,
+                'contextLabel' => 'event',
+                'message' => append_text_reply_to($messageBody),
+                'recipients' => $recipients,
+            ]);
+        }
+
+        $textResults = send_text_messages($recipients, $messageBody);
+
+        send_events_response($pdo, $memberId, 'Event message sent.', $textResults);
+    }
+
+    if ($action === 'update_event_score') {
+        $memberDetails = get_member_details($pdo, $memberId);
+
+        if (!is_super_admin_type($memberDetails['membershipType'])) {
+            send_json(403, [
+                'ok' => false,
+                'message' => 'Only super admins can edit event scores.',
+            ]);
+        }
+
+        $eventId = filter_var($_POST['event_id'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        $roundId = filter_var($_POST['round_id'] ?? null, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+
+        if ($eventId === false || $roundId === false) {
+            send_json(422, [
+                'ok' => false,
+                'message' => 'Please choose a valid event score.',
+            ]);
+        }
+
+        $holeScores = read_event_hole_scores();
+        $scoreTotal = array_sum($holeScores);
+        $update = $pdo->prepare(
+            'UPDATE member_rounds
+             SET score = :score,
+                 hole_scores = :hole_scores
+             WHERE id = :id
+               AND source_event_id = :event_id'
+        );
+        $update->execute([
+            'score' => (string) $scoreTotal,
+            'hole_scores' => json_encode($holeScores),
+            'id' => (int) $roundId,
+            'event_id' => (int) $eventId,
+        ]);
+
+        send_events_response($pdo, $memberId, 'Score updated.');
     }
 
     if (!in_array($action, ['add_event', 'update_event', 'delete_event'], true)) {

@@ -2,6 +2,18 @@
 declare(strict_types=1);
 
 const TEXTME_MONITOR_NUMBER = '6138803625';
+const TEXTME_REPLY_TO_LABEL = 'Reply to - 613-880-3625';
+
+function append_text_reply_to(string $message): string
+{
+    $message = trim($message);
+
+    if (stripos($message, TEXTME_REPLY_TO_LABEL) !== false) {
+        return $message;
+    }
+
+    return $message . "\n\n" . TEXTME_REPLY_TO_LABEL;
+}
 
 function send_textme_json(int $status, array $payload): void
 {
@@ -217,6 +229,7 @@ function send_text_message(string $to, string $message): string
 function send_text_messages(array $recipients, string $message): array
 {
     $recipients = add_text_monitor_recipient($recipients);
+    $message = append_text_reply_to($message);
     $results = [];
 
     foreach ($recipients as $recipient) {

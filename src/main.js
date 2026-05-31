@@ -84,6 +84,34 @@ const EVENTS_COPY = {
     removeConfirm: 'Remove this event?',
     addPlayer: 'Add Player to Event',
     hideAddPlayer: 'Hide Add Player',
+    admin: 'Admin',
+    hideAdmin: 'Hide Admin',
+    teamName: 'Team Name',
+    createTeam: 'Create Team',
+    deleteTeam: 'Delete Team',
+    eventFormat: 'Event Format',
+    teamEvent: 'Team',
+    individualEvent: 'Individual',
+    liveCode: 'Live Code',
+    teeTime: 'T-Time',
+    publishTeams: 'Publish Event',
+    unpublishTeams: 'Unpublish Event',
+    teamsPublished: 'Event published',
+    openRound: 'Open Round',
+    standings: 'Standings',
+    noStandings: 'No scores posted yet.',
+    holes: 'Holes',
+    editScore: 'Edit Score',
+    updateScore: 'Update Score',
+    unassigned: 'Unassigned',
+    saveTeams: 'Save Team/Times',
+    saveTTimes: 'Save T-Times',
+    noTeamPlayers: 'No players here.',
+    sendMessage: 'Send Message',
+    hideMessage: 'Hide Message',
+    messageLabel: 'Message',
+    messagePlaceholder: 'Remember you are playing today at 3:30. Please be there on time.',
+    sendEventMessage: 'Send message',
     player: 'Player',
     savePlayer: 'Save',
     noPlayers: 'No active juniors available.',
@@ -124,6 +152,34 @@ const EVENTS_COPY = {
     removeConfirm: 'Supprimer cet événement?',
     addPlayer: 'Ajouter un joueur à l’événement',
     hideAddPlayer: 'Masquer l’ajout de joueur',
+    admin: 'Admin',
+    hideAdmin: 'Masquer Admin',
+    teamName: 'Nom de l’équipe',
+    createTeam: 'Créer équipe',
+    deleteTeam: 'Supprimer équipe',
+    eventFormat: 'Format',
+    teamEvent: 'Équipe',
+    individualEvent: 'Individuel',
+    liveCode: 'Code direct',
+    teeTime: 'Heure de départ',
+    publishTeams: 'Publier événement',
+    unpublishTeams: 'Dépublier événement',
+    teamsPublished: 'Événement publié',
+    openRound: 'Ouvrir ronde',
+    standings: 'Classement',
+    noStandings: 'Aucun score publié.',
+    holes: 'Trous',
+    editScore: 'Modifier score',
+    updateScore: 'Mettre à jour score',
+    unassigned: 'Non assignés',
+    saveTeams: 'Enregistrer équipes/heures',
+    saveTTimes: 'Enregistrer heures',
+    noTeamPlayers: 'Aucun joueur ici.',
+    sendMessage: 'Envoyer un message',
+    hideMessage: 'Masquer le message',
+    messageLabel: 'Message',
+    messagePlaceholder: 'Rappel : vous jouez aujourd’hui à 15 h 30. Soyez là à temps.',
+    sendEventMessage: 'Envoyer le message',
     player: 'Joueur',
     savePlayer: 'Enregistrer',
     noPlayers: 'Aucun junior actif disponible.',
@@ -153,8 +209,8 @@ const FIND_GAME_COPY = {
     spotsOpen: 'spots open',
     playing: 'Playing',
     location: 'Location',
-    textPreviewTitle: 'Text preview only',
-    textPreviewIntro: 'No texts were sent. These people match the Find a Game text settings for this round:',
+    textPreviewTitle: 'Text preview',
+    textPreviewIntro: 'Recipients',
     textPreviewEmpty: 'No one would receive a text for this round.',
     textPreviewPlayer: 'Junior',
     textPreviewParent: 'Parent',
@@ -189,8 +245,8 @@ const FIND_GAME_COPY = {
     spotsOpen: 'places disponibles',
     playing: 'Joueurs',
     location: 'Lieu',
-    textPreviewTitle: 'Aperçu texto seulement',
-    textPreviewIntro: 'Aucun texto envoyé. Ces personnes correspondent aux avis texto pour cette ronde :',
+    textPreviewTitle: 'Aperçu texto',
+    textPreviewIntro: 'Destinataires',
     textPreviewEmpty: 'Personne ne recevrait un texto pour cette ronde.',
     textPreviewPlayer: 'Junior',
     textPreviewParent: 'Parent',
@@ -215,6 +271,74 @@ const FIND_GAME_COPY = {
     },
   },
 }
+const TRACK_SCORE_COPY = {
+  en: {
+    track: 'Track score',
+    hide: 'Hide scorecard',
+    title: 'Track score',
+    eventTitle: 'Track event score',
+    method: 'Scoring method',
+    holes: 'Holes',
+    regular: 'Regular',
+    stableford: 'Stableford',
+    practice: 'Practice',
+    regularHole: 'Score',
+    stablefordHole: 'Points',
+    practiceHole: 'Practice shots',
+    hole: 'Hole',
+    total: 'Total',
+    toPar: 'To par',
+    save: 'Save to Scores',
+    finish: 'Finish tracking',
+    saved: 'Score saved.',
+    saving: 'Saving score...',
+    saveError: 'Unable to save this score right now.',
+  },
+  fr: {
+    track: 'Suivre le score',
+    hide: 'Masquer la carte',
+    title: 'Suivre le score',
+    eventTitle: 'Suivre le score de l’événement',
+    method: 'Méthode de score',
+    holes: 'Trous',
+    regular: 'Régulier',
+    stableford: 'Stableford',
+    practice: 'Pratique',
+    regularHole: 'Score',
+    stablefordHole: 'Points',
+    practiceHole: 'Coups de pratique',
+    hole: 'Trou',
+    total: 'Total',
+    toPar: 'Par rapport au par',
+    save: 'Enregistrer aux scores',
+    finish: 'Terminer',
+    saved: 'Score enregistré.',
+    saving: 'Enregistrement...',
+    saveError: 'Impossible d’enregistrer ce score pour le moment.',
+  },
+}
+const LIVE_SCORE_COPY = {
+  en: {
+    loadError: 'Unable to open that scorecard.',
+    saveError: 'Unable to save this score right now.',
+    saving: 'Saving score...',
+    saved: 'Score saved.',
+    codeReady: 'Enter your code.',
+    scoreFor: 'Scoring for',
+    event: 'Event',
+    submit: 'Submit score',
+  },
+  fr: {
+    loadError: 'Impossible d’ouvrir cette carte.',
+    saveError: 'Impossible d’enregistrer ce score.',
+    saving: 'Enregistrement...',
+    saved: 'Score enregistré.',
+    codeReady: 'Entrez votre code.',
+    scoreFor: 'Score pour',
+    event: 'Événement',
+    submit: 'Envoyer score',
+  },
+}
 const LESSON_COPY = {
   en: {
     loadError: 'Unable to load lessons right now.',
@@ -233,6 +357,11 @@ const LESSON_COPY = {
     provider: 'Available by',
     requester: 'Requested by',
     students: 'Students',
+    sendText: 'Send Text',
+    hideText: 'Hide Text',
+    messageLabel: 'Message',
+    messagePlaceholder: 'Remember you are playing today at 3:30. Please be there on time.',
+    sendLessonMessage: 'Send text',
     location: 'Location',
     max: 'Maximum',
     age: 'Age',
@@ -266,6 +395,11 @@ const LESSON_COPY = {
     provider: 'Offerte par',
     requester: 'Demandée par',
     students: 'Élèves',
+    sendText: 'Envoyer texto',
+    hideText: 'Masquer le texto',
+    messageLabel: 'Message',
+    messagePlaceholder: 'Rappel : vous jouez aujourd’hui à 15 h 30. Soyez là à temps.',
+    sendLessonMessage: 'Envoyer le texto',
     location: 'Lieu',
     max: 'Maximum',
     age: 'Âge',
@@ -305,7 +439,6 @@ const ADMIN_COPY = {
     age: 'Age',
     ageNotSet: 'Age not set',
     notifications: 'Notifications',
-    notificationsReadOnly: 'Notification settings are visible to Admin, but only Super Admin can edit them.',
     publicStats: 'Scores, points, and rank visibility',
     displayScores: 'Display Scores',
     hideScores: 'Hide Scores',
@@ -345,16 +478,20 @@ const ADMIN_COPY = {
     playerTextNotify: 'Junior',
     deleteMember: 'Set Inactive',
     activateMember: 'Reactivate',
-    deleteConfirm: 'Set this member inactive? You can reactivate them later from this same Manage panel.',
+    deleteConfirm: 'Set this member inactive?',
     noStaff: 'No admins or teachers found.',
     noCup: 'No Member players found.',
     noCommunity: 'No Community members found.',
     noInactive: 'No inactive members found.',
-    textLoading: 'Preparing text preview...',
+    textLoading: 'Sending text...',
     textNoRecipients: 'No text numbers found for this selection.',
-    textSentPreview: 'Text preview ready.',
-    textError: 'Unable to prepare the text preview right now.',
+    textSentPreview: 'Text send complete.',
+    textError: 'Unable to send the text right now.',
     textRecipientCount: 'recipients',
+    memberTextTitle: 'Send Text',
+    memberTextMessage: 'Message',
+    memberTextPlaceholder: 'Example: Hi {name}, please remember your tee time today.',
+    memberTextSend: 'Send Text',
   },
   fr: {
     loadError: 'Impossible de charger les membres pour le moment.',
@@ -377,7 +514,6 @@ const ADMIN_COPY = {
     age: 'Âge',
     ageNotSet: 'Âge non indiqué',
     notifications: 'Avis',
-    notificationsReadOnly: 'Les avis sont visibles par Admin, mais seulement Super Admin peut les modifier.',
     publicStats: 'Visibilité des scores, points et classement',
     displayScores: 'Afficher les scores',
     hideScores: 'Masquer les scores',
@@ -417,24 +553,32 @@ const ADMIN_COPY = {
     playerTextNotify: 'Junior',
     deleteMember: 'Rendre inactif',
     activateMember: 'Réactiver',
-    deleteConfirm: 'Rendre ce membre inactif? Vous pourrez le réactiver plus tard dans ce même panneau.',
+    deleteConfirm: 'Rendre ce membre inactif?',
     noStaff: 'Aucun admin ou enseignant trouvé.',
     noCup: 'Aucun joueur membre trouvé.',
     noCommunity: 'Aucun membre communauté trouvé.',
     noInactive: 'Aucun membre inactif trouvé.',
-    textLoading: 'Préparation de l’aperçu texto...',
+    textLoading: 'Envoi du texto...',
     textNoRecipients: 'Aucun numéro texto trouvé pour cette sélection.',
-    textSentPreview: 'Aperçu texto prêt.',
-    textError: 'Impossible de préparer l’aperçu texto pour le moment.',
+    textSentPreview: 'Envoi texto terminé.',
+    textError: 'Impossible d’envoyer le texto pour le moment.',
     textRecipientCount: 'destinataires',
+    memberTextTitle: 'Envoyer texto',
+    memberTextMessage: 'Message',
+    memberTextPlaceholder: 'Exemple : Bonjour {name}, n’oubliez pas votre heure de départ aujourd’hui.',
+    memberTextSend: 'Envoyer texto',
   },
 }
+const TEXT_REPLY_TO_LABEL = 'Reply to - 613-880-3625'
+const ADMIN_MEMBER_MANUAL_TEXTS_ENABLED = true
+let activeAdminMemberTextPanel = null
 let pendingProfileToken = sessionStorage.getItem('pendingProfileToken') || ''
 let memberToken = localStorage.getItem(MEMBER_TOKEN_KEY) || ''
 let isLoggedIn = isStoredTokenCurrent(memberToken)
 let currentMember = getTokenPayload(memberToken)
 let currentEventsById = new Map()
 let currentFindGamesById = new Map()
+let openTrackScoreKey = ''
 let isEventAdminModeOpen = false
 let currentAdminMembers = []
 let currentAdminCashouts = []
@@ -536,9 +680,16 @@ function isMemberPortalPath() {
   return ['/member', '/members'].includes(window.location.pathname.replace(/\/+$/, ''))
 }
 
+function isLiveScoringPath() {
+  return window.location.pathname.replace(/\/+$/, '') === '/live'
+}
+
 function getCurrentRoute() {
   const isMemberPortal = isMemberPortalPath()
-  const routeId = window.location.hash.replace('#', '') || (isMemberPortal ? 'my-account' : 'home')
+  const hashRoute = window.location.hash.replace('#', '')
+  const routeId = isLiveScoringPath() && !hashRoute
+    ? 'live-score'
+    : hashRoute || (isMemberPortal ? 'my-account' : 'home')
   const page = siteContent.pageMap.get(routeId) || siteContent.pageMap.get(isMemberPortal ? 'my-account' : 'home')
 
   if (isMemberPortal && page?.template !== 'login' && !page?.accountArea) {
@@ -676,6 +827,10 @@ async function render() {
     if (adminPanel) {
       loadAdminMembers(adminPanel, language)
     }
+  }
+
+  if (page.id === 'live-score') {
+    initializeLiveScoring(language)
   }
 }
 
@@ -1220,6 +1375,53 @@ function getAdminTextRecipients(target) {
   return recipients
 }
 
+function getAdminMemberManualTextRecipients(panel) {
+  const detail = panel?.closest('.admin-point-detail') || activeAdminMemberTextPanel?.closest('.admin-point-detail')
+  const memberForm = detail?.querySelector('[data-admin-member-form]')
+  const recipients = []
+  const seenNumbers = new Set()
+
+  if (!memberForm) {
+    return recipients
+  }
+
+  const firstName = memberForm.querySelector('input[name="first_name"]')?.value || ''
+  const lastName = memberForm.querySelector('input[name="last_name"]')?.value || ''
+  const playerName = `${firstName} ${lastName}`.trim() || 'Junior'
+  const parentName = memberForm.querySelector('input[name="parent_name"]')?.value || `Parent of ${playerName}`
+  const parentText = memberForm.querySelector('input[name="parent_text"]')?.value || ''
+  const playerText = memberForm.querySelector('input[name="player_text"]')?.value || ''
+
+  addTextRecipient(recipients, seenNumbers, parentText, parentName, 'parent')
+  addTextRecipient(recipients, seenNumbers, playerText, playerName, 'junior')
+
+  return recipients
+}
+
+function setAdminMemberTextModalOpen(panel, isOpen) {
+  const modal = panel?.querySelector('[data-admin-member-text-modal]')
+
+  if (!modal) {
+    return
+  }
+
+  activeAdminMemberTextPanel = isOpen ? panel : null
+  modal.classList.toggle('is-hidden', !isOpen)
+  modal.setAttribute('aria-hidden', String(!isOpen))
+
+  if (isOpen) {
+    modal.querySelector('textarea[name="message"]')?.focus()
+  } else {
+    modal.querySelector('textarea[name="message"]') && (modal.querySelector('textarea[name="message"]').value = '')
+    const results = modal.querySelector('[data-admin-member-text-results]')
+
+    if (results) {
+      results.innerHTML = ''
+      results.classList.remove('error', 'success')
+    }
+  }
+}
+
 function renderAdminTextResults(resultsEl, result, language) {
   const copy = ADMIN_COPY[language]
   const rows = Array.isArray(result.results) ? result.results : []
@@ -1240,6 +1442,103 @@ function renderAdminTextResults(resultsEl, result, language) {
       </ul>
     ` : ''}
   `
+}
+
+function renderAdminTextPreview(resultsEl, recipients, message, language) {
+  const copy = ADMIN_COPY[language]
+  const previewMessage = message.includes(TEXT_REPLY_TO_LABEL)
+    ? message
+    : `${message}\n\n${TEXT_REPLY_TO_LABEL}`
+
+  resultsEl.classList.add('success')
+  resultsEl.classList.remove('error')
+  resultsEl.innerHTML = `
+    <small>${recipients.length} ${escapeHtml(copy.textRecipientCount)}</small>
+    <p><strong>Message:</strong> ${escapeHtml(previewMessage)}</p>
+    <ul>
+      ${recipients.map((recipient) => `
+        <li>
+          <span>${escapeHtml(recipient.name || '')}${recipient.name ? ' - ' : ''}${escapeHtml(recipient.to || '')}</span>
+          <small>${escapeHtml(recipient.type || '')}</small>
+        </li>
+      `).join('')}
+    </ul>
+  `
+}
+
+async function handleAdminMemberManualText(panel) {
+  const modal = panel.querySelector('[data-admin-member-text-modal]')
+  const language = getLanguage()
+  const copy = ADMIN_COPY[language]
+  const resultsEl = modal?.querySelector('[data-admin-member-text-results]')
+  const submitButton = modal?.querySelector('[data-admin-member-text-send]')
+  const message = String(modal?.querySelector('textarea[name="message"]')?.value || '').trim()
+  const recipients = getAdminMemberManualTextRecipients(panel)
+
+  if (!resultsEl) {
+    return
+  }
+
+  if (!message) {
+    resultsEl.textContent = 'Message is required.'
+    resultsEl.classList.add('error')
+    resultsEl.classList.remove('success')
+    return
+  }
+
+  if (!recipients.length) {
+    resultsEl.textContent = copy.textNoRecipients
+    resultsEl.classList.add('error')
+    resultsEl.classList.remove('success')
+    return
+  }
+
+  resultsEl.textContent = copy.textLoading
+  resultsEl.classList.remove('error', 'success')
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  if (!ADMIN_MEMBER_MANUAL_TEXTS_ENABLED) {
+    renderAdminTextPreview(resultsEl, recipients, message, language)
+
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+
+    return
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/textme.php`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        message,
+        recipients,
+      }),
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || copy.textError)
+    }
+
+    renderAdminTextResults(resultsEl, result, language)
+  } catch (error) {
+    resultsEl.textContent = error.message || copy.textError
+    resultsEl.classList.add('error')
+    resultsEl.classList.remove('success')
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
 }
 
 async function handleAdminTextSubmit(form) {
@@ -1318,7 +1617,6 @@ function renderAdminNotificationSummary(member, copy, canEdit = false) {
   return `
     <div class="admin-notification-summary">
       <h3>${copy.notifications}</h3>
-      ${canEdit ? '' : `<p class="admin-readonly-note">${copy.notificationsReadOnly}</p>`}
       <div class="admin-notification-groups">
         ${rows.map(([label, prefix, fieldPrefix]) => `
           <section class="admin-notification-group">
@@ -1410,7 +1708,7 @@ function renderAdminMembers(panel, members, language) {
   const container = panel.querySelector('[data-admin-members]')
   const copy = ADMIN_COPY[language]
   const filteredMembers = getFilteredAdminMembers(members)
-  const canSuperAdmin = currentMember?.membershipType === 'SUPER_ADMIN'
+  const canSuperAdmin = String(currentMember?.membershipType || '').toUpperCase() === 'SUPER_ADMIN'
 
   updateAdminFilterCounts(panel, members)
   updateAdminFilterButtons(panel)
@@ -1492,6 +1790,29 @@ function renderAdminMembers(panel, members, language) {
                   <span>${copy.age}</span>
                   <input type="number" name="player_age" min="1" max="18" inputmode="numeric" value="${member.playerAge ? Number(member.playerAge) : ''}" />
                 </label>
+                <div class="admin-member-text-trigger" data-admin-member-text-panel>
+                  <span>${copy.memberTextTitle}</span>
+                  <button type="button" data-admin-member-text-open>${copy.memberTextSend}</button>
+                  <div class="admin-member-text-modal is-hidden" data-admin-member-text-modal aria-hidden="true">
+                    <div class="admin-text-dialog" role="dialog" aria-modal="true">
+                      <div class="admin-text-heading">
+                        <span>
+                          <h3>${copy.memberTextTitle}</h3>
+                        </span>
+                        <button type="button" data-admin-member-text-close aria-label="${copy.close}">&times;</button>
+                      </div>
+                      <label>
+                        <span>${copy.memberTextMessage}</span>
+                        <textarea name="message" rows="5" placeholder="${copy.memberTextPlaceholder}" required></textarea>
+                      </label>
+                      <div class="admin-text-actions">
+                        <button type="button" data-admin-member-text-close>${copy.close}</button>
+                        <button type="button" data-admin-member-text-send>${copy.memberTextSend}</button>
+                      </div>
+                      <div class="admin-text-results" data-admin-member-text-results aria-live="polite"></div>
+                    </div>
+                  </div>
+                </div>
                 <fieldset class="account-public-stats-toggle admin-public-stats-toggle">
                   <legend>${copy.publicStats}</legend>
                   <div class="account-public-stats-options">
@@ -1965,7 +2286,9 @@ function getRoundScoreDisplay(round, language) {
   const format = String(round?.format || '')
 
   if (format === 'practice') {
-    return language === 'fr' ? 'Aucun score' : 'No score'
+    return round.score && round.score !== 'Practice'
+      ? round.score
+      : language === 'fr' ? 'Aucun score' : 'No score'
   }
 
   if (format === 'stableford') {
@@ -2955,6 +3278,712 @@ function renderEventPlayerOptions(activeJuniors, language) {
   return html || `<option value="">${EVENTS_COPY[language].noPlayers}</option>`
 }
 
+function getEventTeamNames(attendees) {
+  return [...new Set((Array.isArray(attendees) ? attendees : [])
+    .map((attendee) => String(attendee.teamName || '').trim())
+    .filter(Boolean))]
+}
+
+function getEventTeamTeeTime(teamName, attendees) {
+  const match = (Array.isArray(attendees) ? attendees : [])
+    .find((attendee) => String(attendee.teamName || '').trim() === teamName && String(attendee.teeTime || '').trim())
+
+  return match ? String(match.teeTime || '').trim() : ''
+}
+
+function liveScoreCodeHtml(attendee, event) {
+  const code = String(attendee?.liveScoreCode || '').trim()
+
+  if (!event?.teamsPublished || !code) {
+    return ''
+  }
+
+  return `<a class="event-live-code-link" href="/live?code=${encodeURIComponent(code)}">${escapeHtml(code)}</a>`
+}
+
+function renderEventTeamDropZone(teamName, attendees, language) {
+  const safeTeamName = escapeHtml(teamName)
+  const players = attendees.filter((attendee) => String(attendee.teamName || '').trim() === teamName)
+  const teeTime = getEventTeamTeeTime(teamName, attendees)
+
+  return `
+    <div class="event-team-column" data-event-team-dropzone data-team-name="${safeTeamName}">
+      <div class="event-team-column-heading">
+        <strong>${teamName ? safeTeamName : EVENTS_COPY[language].unassigned}</strong>
+        ${teamName ? `<button type="button" data-event-team-delete>${EVENTS_COPY[language].deleteTeam}</button>` : ''}
+      </div>
+      ${teamName ? `
+        <label>
+          <span>${EVENTS_COPY[language].teeTime}</span>
+          <input type="time" value="${escapeHtml(teeTime)}" data-event-team-tee-time />
+        </label>
+      ` : ''}
+      <div class="event-team-players">
+        ${players.length ? players.map((attendee) => `
+          <div
+            class="event-team-player"
+            draggable="true"
+            data-event-team-player
+            data-member-id="${Number(attendee.memberId || 0)}"
+          >
+            <span class="event-team-player-name">${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}</span>
+            ${attendee.liveScoreCode ? `<span class="event-live-code">${EVENTS_COPY[language].liveCode}: <strong>${escapeHtml(attendee.liveScoreCode)}</strong></span>` : ''}
+            <label class="event-player-time">
+              <span>${EVENTS_COPY[language].teeTime}</span>
+              <input type="time" value="${escapeHtml(attendee.teeTime || '')}" data-event-team-player-time />
+            </label>
+          </div>
+        `).join('') : `<span class="event-team-empty">${EVENTS_COPY[language].noTeamPlayers}</span>`}
+      </div>
+    </div>
+  `
+}
+
+function renderEventTeamAdmin(event, attendees, language) {
+  const teamNames = getEventTeamNames(attendees)
+  const unassigned = attendees.filter((attendee) => !String(attendee.teamName || '').trim())
+  const eventFormat = String(event.eventFormat || (teamNames.length ? 'TEAM' : 'INDIVIDUAL')).toUpperCase() === 'INDIVIDUAL'
+    ? 'INDIVIDUAL'
+    : 'TEAM'
+  const individualAttendees = attendees.map((attendee) => ({ ...attendee, teamName: '' }))
+  const zones = eventFormat === 'INDIVIDUAL'
+    ? renderEventTeamDropZone('', individualAttendees, language)
+    : [
+      unassigned.length ? renderEventTeamDropZone('', attendees, language) : '',
+      ...teamNames.map((teamName) => renderEventTeamDropZone(teamName, attendees, language)),
+    ].join('')
+
+  return `
+    <form class="event-team-admin is-hidden" data-event-team-form>
+      <input type="hidden" name="action" value="save_event_teams" />
+      <input type="hidden" name="event_id" value="${Number(event.id || 0)}" />
+      <input type="hidden" name="event_format" value="${eventFormat}" data-event-format-value />
+      <input type="hidden" name="teams_published" value="${event.teamsPublished ? '1' : '0'}" data-event-teams-published />
+      <div class="event-format-control">
+        <span>${EVENTS_COPY[language].eventFormat}</span>
+        <div>
+          <button type="button" class="${eventFormat === 'TEAM' ? 'active' : ''}" data-event-format-choice="TEAM">${EVENTS_COPY[language].teamEvent}</button>
+          <button type="button" class="${eventFormat === 'INDIVIDUAL' ? 'active' : ''}" data-event-format-choice="INDIVIDUAL">${EVENTS_COPY[language].individualEvent}</button>
+        </div>
+      </div>
+      <div class="event-team-create ${eventFormat === 'INDIVIDUAL' ? 'is-hidden' : ''}">
+        <label>
+          <span>${EVENTS_COPY[language].teamName}</span>
+          <input type="text" maxlength="120" data-event-team-name />
+        </label>
+        <button type="button" data-event-team-create>${EVENTS_COPY[language].createTeam}</button>
+      </div>
+      <div class="event-team-board" data-event-team-board>
+        ${zones}
+      </div>
+      <div class="event-team-actions">
+        <button type="submit" data-event-team-save-button>${eventFormat === 'INDIVIDUAL' ? EVENTS_COPY[language].saveTTimes : EVENTS_COPY[language].saveTeams}</button>
+        <button type="button" data-event-team-publish>${EVENTS_COPY[language].publishTeams}</button>
+        ${event.teamsPublished ? `<button type="button" class="is-secondary" data-event-team-unpublish>${EVENTS_COPY[language].unpublishTeams}</button>` : ''}
+        ${event.teamsPublished ? `<span>${EVENTS_COPY[language].teamsPublished}</span>` : ''}
+      </div>
+    </form>
+  `
+}
+
+function renderEventAttendeesList(attendees, language, event) {
+  const teamNames = getEventTeamNames(attendees)
+
+  if (!teamNames.length) {
+    return `
+      <ul>
+        ${attendees.map((attendee) => `<li>${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}${liveScoreCodeHtml(attendee, event)}</li>`).join('')}
+      </ul>
+    `
+  }
+
+  const unassigned = attendees.filter((attendee) => !String(attendee.teamName || '').trim())
+  const teams = teamNames.map((teamName) => {
+    const players = attendees.filter((attendee) => String(attendee.teamName || '').trim() === teamName)
+
+    return `
+      <div class="event-attendee-team">
+        <strong>${escapeHtml(teamName)}</strong>
+        <ul>${players.map((attendee) => `<li>${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}${liveScoreCodeHtml(attendee, event)}</li>`).join('')}</ul>
+      </div>
+    `
+  }).join('')
+
+  return `
+    <div class="event-attendee-teams">
+      ${teams}
+      ${unassigned.length ? `
+        <div class="event-attendee-team">
+          <strong>${EVENTS_COPY[language].unassigned}</strong>
+          <ul>${unassigned.map((attendee) => `<li>${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}${liveScoreCodeHtml(attendee, event)}</li>`).join('')}</ul>
+        </div>
+      ` : ''}
+    </div>
+  `
+}
+
+function formatEventTeeTime(value) {
+  const text = String(value || '').trim()
+
+  if (!text) {
+    return ''
+  }
+
+  const [hourText, minuteText] = text.split(':')
+  const hour = Number(hourText || 0)
+  const minute = Number(minuteText || 0)
+  const suffix = hour >= 12 ? 'PM' : 'AM'
+  const displayHour = hour % 12 || 12
+
+  return `${displayHour}:${String(minute).padStart(2, '0')} ${suffix}`
+}
+
+function renderPublishedEventRound(event, attendees, language) {
+  if (!event.teamsPublished) {
+    return ''
+  }
+
+  const teamNames = getEventTeamNames(attendees)
+  const isTeamEvent = String(event.eventFormat || 'TEAM').toUpperCase() === 'TEAM'
+  const timedPlayers = attendees.filter((attendee) => String(attendee.teeTime || '').trim())
+  const unassignedTimedPlayers = timedPlayers.filter((attendee) => !String(attendee.teamName || '').trim())
+
+  if (!teamNames.length && !timedPlayers.length) {
+    return ''
+  }
+
+  return `
+    <div class="event-published-round">
+      <strong>${EVENTS_COPY[language].teamsPublished}</strong>
+      <div class="event-tee-sheet">
+        ${isTeamEvent && teamNames.length ? `${teamNames.map((teamName) => {
+          const players = attendees.filter((attendee) => String(attendee.teamName || '').trim() === teamName)
+          const teeTime = getEventTeamTeeTime(teamName, attendees)
+
+          return `
+            <div class="event-tee-team">
+              <span>${formatEventTeeTime(teeTime) || EVENTS_COPY[language].teeTime}</span>
+              <strong>${escapeHtml(teamName)}</strong>
+              <ul>${players.map((attendee) => `<li>${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}${liveScoreCodeHtml(attendee, event)}</li>`).join('')}</ul>
+            </div>
+          `
+        }).join('')}${unassignedTimedPlayers.map((attendee) => `
+          <div class="event-tee-team">
+            <span>${formatEventTeeTime(attendee.teeTime)}</span>
+            ${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}
+            ${liveScoreCodeHtml(attendee, event)}
+          </div>
+        `).join('')}` : timedPlayers.map((attendee) => `
+          <div class="event-tee-team">
+            <span>${formatEventTeeTime(attendee.teeTime)}</span>
+            ${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}
+            ${liveScoreCodeHtml(attendee, event)}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `
+}
+
+function renderEventStandings(event, language) {
+  const standings = Array.isArray(event.standings) ? event.standings : []
+  const currentMemberType = String(currentMember?.membershipType || '').toUpperCase()
+  const canEditScores = currentMemberType === 'SUPER_ADMIN'
+
+  if (!event.teamsPublished) {
+    return ''
+  }
+
+  return `
+    <div class="event-standings">
+      <strong>${EVENTS_COPY[language].standings}</strong>
+      ${standings.length ? `
+        <ol>
+          ${standings.map((row) => `
+            <li>
+              ${memberNameHtml(row.name || '', row.membershipType)}
+              <span>${Number(row.score || 0)}</span>
+              ${row.teamName ? `<small>${escapeHtml(row.teamName)}${row.teeTime ? ` - ${formatEventTeeTime(row.teeTime)}` : ''}</small>` : ''}
+              ${!row.teamName && row.teeTime ? `<small>${formatEventTeeTime(row.teeTime)}</small>` : ''}
+              ${Array.isArray(row.holeScores) && row.holeScores.length ? `<small>${EVENTS_COPY[language].holes}: ${row.holeScores.map((score) => Number(score || 0)).join(', ')}</small>` : ''}
+              ${canEditScores ? `
+                <form class="event-score-edit-form" data-event-score-edit-form>
+                  <input type="hidden" name="action" value="update_event_score" />
+                  <input type="hidden" name="event_id" value="${Number(event.id || 0)}" />
+                  <input type="hidden" name="round_id" value="${Number(row.roundId || 0)}" />
+                  <div class="event-score-edit-grid">
+                    ${Array.from({ length: Math.max(9, Math.min(18, Number(row.holeScores?.length || 18))) }, (_, index) => `
+                      <label>
+                        <span>${TRACK_SCORE_COPY[language].hole} ${index + 1}</span>
+                        <input type="number" min="0" max="30" step="1" inputmode="numeric" value="${Number(row.holeScores?.[index] || 0)}" data-event-score-hole />
+                      </label>
+                    `).join('')}
+                  </div>
+                  <button type="submit">${EVENTS_COPY[language].updateScore}</button>
+                </form>
+              ` : ''}
+            </li>
+          `).join('')}
+        </ol>
+      ` : `<p>${EVENTS_COPY[language].noStandings}</p>`}
+    </div>
+  `
+}
+
+function trackScoreKey(source, id) {
+  return `${source}:${Number(id || 0)}`
+}
+
+function renderTrackScoreButton(source, id, language, label = '') {
+  const key = trackScoreKey(source, id)
+  const isOpen = openTrackScoreKey === key
+  const openLabel = label || TRACK_SCORE_COPY[language].track
+
+  return `
+    <button
+      class="event-join-button is-secondary"
+      type="button"
+      data-track-score-toggle
+      data-track-source="${source}"
+      data-track-id="${Number(id || 0)}"
+      data-track-label="${escapeHtml(openLabel)}"
+      aria-expanded="${isOpen ? 'true' : 'false'}"
+    >${isOpen ? TRACK_SCORE_COPY[language].hide : openLabel}</button>
+  `
+}
+
+function getTrackScoreParTotal(holeCount) {
+  return holeCount <= 9 ? 36 : 72
+}
+
+function renderTrackScoreHoleInputs(holeCount, copy) {
+  return Array.from({ length: holeCount }, (_, index) => `
+    <label>
+      <span>${copy.hole} ${index + 1}</span>
+      <input type="number" min="0" max="20" step="1" inputmode="numeric" data-track-hole-score aria-label="${copy.hole} ${index + 1}" />
+    </label>
+  `).join('')
+}
+
+function renderTrackScorePanel({ source, id, holes = 9, date = '', tee = 'red', language }) {
+  const copy = TRACK_SCORE_COPY[language]
+  const isEvent = source === 'event'
+  const isStandaloneScore = source === 'score'
+  const holeCount = Math.max(1, Math.min(18, Number(holes || 9)))
+  const parTotal = getTrackScoreParTotal(holeCount)
+
+  return `
+    <form class="track-score-panel" data-track-score-form data-track-source="${source}">
+      <input type="hidden" name="event_id" value="${source === 'event' ? Number(id || 0) : ''}" />
+      <input type="hidden" name="round_date" value="${escapeHtml(date || toDateValue(new Date()))}" />
+      <input type="hidden" name="tee" value="${escapeHtml(tee)}" />
+      <div class="track-score-heading">
+        <div>
+          <h3>${isEvent ? copy.eventTitle : copy.title}</h3>
+        </div>
+        ${isStandaloneScore ? `
+          <label>
+            <span>${copy.holes}</span>
+            <select name="holes" data-track-score-holes>
+              <option value="9" ${holeCount === 9 ? 'selected' : ''}>9</option>
+              <option value="18" ${holeCount === 18 ? 'selected' : ''}>18</option>
+            </select>
+          </label>
+        ` : ''}
+        <label>
+          <span>${copy.method}</span>
+          <select name="format" data-track-score-format ${isEvent ? 'disabled' : ''}>
+            <option value="score">${copy.regular}</option>
+            <option value="stableford">${copy.stableford}</option>
+            <option value="practice">${copy.practice}</option>
+          </select>
+        </label>
+      </div>
+      <div class="track-score-grid" data-track-score-grid style="--track-holes: ${holeCount}">
+        ${renderTrackScoreHoleInputs(holeCount, copy)}
+      </div>
+      <div class="track-score-summary">
+        <span>${copy.total}: <strong data-track-score-total>0</strong></span>
+        <span data-track-score-par data-par-total="${parTotal}">${copy.toPar}: <strong>E</strong></span>
+      </div>
+      <div class="track-score-actions">
+        <button type="submit">${isEvent ? copy.finish : copy.save}</button>
+        <p class="score-status" data-track-score-status aria-live="polite"></p>
+      </div>
+    </form>
+  `
+}
+
+function renderTrackScorePanelForCard(source, item, language) {
+  const id = Number(item?.id || 0)
+
+  if (!id || openTrackScoreKey !== trackScoreKey(source, id)) {
+    return ''
+  }
+
+  return renderTrackScorePanel({
+    source,
+    id,
+    holes: source === 'round' ? Number(item.gameHoles || 9) : 18,
+    date: source === 'round' ? item.gameDate : item.eventDate,
+    language,
+  })
+}
+
+function updateTrackScorePanel(form, language) {
+  const copy = TRACK_SCORE_COPY[language]
+  const format = form?.querySelector('[data-track-score-format]')?.value || 'score'
+  const inputs = Array.from(form?.querySelectorAll('[data-track-hole-score]') || [])
+  const total = inputs.reduce((sum, input) => sum + Math.max(0, Number(input.value || 0)), 0)
+  const totalOutput = form?.querySelector('[data-track-score-total]')
+  const parRow = form?.querySelector('[data-track-score-par]')
+  const parOutput = parRow?.querySelector('strong')
+  const holeLabel = format === 'stableford'
+    ? copy.stablefordHole
+    : format === 'practice'
+      ? copy.practiceHole
+      : copy.regularHole
+
+  inputs.forEach((input, index) => {
+    input.max = format === 'practice' ? '30' : '20'
+    input.setAttribute('aria-label', `${copy.hole} ${index + 1} ${holeLabel}`)
+    input.closest('label')?.querySelector('span')?.replaceChildren(`${copy.hole} ${index + 1} ${holeLabel}`)
+  })
+
+  if (totalOutput) {
+    totalOutput.textContent = String(total)
+  }
+
+  if (parRow) {
+    parRow.hidden = format !== 'score'
+  }
+
+  if (parOutput) {
+    const parTotal = Number(parRow?.dataset.parTotal || 0)
+    const diff = total - parTotal
+    parOutput.textContent = diff === 0 ? 'E' : diff > 0 ? `+${diff}` : String(diff)
+  }
+}
+
+function updateTrackScoreHoleCount(form, language) {
+  const copy = TRACK_SCORE_COPY[language]
+  const holes = Math.max(1, Math.min(18, Number(form?.querySelector('[data-track-score-holes]')?.value || 9)))
+  const grid = form?.querySelector('[data-track-score-grid]')
+  const parRow = form?.querySelector('[data-track-score-par]')
+
+  if (grid) {
+    grid.style.setProperty('--track-holes', String(holes))
+    grid.innerHTML = renderTrackScoreHoleInputs(holes, copy)
+  }
+
+  if (parRow) {
+    parRow.dataset.parTotal = String(getTrackScoreParTotal(holes))
+  }
+
+  updateTrackScorePanel(form, language)
+}
+
+async function handleTrackScoreSubmit(form) {
+  const language = getLanguage()
+  const status = form.querySelector('[data-track-score-status]')
+  const source = form.dataset.trackSource || 'round'
+  const formatSelect = form.querySelector('[data-track-score-format]')
+  const format = source === 'event' ? 'score' : formatSelect?.value || 'score'
+  const total = Array.from(form.querySelectorAll('[data-track-hole-score]'))
+    .reduce((sum, input) => sum + Math.max(0, Number(input.value || 0)), 0)
+  const submitButton = form.querySelector('button[type="submit"]')
+
+  if (status) {
+    status.textContent = TRACK_SCORE_COPY[language].saving
+    status.classList.remove('error', 'success')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const formData = new FormData()
+    const holeScores = Array.from(form.querySelectorAll('[data-track-hole-score]'))
+      .map((input) => Math.max(0, Number(input.value || 0)))
+    formData.set('round_date', form.querySelector('input[name="round_date"]')?.value || toDateValue(new Date()))
+    formData.set('tee', form.querySelector('input[name="tee"]')?.value || 'red')
+    formData.set('format', format)
+    formData.set('score', format === 'practice' ? `Practice shots: ${total}` : String(total))
+    formData.set('hole_scores', JSON.stringify(holeScores))
+    if (source === 'event') {
+      formData.set('event_id', form.querySelector('input[name="event_id"]')?.value || '')
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/scores.php`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || TRACK_SCORE_COPY[language].saveError)
+    }
+
+    if (status) {
+      status.textContent = TRACK_SCORE_COPY[language].saved
+      status.classList.add('success')
+      status.classList.remove('error')
+    }
+
+    const scoresTool = form.closest('[data-scores-tool]')
+
+    if (scoresTool) {
+      loadScores(scoresTool, language)
+    }
+
+    const eventsTool = form.closest('[data-events-tool]')
+
+    if (eventsTool) {
+      loadEvents(eventsTool, language)
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || TRACK_SCORE_COPY[language].saveError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+}
+
+function closeVisibleTrackScorePanels() {
+  document.querySelectorAll('[data-track-score-form]').forEach((panel) => panel.remove())
+  document.querySelectorAll('[data-track-score-toggle]').forEach((button) => {
+    button.textContent = button.dataset.trackLabel || TRACK_SCORE_COPY[getLanguage()].track
+    button.setAttribute('aria-expanded', 'false')
+  })
+}
+
+function handleTrackScoreToggle(button) {
+  const language = getLanguage()
+  const source = button.dataset.trackSource || 'round'
+  const id = Number(button.dataset.trackId || 0)
+  const key = trackScoreKey(source, id)
+
+  if (!id) {
+    return
+  }
+
+  if (openTrackScoreKey === key) {
+    openTrackScoreKey = ''
+    closeVisibleTrackScorePanels()
+    return
+  }
+
+  openTrackScoreKey = key
+  closeVisibleTrackScorePanels()
+
+  const item = source === 'event'
+    ? currentEventsById.get(String(id))
+    : currentFindGamesById.get(String(id))
+  const target = button.closest('li')?.querySelector('.event-attendees') || button.closest('li')
+
+  if (!item || !target) {
+    return
+  }
+
+  button.textContent = TRACK_SCORE_COPY[language].hide
+  button.setAttribute('aria-expanded', 'true')
+  target.insertAdjacentHTML('beforeend', renderTrackScorePanelForCard(source, item, language))
+  const panel = target.querySelector('[data-track-score-form]')
+
+  if (panel) {
+    updateTrackScorePanel(panel, language)
+    panel.querySelector('[data-track-hole-score]')?.focus()
+  }
+}
+
+function renderLiveScorecard(context, language) {
+  const copy = LIVE_SCORE_COPY[language]
+  const holes = Number(context?.holes || 18)
+
+  return `
+    <div class="live-score-summary">
+      <strong>${copy.event}: ${escapeHtml(context?.eventName || '')}</strong>
+      <span>${copy.scoreFor}: ${escapeHtml(context?.scoringFor || context?.playerName || '')}</span>
+    </div>
+    <form class="track-score-panel live-score-form" data-live-score-form>
+      <input type="hidden" name="code" value="${escapeHtml(context?.code || '')}" />
+      <div class="track-score-grid" data-track-score-grid>
+        ${renderTrackScoreHoleInputs(holes, TRACK_SCORE_COPY[language])}
+      </div>
+      <div class="track-score-summary">
+        <span>${TRACK_SCORE_COPY[language].total}: <strong data-track-score-total>0</strong></span>
+        <span data-track-score-par data-par-total="${getTrackScoreParTotal(holes)}">${TRACK_SCORE_COPY[language].toPar}: <strong>E</strong></span>
+      </div>
+      <div class="track-score-actions">
+        <button type="submit">${copy.submit}</button>
+      </div>
+    </form>
+  `
+}
+
+async function loadLiveScorecard(code, language) {
+  const page = document.querySelector('[data-live-score-page]')
+  const card = page?.querySelector('[data-live-score-card]')
+  const status = page?.querySelector('[data-live-score-status]')
+  const normalizedCode = String(code || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4)
+
+  if (!page || !card || normalizedCode.length !== 4) {
+    return
+  }
+
+  if (status) {
+    status.textContent = LIVE_SCORE_COPY[language].codeReady
+    status.classList.remove('error', 'success')
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/live-score.php?code=${encodeURIComponent(normalizedCode)}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || LIVE_SCORE_COPY[language].loadError)
+    }
+
+    card.innerHTML = renderLiveScorecard(result, language)
+    updateTrackScorePanel(card.querySelector('[data-live-score-form]'), language)
+    card.querySelector('[data-track-hole-score]')?.focus()
+
+    if (status) {
+      status.textContent = ''
+      status.classList.remove('error', 'success')
+    }
+  } catch (error) {
+    card.innerHTML = ''
+    if (status) {
+      status.textContent = error.message || LIVE_SCORE_COPY[language].loadError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  }
+}
+
+function initializeLiveScoring(language) {
+  const page = document.querySelector('[data-live-score-page]')
+  const status = page?.querySelector('[data-live-score-status]')
+  const input = page?.querySelector('[data-live-code-input]')
+  const urlCode = new URLSearchParams(window.location.search).get('code') || ''
+
+  if (status) {
+    status.textContent = LIVE_SCORE_COPY[language].codeReady
+    status.classList.remove('error', 'success')
+  }
+
+  if (input) {
+    input.value = urlCode.trim().toUpperCase().slice(0, 4)
+    input.focus()
+  }
+
+  if (urlCode) {
+    loadLiveScorecard(urlCode, language)
+  }
+}
+
+async function handleLiveCodeSubmit(form) {
+  const language = getLanguage()
+  const code = form.querySelector('[data-live-code-input]')?.value || ''
+
+  await loadLiveScorecard(code, language)
+}
+
+async function handleLiveScoreSubmit(form) {
+  const page = form.closest('[data-live-score-page]')
+  const status = page?.querySelector('[data-live-score-status]')
+  const language = getLanguage()
+  const submitButton = form.querySelector('button[type="submit"]')
+  const holeScores = Array.from(form.querySelectorAll('[data-track-hole-score]'))
+    .map((input) => Math.max(0, Number(input.value || 0)))
+  const formData = new FormData(form)
+
+  formData.set('hole_scores', JSON.stringify(holeScores))
+
+  if (status) {
+    status.textContent = LIVE_SCORE_COPY[language].saving
+    status.classList.remove('error', 'success')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/live-score.php`, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || LIVE_SCORE_COPY[language].saveError)
+    }
+
+    if (status) {
+      status.textContent = result.message || LIVE_SCORE_COPY[language].saved
+      status.classList.add('success')
+      status.classList.remove('error')
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || LIVE_SCORE_COPY[language].saveError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+}
+
+function handleScoreStartRoundToggle(button) {
+  const language = getLanguage()
+  const panel = button.closest('[data-scores-tool]')?.querySelector('[data-score-start-round-panel]')
+  const isOpen = button.getAttribute('aria-expanded') === 'true'
+
+  if (!panel) {
+    return
+  }
+
+  if (isOpen) {
+    panel.innerHTML = ''
+    button.textContent = button.dataset.showLabel || siteContent.pageMap.get('scores').scoreTool.startRoundButton[language]
+    button.setAttribute('aria-expanded', 'false')
+    return
+  }
+
+  panel.innerHTML = renderTrackScorePanel({
+    source: 'score',
+    id: 1,
+    holes: 9,
+    date: toDateValue(new Date()),
+    language,
+  })
+  button.textContent = button.dataset.hideLabel || TRACK_SCORE_COPY[language].hide
+  button.setAttribute('aria-expanded', 'true')
+
+  const form = panel.querySelector('[data-track-score-form]')
+  updateTrackScorePanel(form, language)
+  form?.querySelector('[data-track-hole-score]')?.focus()
+}
+
 function renderEventCollection(container, events, language, title = '', options = {}) {
   if (!container) {
     return
@@ -3007,7 +4036,9 @@ function renderEventCollection(container, events, language, title = '', options 
           event.canAddPlayer === true
           || (event.canAddPlayer === undefined && currentMemberType === 'SUPER_ADMIN')
         )
-        const canManage = canEditEvent || canDeleteEvent || canAddPlayerToEvent
+        const canAdminTeams = showAdminActions && canEditEvent
+        const canMessageEvent = showAdminActions && ['SUPER_ADMIN', 'ADMIN'].includes(currentMemberType)
+        const canManage = canMessageEvent || canAdminTeams
         const canJoinAge = event.isAgeEligible !== false
         const joinLabel = !canJoinPath
           ? pathOnlyLabel(EVENTS_COPY[language], eventPath)
@@ -3017,6 +4048,7 @@ function renderEventCollection(container, events, language, title = '', options 
         const costLabel = eventPath === 'CUP'
           ? ''
           : `${EVENTS_COPY[language].communityCost}: ${formatCurrency(communityCost, language)}`
+        const eventScoreButtonLabel = event.teamsPublished ? EVENTS_COPY[language].openRound : TRACK_SCORE_COPY[language].track
 
         return `
           <li>
@@ -3056,6 +4088,24 @@ function renderEventCollection(container, events, language, title = '', options 
                   data-hide-label="${EVENTS_COPY[language].hideAddPlayer}"
                   aria-expanded="false"
                 >${EVENTS_COPY[language].addPlayer}</button>` : ''}
+                ${canAdminTeams ? `<button
+                  class="event-join-button is-admin"
+                  type="button"
+                  data-event-team-toggle
+                  data-event-id="${Number(event.id || 0)}"
+                  data-show-label="${EVENTS_COPY[language].admin}"
+                  data-hide-label="${EVENTS_COPY[language].hideAdmin}"
+                  aria-expanded="false"
+                >${EVENTS_COPY[language].admin}</button>` : ''}
+                ${canMessageEvent ? `<button
+                  class="event-join-button is-message"
+                  type="button"
+                  data-event-message-toggle
+                  data-event-id="${Number(event.id || 0)}"
+                  data-show-label="${EVENTS_COPY[language].sendMessage}"
+                  data-hide-label="${EVENTS_COPY[language].hideMessage}"
+                  aria-expanded="false"
+                >${EVENTS_COPY[language].sendMessage}</button>` : ''}
               ` : showJoin ? event.isJoined ? `
                 <button
                   class="event-join-button is-secondary"
@@ -3063,6 +4113,7 @@ function renderEventCollection(container, events, language, title = '', options 
                   data-event-action="leave"
                   data-event-id="${Number(event.id || 0)}"
                 >${EVENTS_COPY[language].leave}</button>
+                ${renderTrackScoreButton('event', event.id, language, eventScoreButtonLabel)}
               ` : `
                 <button
                   class="event-join-button"
@@ -3075,11 +4126,9 @@ function renderEventCollection(container, events, language, title = '', options 
             </div>
             <div class="event-attendees">
               <strong>${EVENTS_COPY[language].attending}</strong>
-              ${attendees.length ? `
-                <ul>
-                  ${attendees.map((attendee) => `<li>${memberNameHtml(attendee.name || attendee.username || '', attendee.membershipType)}</li>`).join('')}
-                </ul>
-              ` : `<p>${EVENTS_COPY[language].noAttendees}</p>`}
+              ${attendees.length ? renderEventAttendeesList(attendees, language, event) : `<p>${EVENTS_COPY[language].noAttendees}</p>`}
+              ${renderPublishedEventRound(event, attendees, language)}
+              ${renderEventStandings(event, language)}
               ${canAddPlayerToEvent ? `
                 <form class="event-add-player-form is-hidden" data-event-add-player-form>
                   <input type="hidden" name="action" value="add_attendee" />
@@ -3093,6 +4142,19 @@ function renderEventCollection(container, events, language, title = '', options 
                   <button type="submit" ${hasPlayerOptions ? '' : 'disabled'}>${EVENTS_COPY[language].savePlayer}</button>
                 </form>
               ` : ''}
+              ${canMessageEvent ? `
+                <form class="event-message-form is-hidden" data-event-message-form>
+                  <input type="hidden" name="action" value="send_event_message" />
+                  <input type="hidden" name="event_id" value="${Number(event.id || 0)}" />
+                  <label>
+                    <span>${EVENTS_COPY[language].messageLabel}</span>
+                    <textarea name="message" rows="3" maxlength="1000" placeholder="${EVENTS_COPY[language].messagePlaceholder}" required></textarea>
+                  </label>
+                  <button type="submit">${EVENTS_COPY[language].sendEventMessage}</button>
+                </form>
+              ` : ''}
+              ${canAdminTeams ? renderEventTeamAdmin(event, attendees, language) : ''}
+              ${renderTrackScorePanelForCard('event', event, language)}
             </div>
           </li>
         `
@@ -3201,6 +4263,7 @@ function renderFindGamesState(tool, games, language) {
                   data-find-game-action="delete_game"
                   data-game-id="${Number(game.id || 0)}"
                 >${FIND_GAME_COPY[language].remove}</button>
+                ${renderTrackScoreButton('round', game.id, language)}
               ` : `
                 <button
                   class="event-join-button ${game.isJoined ? 'is-secondary' : ''}"
@@ -3209,6 +4272,7 @@ function renderFindGamesState(tool, games, language) {
                   data-game-id="${Number(game.id || 0)}"
                   ${(!game.isJoined && (isFull || !canJoinPath || !canJoinAge)) ? 'disabled' : ''}
                 >${buttonLabel}</button>
+                ${game.isJoined ? renderTrackScoreButton('round', game.id, language) : ''}
               `}
             </div>
             <div class="event-attendees">
@@ -3218,6 +4282,7 @@ function renderFindGamesState(tool, games, language) {
                   ${players.map((player) => `<li>${memberNameHtml(player.name || player.username || '', player.membershipType)}</li>`).join('')}
                 </ul>
               ` : `<p>${FIND_GAME_COPY[language].playing}</p>`}
+              ${renderTrackScorePanelForCard('round', game, language)}
             </div>
           </li>
         `
@@ -3251,15 +4316,13 @@ function renderFindGameTextPreview(tool, preview, language) {
   const recipients = Array.isArray(preview.recipients) ? preview.recipients : []
   const message = String(preview.message || '')
   const isMissing = Boolean(preview.previewMissing)
-  const contextLabel = String(preview.contextLabel || 'round')
-  const intro = `No texts were sent. These people match the text settings for this ${contextLabel}:`
-  const empty = `No one would receive a text for this ${contextLabel}.`
+  const empty = language === 'fr' ? 'Aucun destinataire.' : 'No recipients.'
   const previewHtml = `
     <div class="find-game-text-preview-heading">
       <strong>${copy.textPreviewTitle}</strong>
       <span>${recipients.length} ${ADMIN_COPY[language].textRecipientCount}</span>
     </div>
-    <p>${isMissing ? copy.textPreviewMissing : recipients.length ? intro : empty}</p>
+    ${isMissing || !recipients.length ? `<p>${isMissing ? copy.textPreviewMissing : empty}</p>` : ''}
     ${message ? `<p><strong>${copy.textPreviewMessage}:</strong> ${escapeHtml(message)}</p>` : ''}
     ${recipients.length ? `
       <ul>
@@ -3377,8 +4440,9 @@ function renderLessonsState(tool, result, language) {
   const slotsContainer = tool.querySelector('[data-lesson-slots]')
   const requestsContainer = tool.querySelector('[data-lesson-requests]')
   const currentMemberId = Number(currentMember?.id || currentMember?.sub || 0)
-  const canTeach = ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'COACH'].includes(currentMember?.membershipType)
-  const canJoinLesson = ['CUP', 'COMMUNITY'].includes(currentMember?.membershipType)
+  const currentMemberType = String(currentMember?.membershipType || '').toUpperCase()
+  const canTeach = ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'COACH'].includes(currentMemberType)
+  const canJoinLesson = ['CUP', 'COMMUNITY'].includes(currentMemberType)
   const booked = result.booked || []
   const slots = result.slots || []
   const requests = result.requests || []
@@ -3390,6 +4454,7 @@ function renderLessonsState(tool, result, language) {
           const students = Array.isArray(slot.students) ? slot.students : []
           const isProvider = Number(slot.providerMemberId || 0) === currentMemberId
           const canDeleteSlot = canTeach && isProvider && students.length === 0
+          const canMessageLesson = students.length > 0 && (['SUPER_ADMIN', 'ADMIN'].includes(currentMemberType) || isProvider)
           const lessonPath = String(slot.lessonPath || 'EVERYONE')
           const ageLabel = ageRangeLabel(slot.minAge, slot.maxAge, language, LESSON_COPY[language])
 
@@ -3412,10 +4477,30 @@ function renderLessonsState(tool, result, language) {
                   data-lesson-slot-action="delete_slot"
                   data-slot-id="${Number(slot.id || 0)}"
                 >${LESSON_COPY[language].delete}</button>` : ''}
+                ${canMessageLesson ? `<button
+                  class="event-join-button is-message"
+                  type="button"
+                  data-lesson-message-toggle
+                  data-slot-id="${Number(slot.id || 0)}"
+                  data-show-label="${LESSON_COPY[language].sendText}"
+                  data-hide-label="${LESSON_COPY[language].hideText}"
+                  aria-expanded="false"
+                >${LESSON_COPY[language].sendText}</button>` : ''}
               </div>
               <div class="event-attendees">
                 <strong>${LESSON_COPY[language].students}</strong>
                 ${students.length ? `<ul>${students.map((student) => `<li>${memberNameHtml(student.name || student.username || '', student.membershipType)}</li>`).join('')}</ul>` : `<p>${bookedContainer.dataset.emptyLabel || ''}</p>`}
+                ${canMessageLesson ? `
+                  <form class="event-message-form is-hidden" data-lesson-message-form>
+                    <input type="hidden" name="action" value="send_lesson_message" />
+                    <input type="hidden" name="slot_id" value="${Number(slot.id || 0)}" />
+                    <label>
+                      <span>${LESSON_COPY[language].messageLabel}</span>
+                      <textarea name="message" rows="3" maxlength="1000" placeholder="${LESSON_COPY[language].messagePlaceholder}" required></textarea>
+                    </label>
+                    <button type="submit">${LESSON_COPY[language].sendLessonMessage}</button>
+                  </form>
+                ` : ''}
               </div>
             </li>
           `
@@ -3900,6 +4985,324 @@ async function handleEventAddPlayerSubmit(form) {
   }
 }
 
+function refreshEventTeamDropZone(zone, language) {
+  if (!zone) {
+    return
+  }
+
+  const players = zone.querySelectorAll('[data-event-team-player]')
+  let empty = zone.querySelector('.event-team-empty')
+
+  if (players.length && empty) {
+    empty.remove()
+    return
+  }
+
+  if (!players.length && !empty) {
+    empty = document.createElement('span')
+    empty.className = 'event-team-empty'
+    empty.textContent = EVENTS_COPY[language].noTeamPlayers
+    zone.querySelector('.event-team-players')?.append(empty)
+  }
+}
+
+function moveEventTeamPlayer(player, targetZone, language) {
+  const sourceZone = player?.closest('[data-event-team-dropzone]')
+  const targetPlayers = targetZone?.querySelector('.event-team-players')
+
+  if (!player || !targetZone || !targetPlayers) {
+    return
+  }
+
+  targetZone.querySelector('.event-team-empty')?.remove()
+  targetPlayers.append(player)
+  refreshEventTeamDropZone(sourceZone, language)
+  refreshEventTeamDropZone(targetZone, language)
+}
+
+function ensureEventUnassignedDropZone(form, language) {
+  let zone = form?.querySelector('[data-event-team-dropzone][data-team-name=""]')
+  const board = form?.querySelector('[data-event-team-board]')
+
+  if (zone || !board) {
+    return zone
+  }
+
+  const wrapper = document.createElement('div')
+  wrapper.innerHTML = renderEventTeamDropZone('', [], language).trim()
+  zone = wrapper.firstElementChild
+  board.prepend(zone)
+
+  return zone
+}
+
+function deleteEventTeam(button) {
+  const language = getLanguage()
+  const zone = button.closest('[data-event-team-dropzone]')
+  const form = button.closest('[data-event-team-form]')
+  const unassignedZone = ensureEventUnassignedDropZone(form, language)
+
+  if (!zone || !unassignedZone || zone === unassignedZone) {
+    return
+  }
+
+  zone.querySelectorAll('[data-event-team-player]').forEach((player) => {
+    moveEventTeamPlayer(player, unassignedZone, language)
+  })
+
+  zone.remove()
+  refreshEventTeamDropZone(unassignedZone, language)
+}
+
+function setEventAdminFormat(button) {
+  const form = button.closest('[data-event-team-form]')
+  const nextFormat = button.dataset.eventFormatChoice === 'INDIVIDUAL' ? 'INDIVIDUAL' : 'TEAM'
+  const formatInput = form?.querySelector('[data-event-format-value]')
+  const createRow = form?.querySelector('.event-team-create')
+  const board = form?.querySelector('[data-event-team-board]')
+  const saveButton = form?.querySelector('[data-event-team-save-button]')
+  const language = getLanguage()
+
+  if (!form || !formatInput || !board) {
+    return
+  }
+
+  formatInput.value = nextFormat
+  form.querySelectorAll('[data-event-format-choice]').forEach((choice) => {
+    choice.classList.toggle('active', choice.dataset.eventFormatChoice === nextFormat)
+  })
+  createRow?.classList.toggle('is-hidden', nextFormat === 'INDIVIDUAL')
+  if (saveButton) {
+    saveButton.textContent = nextFormat === 'INDIVIDUAL'
+      ? EVENTS_COPY[language].saveTTimes
+      : EVENTS_COPY[language].saveTeams
+  }
+
+  if (nextFormat === 'INDIVIDUAL') {
+    const players = [...form.querySelectorAll('[data-event-team-player]')]
+    board.innerHTML = renderEventTeamDropZone('', [], language).trim()
+    const unassignedZone = board.querySelector('[data-event-team-dropzone]')
+
+    players.forEach((player) => {
+      moveEventTeamPlayer(player, unassignedZone, language)
+    })
+    refreshEventTeamDropZone(unassignedZone, language)
+  } else if (!board.querySelector('[data-event-team-dropzone]')) {
+    board.innerHTML = renderEventTeamDropZone('', [], language).trim()
+  }
+}
+
+function createEventTeam(button) {
+  const form = button.closest('[data-event-team-form]')
+  const input = form?.querySelector('[data-event-team-name]')
+  const board = form?.querySelector('[data-event-team-board]')
+  const language = getLanguage()
+  const teamName = String(input?.value || '').trim()
+
+  if (!form || !input || !board || !teamName) {
+    input?.focus()
+    return
+  }
+
+  const exists = [...board.querySelectorAll('[data-event-team-dropzone]')]
+    .some((zone) => String(zone.dataset.teamName || '').trim().toLowerCase() === teamName.toLowerCase())
+
+  if (exists) {
+    input.value = ''
+    return
+  }
+
+  const wrapper = document.createElement('div')
+  wrapper.innerHTML = renderEventTeamDropZone(teamName, [], language).trim()
+  board.append(wrapper.firstElementChild)
+  input.value = ''
+  input.focus()
+}
+
+async function handleEventTeamSubmit(form) {
+  const tool = form.closest('[data-events-tool]')
+  const language = getLanguage()
+  const status = tool?.querySelector('[data-events-status]')
+  const submitButton = form.querySelector('button[type="submit"]')
+  const formData = new FormData(form)
+  const assignments = [...form.querySelectorAll('[data-event-team-player]')].map((player) => {
+    const zone = player.closest('[data-event-team-dropzone]')
+    const eventFormat = form.querySelector('[data-event-format-value]')?.value || 'TEAM'
+    const teamName = eventFormat === 'INDIVIDUAL' ? '' : String(zone?.dataset.teamName || '')
+
+    return {
+      memberId: Number(player.dataset.memberId || 0),
+      teamName,
+      teeTime: teamName
+        ? String(zone?.querySelector('[data-event-team-tee-time]')?.value || '')
+        : String(player.querySelector('[data-event-team-player-time]')?.value || ''),
+      scoringForMemberId: 0,
+      scoringForTeamName: '',
+      scoringForGroup: false,
+    }
+  })
+  const hasTeams = assignments.some((assignment) => String(assignment.teamName || '').trim())
+  const hasStartingTimes = assignments.some((assignment) => String(assignment.teeTime || '').trim())
+  const publishedInput = form.querySelector('[data-event-teams-published]')
+
+  if (!hasTeams && !hasStartingTimes && publishedInput) {
+    publishedInput.value = '0'
+  }
+
+  formData.append('assignments', JSON.stringify(assignments))
+
+  if (status) {
+    status.textContent = siteContent.pageMap.get('events').eventsTool.saving[language]
+    status.classList.remove('error', 'success')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/events.php`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || EVENTS_COPY[language].saveError)
+    }
+
+    renderEventsState(tool, result, language)
+
+    if (status) {
+      status.textContent = result.message || EVENTS_COPY[language].saved
+      status.classList.add('success')
+      status.classList.remove('error')
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || EVENTS_COPY[language].saveError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+}
+
+async function handleEventMessageSubmit(form) {
+  const tool = form.closest('[data-events-tool]')
+  const language = getLanguage()
+  const status = tool?.querySelector('[data-events-status]')
+  const submitButton = form.querySelector('button[type="submit"]')
+  const formData = new FormData(form)
+
+  if (status) {
+    status.textContent = siteContent.pageMap.get('events').eventsTool.saving[language]
+    status.classList.remove('error', 'success')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/events.php`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || EVENTS_COPY[language].saveError)
+    }
+
+    renderEventsState(tool, result, language)
+    renderFindGameTextPreview(tool, result.textResults?.dryRun ? result.textResults : null, language)
+    setFindGameTextModalOpen(tool, Boolean(result.textResults?.dryRun))
+
+    if (status) {
+      status.textContent = `${result.message || EVENTS_COPY[language].saved}${getTextResultsSummary(result, language)}`
+      status.classList.add('success')
+      status.classList.remove('error')
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || EVENTS_COPY[language].saveError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+}
+
+async function handleEventScoreEditSubmit(form) {
+  const tool = form.closest('[data-events-tool]')
+  const language = getLanguage()
+  const status = tool?.querySelector('[data-events-status]')
+  const submitButton = form.querySelector('button[type="submit"]')
+  const formData = new FormData(form)
+  const holeScores = Array.from(form.querySelectorAll('[data-event-score-hole]'))
+    .map((input) => Math.max(0, Number(input.value || 0)))
+
+  formData.set('hole_scores', JSON.stringify(holeScores))
+
+  if (status) {
+    status.textContent = siteContent.pageMap.get('events').eventsTool.saving[language]
+    status.classList.remove('error', 'success')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/events.php`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || EVENTS_COPY[language].saveError)
+    }
+
+    renderEventsState(tool, result, language)
+
+    if (status) {
+      status.textContent = result.message || EVENTS_COPY[language].saved
+      status.classList.add('success')
+      status.classList.remove('error')
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || EVENTS_COPY[language].saveError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+}
+
 function resetFindGameForm(form) {
   if (!form) {
     return
@@ -4239,6 +5642,59 @@ async function handleLessonAction(button) {
   }
 }
 
+async function handleLessonMessageSubmit(form) {
+  const tool = form.closest('[data-lesson-tool]')
+  const language = getLanguage()
+  const status = tool?.querySelector('[data-lesson-status]')
+  const submitButton = form.querySelector('button[type="submit"]')
+  const formData = new FormData(form)
+
+  if (status) {
+    status.textContent = siteContent.pageMap.get('book-a-lesson').lessonTool.saving[language]
+    status.classList.remove('error', 'success')
+  }
+
+  if (submitButton) {
+    submitButton.disabled = true
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/lessons.php`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${memberToken}`,
+      },
+      credentials: 'include',
+    })
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.message || LESSON_COPY[language].saveError)
+    }
+
+    renderLessonsState(tool, result, language)
+    renderFindGameTextPreview(tool, result.textResults?.dryRun ? result.textResults : null, language)
+    setFindGameTextModalOpen(tool, Boolean(result.textResults?.dryRun))
+
+    if (status) {
+      status.textContent = `${result.message || LESSON_COPY[language].saved}${getTextResultsSummary(result, language)}`
+      status.classList.add('success')
+      status.classList.remove('error')
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = error.message || LESSON_COPY[language].saveError
+      status.classList.add('error')
+      status.classList.remove('success')
+    }
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+}
+
 document.addEventListener('click', (event) => {
   const datePickerToggle = event.target.closest('[data-date-picker-toggle]')
 
@@ -4306,6 +5762,20 @@ document.addEventListener('click', (event) => {
     return
   }
 
+  const trackScoreToggle = event.target.closest('[data-track-score-toggle]')
+
+  if (trackScoreToggle) {
+    handleTrackScoreToggle(trackScoreToggle)
+    return
+  }
+
+  const scoreStartRoundToggle = event.target.closest('[data-score-start-round-toggle]')
+
+  if (scoreStartRoundToggle) {
+    handleScoreStartRoundToggle(scoreStartRoundToggle)
+    return
+  }
+
   const sessionModeLink = event.target.closest('[data-session-mode-link]')
 
   if (sessionModeLink) {
@@ -4330,6 +5800,45 @@ document.addEventListener('click', (event) => {
     const panel = adminTextOpen.closest('[data-admin-panel]')
 
     setAdminTextModalOpen(panel, true)
+    return
+  }
+
+  const adminMemberTextSend = event.target.closest('[data-admin-member-text-send]')
+
+  if (adminMemberTextSend) {
+    const panel = adminMemberTextSend.closest('[data-admin-member-text-panel]')
+
+    if (panel) {
+      handleAdminMemberManualText(panel)
+    }
+
+    return
+  }
+
+  const adminMemberTextOpen = event.target.closest('[data-admin-member-text-open]')
+
+  if (adminMemberTextOpen) {
+    const panel = adminMemberTextOpen.closest('[data-admin-member-text-panel]')
+
+    setAdminMemberTextModalOpen(panel, true)
+    return
+  }
+
+  const adminMemberTextClose = event.target.closest('[data-admin-member-text-close]')
+
+  if (adminMemberTextClose) {
+    const panel = adminMemberTextClose.closest('[data-admin-member-text-panel]')
+
+    setAdminMemberTextModalOpen(panel, false)
+    return
+  }
+
+  const adminMemberTextModal = event.target.closest('[data-admin-member-text-modal]')
+
+  if (adminMemberTextModal && event.target === adminMemberTextModal) {
+    const panel = adminMemberTextModal.closest('[data-admin-member-text-panel]')
+
+    setAdminMemberTextModalOpen(panel, false)
     return
   }
 
@@ -4690,6 +6199,21 @@ document.addEventListener('click', (event) => {
     return
   }
 
+  const lessonMessageToggle = event.target.closest('[data-lesson-message-toggle]')
+
+  if (lessonMessageToggle) {
+    const card = lessonMessageToggle.closest('li')
+    const form = card?.querySelector('[data-lesson-message-form]')
+    const isHidden = form?.classList.toggle('is-hidden')
+
+    lessonMessageToggle.textContent = isHidden
+      ? lessonMessageToggle.dataset.showLabel
+      : lessonMessageToggle.dataset.hideLabel
+    lessonMessageToggle.setAttribute('aria-expanded', String(!isHidden))
+    form?.querySelector('textarea[name="message"]')?.focus()
+    return
+  }
+
   const eventAdminToggle = event.target.closest('[data-event-admin-toggle]')
 
   if (eventAdminToggle) {
@@ -4720,6 +6244,127 @@ document.addEventListener('click', (event) => {
       ? eventAddPlayerToggle.dataset.showLabel
       : eventAddPlayerToggle.dataset.hideLabel
     eventAddPlayerToggle.setAttribute('aria-expanded', String(!isHidden))
+    return
+  }
+
+  const eventTeamToggle = event.target.closest('[data-event-team-toggle]')
+
+  if (eventTeamToggle) {
+    const card = eventTeamToggle.closest('li')
+    const form = card?.querySelector('[data-event-team-form]')
+    const isHidden = form?.classList.toggle('is-hidden')
+
+    eventTeamToggle.textContent = isHidden
+      ? eventTeamToggle.dataset.showLabel
+      : eventTeamToggle.dataset.hideLabel
+    eventTeamToggle.setAttribute('aria-expanded', String(!isHidden))
+    form?.querySelector('[data-event-team-name]')?.focus()
+    return
+  }
+
+  const eventTeamCreate = event.target.closest('[data-event-team-create]')
+
+  if (eventTeamCreate) {
+    event.preventDefault()
+    createEventTeam(eventTeamCreate)
+    return
+  }
+
+  const eventFormatChoice = event.target.closest('[data-event-format-choice]')
+
+  if (eventFormatChoice) {
+    event.preventDefault()
+    setEventAdminFormat(eventFormatChoice)
+    return
+  }
+
+  const eventTeamDelete = event.target.closest('[data-event-team-delete]')
+
+  if (eventTeamDelete) {
+    event.preventDefault()
+    deleteEventTeam(eventTeamDelete)
+    return
+  }
+
+  const eventTeamPublish = event.target.closest('[data-event-team-publish]')
+
+  if (eventTeamPublish) {
+    const form = eventTeamPublish.closest('[data-event-team-form]')
+    const publishedInput = form?.querySelector('[data-event-teams-published]')
+
+    event.preventDefault()
+    if (publishedInput) {
+      publishedInput.value = '1'
+    }
+    form?.requestSubmit()
+    return
+  }
+
+  const eventTeamUnpublish = event.target.closest('[data-event-team-unpublish]')
+
+  if (eventTeamUnpublish) {
+    const form = eventTeamUnpublish.closest('[data-event-team-form]')
+    const publishedInput = form?.querySelector('[data-event-teams-published]')
+
+    event.preventDefault()
+    if (publishedInput) {
+      publishedInput.value = '0'
+    }
+    form?.requestSubmit()
+    return
+  }
+
+  const eventTeamPlayer = event.target.closest('[data-event-team-player]')
+
+  if (eventTeamPlayer) {
+    if (event.target.closest('[data-event-team-player-time]')) {
+      return
+    }
+
+    const form = eventTeamPlayer.closest('[data-event-team-form]')
+
+    event.preventDefault()
+    form?.querySelectorAll('[data-event-team-player].is-selected').forEach((player) => {
+      player.classList.remove('is-selected')
+    })
+    eventTeamPlayer.classList.add('is-selected')
+    if (form) {
+      form.dataset.selectedMemberId = eventTeamPlayer.dataset.memberId || ''
+    }
+    return
+  }
+
+  const eventTeamDropzone = event.target.closest('[data-event-team-dropzone]')
+
+  if (eventTeamDropzone) {
+    const form = eventTeamDropzone.closest('[data-event-team-form]')
+    const selectedMemberId = form?.dataset.selectedMemberId || ''
+    const selectedPlayer = [...(form?.querySelectorAll('[data-event-team-player]') || [])]
+      .find((candidate) => candidate.dataset.memberId === selectedMemberId)
+
+    if (selectedPlayer) {
+      event.preventDefault()
+      moveEventTeamPlayer(selectedPlayer, eventTeamDropzone, getLanguage())
+      selectedPlayer.classList.remove('is-selected')
+      if (form) {
+        form.dataset.selectedMemberId = ''
+      }
+    }
+    return
+  }
+
+  const eventMessageToggle = event.target.closest('[data-event-message-toggle]')
+
+  if (eventMessageToggle) {
+    const card = eventMessageToggle.closest('li')
+    const form = card?.querySelector('[data-event-message-form]')
+    const isHidden = form?.classList.toggle('is-hidden')
+
+    eventMessageToggle.textContent = isHidden
+      ? eventMessageToggle.dataset.showLabel
+      : eventMessageToggle.dataset.hideLabel
+    eventMessageToggle.setAttribute('aria-expanded', String(!isHidden))
+    form?.querySelector('textarea[name="message"]')?.focus()
     return
   }
 
@@ -4768,9 +6413,104 @@ document.addEventListener('change', (event) => {
   if (scoreFormat) {
     updateScoreFormForFormat(scoreFormat.closest('[data-score-form]'), getLanguage())
   }
+
+  const trackScoreFormat = event.target.closest('[data-track-score-format]')
+
+  if (trackScoreFormat) {
+    updateTrackScorePanel(trackScoreFormat.closest('[data-track-score-form]'), getLanguage())
+  }
+
+  const trackScoreHoles = event.target.closest('[data-track-score-holes]')
+
+  if (trackScoreHoles) {
+    updateTrackScoreHoleCount(trackScoreHoles.closest('[data-track-score-form]'), getLanguage())
+  }
+})
+
+document.addEventListener('dragstart', (event) => {
+  const player = event.target.closest('[data-event-team-player]')
+
+  if (!player) {
+    return
+  }
+
+  event.dataTransfer?.setData('text/plain', player.dataset.memberId || '')
+  event.dataTransfer?.setData('application/x-event-team-player', player.dataset.memberId || '')
+  event.dataTransfer.effectAllowed = 'move'
+  player.classList.add('is-dragging')
+})
+
+document.addEventListener('dragend', (event) => {
+  event.target.closest('[data-event-team-player]')?.classList.remove('is-dragging')
+  document.querySelectorAll('[data-event-team-dropzone].is-drop-target').forEach((zone) => {
+    zone.classList.remove('is-drop-target')
+  })
+})
+
+document.addEventListener('dragover', (event) => {
+  const zone = event.target.closest('[data-event-team-dropzone]')
+
+  if (!zone) {
+    return
+  }
+
+  event.preventDefault()
+  zone.classList.add('is-drop-target')
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
+  }
+})
+
+document.addEventListener('dragleave', (event) => {
+  const zone = event.target.closest('[data-event-team-dropzone]')
+
+  if (zone && !zone.contains(event.relatedTarget)) {
+    zone.classList.remove('is-drop-target')
+  }
+})
+
+document.addEventListener('drop', (event) => {
+  const zone = event.target.closest('[data-event-team-dropzone]')
+  const memberId = event.dataTransfer?.getData('application/x-event-team-player') || event.dataTransfer?.getData('text/plain')
+
+  if (!zone || !memberId) {
+    return
+  }
+
+  const form = zone.closest('[data-event-team-form]')
+  const player = [...(form?.querySelectorAll('[data-event-team-player]') || [])]
+    .find((candidate) => candidate.dataset.memberId === memberId)
+
+  event.preventDefault()
+  zone.classList.remove('is-drop-target')
+  moveEventTeamPlayer(player, zone, getLanguage())
 })
 
 document.addEventListener('submit', (event) => {
+  const liveCodeForm = event.target.closest('[data-live-code-form]')
+
+  if (liveCodeForm) {
+    event.preventDefault()
+    handleLiveCodeSubmit(liveCodeForm)
+    return
+  }
+
+  const liveScoreForm = event.target.closest('[data-live-score-form]')
+
+  if (liveScoreForm) {
+    event.preventDefault()
+    handleLiveScoreSubmit(liveScoreForm)
+    return
+  }
+
+  const trackScoreForm = event.target.closest('[data-track-score-form]')
+
+  if (trackScoreForm) {
+    event.preventDefault()
+    handleTrackScoreSubmit(trackScoreForm)
+    return
+  }
+
   const scoreForm = event.target.closest('[data-score-form]')
 
   if (scoreForm) {
@@ -4811,6 +6551,14 @@ document.addEventListener('submit', (event) => {
     return
   }
 
+  const lessonMessageForm = event.target.closest('[data-lesson-message-form]')
+
+  if (lessonMessageForm) {
+    event.preventDefault()
+    handleLessonMessageSubmit(lessonMessageForm)
+    return
+  }
+
   const eventForm = event.target.closest('[data-event-form]')
 
   if (eventForm) {
@@ -4824,6 +6572,30 @@ document.addEventListener('submit', (event) => {
   if (eventAddPlayerForm) {
     event.preventDefault()
     handleEventAddPlayerSubmit(eventAddPlayerForm)
+    return
+  }
+
+  const eventTeamForm = event.target.closest('[data-event-team-form]')
+
+  if (eventTeamForm) {
+    event.preventDefault()
+    handleEventTeamSubmit(eventTeamForm)
+    return
+  }
+
+  const eventScoreEditForm = event.target.closest('[data-event-score-edit-form]')
+
+  if (eventScoreEditForm) {
+    event.preventDefault()
+    handleEventScoreEditSubmit(eventScoreEditForm)
+    return
+  }
+
+  const eventMessageForm = event.target.closest('[data-event-message-form]')
+
+  if (eventMessageForm) {
+    event.preventDefault()
+    handleEventMessageSubmit(eventMessageForm)
     return
   }
 
@@ -4884,6 +6656,13 @@ document.addEventListener('submit', (event) => {
 })
 
 document.addEventListener('input', (event) => {
+  const trackScoreInput = event.target.closest('[data-track-hole-score]')
+
+  if (trackScoreInput) {
+    updateTrackScorePanel(trackScoreInput.closest('[data-track-score-form], [data-live-score-form]'), getLanguage())
+    return
+  }
+
   const playerAge = event.target.closest('[data-player-age]')
 
   if (playerAge) {

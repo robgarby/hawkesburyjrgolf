@@ -53,14 +53,14 @@ export const myAccountPage = {
     {
       "route": "find-a-game",
       "label": {
-        "en": "Find a Round",
+        "en": "Rounds",
         "fr": "Trouver une ronde"
       }
     },
     {
       "route": "book-a-lesson",
       "label": {
-        "en": "Book a Lesson",
+        "en": "Lessons",
         "fr": "Réserver une leçon"
       }
     },
@@ -89,8 +89,8 @@ export const adminPanelPage = {
     "fr": "Panneau admin"
   },
   "intro": {
-    "en": "Manage accounts, roles, points, rounds, events, lessons, cash outs, and messages.",
-    "fr": "Gérez les comptes, rôles, points, rondes, événements, leçons, demandes de points et messages."
+    "en": "Accounts, roles, points, rounds, events, lessons, cash outs, and messages.",
+    "fr": "Comptes, rôles, points, rondes, événements, leçons, demandes de points et messages."
   },
   "template": "adminPanel",
   "hideFromNav": true,

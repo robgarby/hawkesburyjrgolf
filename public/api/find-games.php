@@ -271,7 +271,7 @@ function build_find_game_text_preview(
     return [
         'dryRun' => true,
         'contextLabel' => 'round',
-        'message' => $message,
+        'message' => append_text_reply_to($message),
         'recipients' => $recipients,
     ];
 }

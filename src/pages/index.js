@@ -1,6 +1,7 @@
 import { homePage } from './HomePage.js'
 import { lessonsPage } from './LessonsPage.js'
 import { loginPage } from './LoginPage.js'
+import { liveScoringPage } from './LiveScoringPage.js'
 import { contactPage } from './ContactPage.js'
 import { ourProgramPage } from './OurProgramPage.js'
 import { sponsorsPage } from './SponsorsPage.js'
@@ -22,6 +23,7 @@ export const pages = [
   lessonsPage,
   sponsorsPage,
   contactPage,
+  liveScoringPage,
   loginPage,
   myAccountPage,
   adminPanelPage,

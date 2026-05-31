@@ -32,6 +32,14 @@ export const scoresPage = {
       "en": "Enter a score",
       "fr": "Inscrire un score"
     },
+    "startRoundButton": {
+      "en": "Start Round",
+      "fr": "Commencer la ronde"
+    },
+    "hideRoundButton": {
+      "en": "Hide scorecard",
+      "fr": "Masquer la carte"
+    },
     "dateLabel": {
       "en": "Round date",
       "fr": "Date de la ronde"
@@ -409,8 +417,8 @@ export const eventsPage = {
     "fr": "Événements"
   },
   "intro": {
-    "en": "View upcoming events, see who is attending, and join instantly when spots are open. Admins and teachers can add, edit, and remove events.",
-    "fr": "Consultez les événements à venir, voyez qui participe et joignez instantanément lorsqu’il reste des places. Les admins et enseignants peuvent ajouter, modifier et supprimer les événements."
+    "en": "View upcoming events, see who is attending, and juniors can join instantly when spots are open.",
+    "fr": "Consultez les événements à venir, voyez qui participe, et les juniors peuvent joindre instantanément lorsqu’il reste des places."
   },
   "eventsTool": {
     "addTitle": {
@@ -614,11 +622,11 @@ export const findAGamePage = {
   ...accountSubPageDefaults,
   "id": "find-a-game",
   "title": {
-    "en": "Find a Round",
+    "en": "Rounds",
     "fr": "Trouver une ronde"
   },
   "heading": {
-    "en": "Find a Round",
+    "en": "Rounds",
     "fr": "Trouver une ronde"
   },
   "intro": {
@@ -743,11 +751,11 @@ export const bookALessonPage = {
   ...accountSubPageDefaults,
   "id": "book-a-lesson",
   "title": {
-    "en": "Book a Lesson",
+    "en": "Lessons",
     "fr": "Réserver une leçon"
   },
   "heading": {
-    "en": "Book a Lesson",
+    "en": "Lessons",
     "fr": "Réserver une leçon"
   },
   "intro": {

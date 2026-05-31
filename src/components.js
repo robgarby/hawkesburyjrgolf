@@ -69,6 +69,41 @@ function renderHeader({ routes, page, language, copy, isLoggedIn, member, isMemb
   `
 }
 
+function renderLiveScorePage(page, language) {
+  const copy = {
+    en: {
+      codeLabel: '4-letter code',
+      codePlaceholder: 'ABCD',
+      open: 'Open scorecard',
+      loading: 'Loading scorecard...',
+    },
+    fr: {
+      codeLabel: 'Code de 4 caractères',
+      codePlaceholder: 'ABCD',
+      open: 'Ouvrir la carte',
+      loading: 'Chargement...',
+    },
+  }[language]
+
+  return `
+    <section class="live-score-page" data-live-score-page>
+      <div class="live-score-shell">
+        <h1>${page.heading[language]}</h1>
+        <p>${page.intro[language]}</p>
+        <form class="live-code-form" data-live-code-form>
+          <label>
+            <span>${copy.codeLabel}</span>
+            <input type="text" name="code" maxlength="4" autocomplete="one-time-code" placeholder="${copy.codePlaceholder}" data-live-code-input required />
+          </label>
+          <button type="submit">${copy.open}</button>
+        </form>
+        <div class="live-score-card" data-live-score-card></div>
+        <p class="score-status" data-live-score-status aria-live="polite">${copy.loading}</p>
+      </div>
+    </section>
+  `
+}
+
 function renderMemberHeader(language, page, copy, member) {
   const logoutLabel = language === 'fr' ? 'Se déconnecter' : 'Log out'
   const fullSiteLabel = language === 'fr' ? 'Quitter le portail junior' : 'Exit Junior Portal'
@@ -257,7 +292,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
   const copy = {
     en: {
       title: 'Admin Panel',
-      helper: 'Update member profiles, contact details, roles, status, and notifications.',
       loading: 'Loading members...',
       staff: 'Staff',
       cup: 'Member',
@@ -265,7 +299,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
       inactive: 'Inactive',
       sendText: 'Send Text',
       createTitle: 'Create Account',
-      createHelper: 'Create a verified account for a junior, coach, teacher, or admin.',
       showCreate: 'Create Account',
       hideCreate: 'Hide Account Form',
       firstName: 'First Name',
@@ -277,7 +310,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
       path: 'Path',
       createAccount: 'Create Account',
       textTitle: 'Send Text',
-      textHelper: 'Live sending is on. Your monitoring number will also receive every send.',
       targetLabel: 'Send to',
       all: 'All',
       parents: 'Parents',
@@ -289,7 +321,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
     },
     fr: {
       title: 'Panneau admin',
-      helper: 'Mettez à jour les profils, coordonnées, rôles, statuts et avis.',
       loading: 'Chargement des membres...',
       staff: 'Personnel',
       cup: 'Membre',
@@ -297,7 +328,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
       inactive: 'Inactifs',
       sendText: 'Envoyer texto',
       createTitle: 'Créer un compte',
-      createHelper: 'Créez un compte vérifié pour un junior, entraîneur, enseignant ou admin.',
       showCreate: 'Créer un compte',
       hideCreate: 'Masquer le formulaire',
       firstName: 'Prénom',
@@ -309,7 +339,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
       path: 'Parcours',
       createAccount: 'Créer le compte',
       textTitle: 'Envoyer texto',
-      textHelper: 'L’envoi réel est activé. Votre numéro de surveillance recevra aussi chaque envoi.',
       targetLabel: 'Envoyer à',
       all: 'Tous',
       parents: 'Parents',
@@ -325,7 +354,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
     <section class="account-admin-panel ${isHidden ? 'is-hidden' : ''}" data-admin-panel>
       <div class="account-profile-heading">
         <h2>${copy.title}</h2>
-        <p>${copy.helper}</p>
       </div>
       <div class="admin-toolbar">
         ${canSuperAdmin ? `<button type="button" data-admin-create-toggle data-show-label="${copy.showCreate}" data-hide-label="${copy.hideCreate}" aria-expanded="false">${copy.showCreate}</button>` : ''}
@@ -336,7 +364,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
         <div class="admin-create-heading">
           <span>
             <h3>${copy.createTitle}</h3>
-            <p>${copy.createHelper}</p>
           </span>
         </div>
         <div class="form-grid two-column">
@@ -365,7 +392,6 @@ function renderAdminPanel(language, isHidden = true, member = null) {
             <div class="admin-text-heading">
               <span>
                 <h3 id="admin-text-title">${copy.textTitle}</h3>
-                <p>${copy.textHelper}</p>
               </span>
               <button type="button" data-admin-text-close aria-label="${copy.cancel}">&times;</button>
             </div>
@@ -468,8 +494,8 @@ function renderMemberPortalNavLinks(language, activeRoute = 'my-account', member
     ['scores', language === 'fr' ? 'Scores' : 'Scores'],
     ['points', language === 'fr' ? 'Points' : 'Points'],
     ['events', language === 'fr' ? 'Événements' : 'Events'],
-    ['find-a-game', language === 'fr' ? 'Trouver une ronde' : 'Find a Round'],
-    ['book-a-lesson', language === 'fr' ? 'Réserver une leçon' : 'Book a Lesson'],
+    ['find-a-game', language === 'fr' ? 'Trouver une ronde' : 'Rounds'],
+    ['book-a-lesson', language === 'fr' ? 'Réserver une leçon' : 'Lessons'],
     ['ranking', language === 'fr' ? 'Classement' : 'Ranking'],
   ]
 
@@ -1035,6 +1061,10 @@ function renderScoresTool(page, language, member) {
         <small><span data-rounds-count>0</span> ${scoreTool.roundsLabel[language]}</small>
       </aside>
       <div class="score-entry-panel">
+        <div class="score-start-round">
+          <button type="button" data-score-start-round-toggle data-show-label="${scoreTool.startRoundButton[language]}" data-hide-label="${scoreTool.hideRoundButton[language]}" aria-expanded="false">${scoreTool.startRoundButton[language]}</button>
+          <div data-score-start-round-panel></div>
+        </div>
         <form class="score-entry-form" data-score-form>
           <h2>${scoreTool.formTitle[language]}</h2>
           <div class="form-grid two-column">
@@ -1361,6 +1391,16 @@ function renderLoginPanel(page, language) {
 }
 
 export function renderPage({ routes, page, language, copy, isLoggedIn, member, isMemberPortal = false }) {
+  if (page.template === 'liveScore') {
+    return `
+      ${renderHeader({ routes, page, language, copy, isLoggedIn, member, isMemberPortal })}
+      <main>
+        ${renderLiveScorePage(page, language)}
+      </main>
+      ${renderFooter(language, isMemberPortal)}
+    `
+  }
+
   if (page.template === 'login') {
     return `
       ${renderHeader({ routes, page, language, copy, isLoggedIn, isMemberPortal })}

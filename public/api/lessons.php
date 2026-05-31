@@ -30,6 +30,8 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/textme.php';
 
+const LESSON_MESSAGE_TEXTS_ENABLED = false;
+
 if (!function_exists('is_lesson_staff_type')) {
     function is_lesson_staff_type(string $type): bool
     {
@@ -405,7 +407,7 @@ function build_lesson_text_preview(
         }
     }
 
-    return ['contextLabel' => 'lesson', 'message' => $message, 'recipients' => $recipients];
+    return ['contextLabel' => 'lesson', 'message' => append_text_reply_to($message), 'recipients' => $recipients];
 }
 
 function build_lesson_request_text_notice(
@@ -429,6 +431,51 @@ function build_lesson_request_text_notice(
         // Future recipient list: opted-in Teachers/Instructors. The shared text sender adds the monitor number.
         'recipients' => [],
     ];
+}
+
+function build_lesson_student_message_recipients(PDO $pdo, int $slotId, string $message): array
+{
+    $statement = $pdo->prepare(
+        "SELECT members.id, members.first_name, members.last_name, members.username,
+                members.parent_text, members.player_text
+         FROM member_lesson_slot_students students
+         INNER JOIN members ON members.id = students.member_id
+         WHERE students.lesson_slot_id = :slot_id
+           AND members.is_active = 1
+         ORDER BY students.created_at ASC, students.id ASC"
+    );
+    $statement->execute(['slot_id' => $slotId]);
+    $recipients = [];
+
+    foreach ($statement->fetchAll() as $member) {
+        $memberId = (int) $member['id'];
+        $name = trim((string) (($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? '')));
+        $name = $name !== '' ? $name : (string) ($member['username'] ?? 'Member');
+
+        if (trim((string) ($member['player_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'to' => $member['player_text'],
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'player',
+                'phone' => mask_text_number($member['player_text']),
+                'message' => $message,
+            ];
+        }
+
+        if (trim((string) ($member['parent_text'] ?? '')) !== '') {
+            $recipients[] = [
+                'to' => $member['parent_text'],
+                'memberId' => $memberId,
+                'name' => $name,
+                'recipientType' => 'parent',
+                'phone' => mask_text_number($member['parent_text']),
+                'message' => $message,
+            ];
+        }
+    }
+
+    return $recipients;
 }
 
 function read_age_range(): array
@@ -575,6 +622,72 @@ try {
         $delete->execute($deleteParams);
 
         send_lessons_response($pdo, $memberId, 'Lesson time removed.');
+    }
+
+    if ($action === 'send_lesson_message') {
+        if (!$canManageLessons) {
+            send_json(403, ['ok' => false, 'message' => 'Only teachers, coaches, admins, and super admins can message lesson students.']);
+        }
+
+        $slotId = filter_var($_POST['slot_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $note = trim((string) ($_POST['message'] ?? ''));
+
+        if ($slotId === false) {
+            send_json(422, ['ok' => false, 'message' => 'Please choose a valid lesson time.']);
+        }
+
+        if ($note === '') {
+            send_json(422, ['ok' => false, 'message' => 'Please enter a message to send.']);
+        }
+
+        if (strlen($note) > 1000) {
+            send_json(422, ['ok' => false, 'message' => 'Please keep lesson messages under 1000 characters.']);
+        }
+
+        $slotStatement = $pdo->prepare(
+            'SELECT id, provider_member_id, lesson_date, lesson_time, location
+             FROM member_lesson_slots
+             WHERE id = :id
+             LIMIT 1'
+        );
+        $slotStatement->execute(['id' => (int) $slotId]);
+        $slot = $slotStatement->fetch();
+
+        if (!$slot) {
+            send_json(404, ['ok' => false, 'message' => 'Lesson time not found.']);
+        }
+
+        if (
+            !in_array($memberType, ['SUPER_ADMIN', 'ADMIN'], true)
+            && (int) $slot['provider_member_id'] !== $memberId
+        ) {
+            send_json(403, ['ok' => false, 'message' => 'Only the lesson teacher, coach, admin, or super admin can message these students.']);
+        }
+
+        $messageBody = sprintf(
+            "HJG Lesson Message for %s at %s:\n\n%s",
+            (string) $slot['lesson_date'],
+            substr((string) $slot['lesson_time'], 0, 5),
+            $note
+        );
+        $recipients = build_lesson_student_message_recipients($pdo, (int) $slotId, $messageBody);
+
+        if (count($recipients) < 1) {
+            send_lessons_response($pdo, $memberId, 'No lesson text recipients found.');
+        }
+
+        if (!LESSON_MESSAGE_TEXTS_ENABLED) {
+            send_lessons_response($pdo, $memberId, 'Preview only. No lesson message texts were sent.', [
+                'dryRun' => true,
+                'contextLabel' => 'lesson',
+                'message' => append_text_reply_to($messageBody),
+                'recipients' => $recipients,
+            ]);
+        }
+
+        $textResults = send_text_messages($recipients, $messageBody);
+
+        send_lessons_response($pdo, $memberId, 'Lesson message sent.', $textResults);
     }
 
     if ($action === 'accept_request') {
